@@ -8,6 +8,12 @@ import { RootLayoutAdminComponent } from './_root/root-layout-admin.component';
 import { RootLayoutUserComponent } from './_root/root-layout-user.component';
 import { HomeComponent } from './_root/userPages/home.component';
 import { ProfileComponent } from './_root/userPages/profile.component';
+import { ResidentsComponent } from './_root/pages/residents.component';
+import { DocuComponent } from './_root/pages/docu.component';
+import { AnnouncementComponent } from './_root/pages/announcement.component';
+import { ReportsComponent } from './_root/pages/reports.component';
+import { DocumentsComponent } from './_root/userPages/documents.component';
+import { ComplaintsComponent } from './_root/userPages/complaints.component';
 
 export const routes: Routes = [
     {
@@ -27,8 +33,10 @@ export const routes: Routes = [
         children: [
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: DashboardComponent},
-            // {path: 'home', component: HomeComponent},
-            // {path: 'sign-up-information', component: SignUpInformationFormComponent},
+            {path: 'residents', component: ResidentsComponent},
+            {path: 'documents', component: DocuComponent},
+            {path: 'announcements', component: AnnouncementComponent},
+            {path: 'reports', component: ReportsComponent},
         ]
     },
 
@@ -39,7 +47,8 @@ export const routes: Routes = [
             {path: '', redirectTo: 'home', pathMatch: 'full'},
             {path: 'profile', component: ProfileComponent},
             {path: 'home', component: HomeComponent},
-            // {path: 'sign-up-information', component: SignUpInformationFormComponent},
+            {path: 'request', component: DocumentsComponent},
+            {path: 'complaints', component: ComplaintsComponent},
         ]
     },
 ];
