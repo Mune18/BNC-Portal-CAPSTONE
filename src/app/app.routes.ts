@@ -23,10 +23,12 @@ export const routes: Routes = [
             {path: '', redirectTo: 'sign-in', pathMatch: 'full'},
             {path: 'sign-in', component: SignInFormComponent},
             {path: 'sign-up', component: SignUpFormComponent},
-            {path: 'sign-up-information', component: SignUpInformationFormComponent},
         ]
     },
-
+    {
+        path: 'sign-up-information',
+        component: SignUpInformationFormComponent
+    },
     {
         path: 'admin',
         component: RootLayoutAdminComponent,
@@ -39,7 +41,6 @@ export const routes: Routes = [
             {path: 'reports', component: ReportsComponent},
         ]
     },
-
     {
         path: 'user',
         component: RootLayoutUserComponent,

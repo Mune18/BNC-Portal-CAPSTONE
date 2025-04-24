@@ -41,9 +41,6 @@ import { RouterModule } from '@angular/router';
                 <span class="flex-1 ms-3 whitespace-nowrap">Complaints & Reports</span>
               </a>
             </li>
-            <div class="mt-93">
-              <p class="text-center text-[8px] text-gray-600">Barangay New Cabalan System</p>
-            </div>
           </ul>
         </div>
       </aside>

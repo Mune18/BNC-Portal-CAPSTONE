@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root-layout-admin',
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
     <div class="flex">
       <aside id="separator-sidebar" [class.hidden]="isSidebarHidden" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0" aria-label="Sidebar">
@@ -16,38 +16,35 @@ import { RouterOutlet } from '@angular/router';
           <p class="text-center text-xs text-gray-600">Barangay New Cabalan System</p>
           <ul class="pt-4 mt-6 space-y-3 font-medium border-t border-gray-200 dark:border-gray-300">
             <li>
-              <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/dashboard']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/dashboard.png" alt="Dashboard Icon" class="w-5 h-5">
                 <span class="ms-3">Barangay Dashboard</span>
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/residents']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/teamwork.png" alt="Residents Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Residents</span>
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/documents']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/google-docs.png" alt="Document Requests Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Document Requests</span>
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/announcements']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/marketing.png" alt="Announcements Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Announcements</span>
               </a>
             </li>
             <li>
-              <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/reports']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/report.png" alt="Complaints Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Complaints & Reports</span>
               </a>
             </li>
-            <div class="mt-93">
-              <p class="text-center text-[8px] text-gray-600">Barangay New Cabalan System</p>
-            </div>
           </ul>
         </div>
       </aside>
@@ -62,17 +59,24 @@ import { RouterOutlet } from '@angular/router';
               </svg>
             </button>
 
-            <!-- Add profile dropdown -->
-            <div class="relative">
-              <button (click)="toggleProfileMenu()" class="profile-button flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-                <img src="/assets/profile-placeholder.png" alt="Profile" class="w-8 h-8 rounded-full">
-              </button>
+            <div class="flex items-center gap-4">
+              <!-- Date and Time Display -->
+              <div class="text-gray-600">
+                <span class="text-sm">{{currentDateTime | date:'EEEE, MMM d, yyyy, h:mm a'}}</span>
+              </div>
 
-              <!-- Dropdown menu -->
-              <div *ngIf="isProfileMenuOpen" class="profile-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
-                <hr class="my-1 border-gray-200">
-                <a href="#" (click)="logout()" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
+              <!-- Add profile dropdown -->
+              <div class="relative">
+                <button (click)="toggleProfileMenu()" class="profile-button flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
+                  <img src="/assets/profile-placeholder.png" alt="Profile" class="w-8 h-8 rounded-full">
+                </button>
+
+                <!-- Dropdown menu -->
+                <div *ngIf="isProfileMenuOpen" class="profile-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <a [routerLink]="['/admin/settings']" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+                  <hr class="my-1 border-gray-200">
+                  <a (click)="logout()" class="block px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer">Logout</a>
+                </div>
               </div>
             </div>
           </div>
@@ -91,9 +95,26 @@ import { RouterOutlet } from '@angular/router';
     }
   `]
 })
-export class RootLayoutAdminComponent {
+export class RootLayoutAdminComponent implements OnInit, OnDestroy {
   isSidebarHidden = false;
   isProfileMenuOpen = false;
+  currentDateTime: Date = new Date();
+  private dateTimeInterval: any;
+
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    // Update time every second
+    this.dateTimeInterval = setInterval(() => {
+      this.currentDateTime = new Date();
+    }, 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.dateTimeInterval) {
+      clearInterval(this.dateTimeInterval);
+    }
+  }
 
   toggleSidebar() {
     this.isSidebarHidden = !this.isSidebarHidden;
@@ -106,6 +127,7 @@ export class RootLayoutAdminComponent {
   logout() {
     // Implement logout logic here
     console.log('Logging out...');
+    this.router.navigate(['/sign-in']);
   }
 
   @HostListener('document:click', ['$event'])
