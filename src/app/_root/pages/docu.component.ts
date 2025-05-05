@@ -26,15 +26,31 @@ interface DocumentRequest {
 
       <!-- Actions and Search Bar -->
       <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <!-- Status Filters -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <button 
-            *ngFor="let status of ['Request', 'Approved', 'Disapproved', 'Completed']" 
-            [class]="getStatusButtonClass(status, selectedStatus)"
-            (click)="selectStatus(status)"
+        <!-- Status Dropdown -->
+        <div class="flex items-center gap-4 flex-1">
+          <div class="relative flex-1 max-w-md">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm"
+              placeholder="Search..." 
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+            <span class="absolute left-3 top-2.5 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+          </div>
+          <select 
+            [(ngModel)]="selectedStatus"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            {{ status }}
-          </button>
+            <option value="all">All Status</option>
+            <option value="Request">Request</option>
+            <option value="Approved">Approved</option>
+            <option value="Disapproved">Disapproved</option>
+            <option value="Completed">Completed</option>
+          </select>
         </div>
 
         <!-- Action Buttons -->
@@ -45,23 +61,6 @@ interface DocumentRequest {
             </svg>
             Generate List
           </button>
-        </div>
-      </div>
-
-      <!-- Search Bar -->
-      <div class="mb-6">
-        <div class="relative">
-          <input 
-            type="text" 
-            [(ngModel)]="searchTerm"
-            placeholder="Search..." 
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-          <span class="absolute left-3 top-2.5 text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </span>
         </div>
       </div>
 
