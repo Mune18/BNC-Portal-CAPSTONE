@@ -7,9 +7,9 @@ import { ResidentInfo } from './sign-up-information-form.component';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" *ngIf="show">
-      <div class="relative top-20 mx-auto p-5 border w-4/5 shadow-lg rounded-md bg-white">
-        <div class="flex flex-col h-full">
+  <div class="fixed inset-0 z-50 flex items-center justify-center" *ngIf="show">
+    <div class="relative mx-auto p-5 w-400 max-w-3xl shadow-lg rounded-md bg-white z-50">
+      <div class="flex flex-col h-full">
           <div class="flex justify-between items-center pb-3">
             <h3 class="text-xl font-bold">Review Your Information</h3>
             <button class="text-gray-400 hover:text-gray-500" (click)="onClose()">
@@ -199,4 +199,4 @@ export class ResidentInfoPreviewModalComponent {
   onConfirm() {
     this.confirm.emit();
   }
-} 
+}

@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sign-in-form',
   imports: [CommonModule],
   template: `
     <div class="flex flex-col items-center justify-center h-full">
-      <form class="w-120 h-90 max-w-m bg-white p-6 rounded-4xl shadow-md">
+      <form class="w-120 h-90 max-w-m bg-white p-6 rounded-4xl shadow-md" (ngSubmit)="onSubmit()">
         <h2 class="text-center text-2xl font-semibold mb-4">Login</h2>
         <hr class="border-t border-gray-200 mx-3 mb-4">
         <div class="mx-3 mb-4">
@@ -36,11 +37,18 @@ import { Component } from '@angular/core';
           </button>
         </div>
         <p class="text-center mt-4">
-          Don't have an account? <a href="sign-up" class="text-blue-600 hover:underline">Sign Up Now</a>
+          Don't have an account? <a href="sign-up-information" class="text-blue-600 hover:underline">Sign Up Now</a>
         </p>
       </form>
     </div>
   `,
   styles: ``
 })
-export class SignInFormComponent {}
+export class SignInFormComponent {
+  constructor(private router: Router) {}
+
+  onSubmit() {
+    // You can add authentication logic here if needed
+    this.router.navigate(['/sign-up-information']);
+  }
+}

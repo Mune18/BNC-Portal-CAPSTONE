@@ -29,12 +29,12 @@ import { RouterModule, RouterLink, RouterLinkActive, Router } from '@angular/rou
                 <span class="flex-1 ms-3 whitespace-nowrap">Home</span>
               </a>
             </li>
-            <li>
+            <!-- <li>
               <a [routerLink]="['/user/request']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/google-docs.png" alt="Document Requests Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Document Requests</span>
               </a>
-            </li>
+            </li> -->
             <li>
               <a [routerLink]="['/user/complaints']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/report.png" alt="Complaints Icon" class="w-5 h-5">

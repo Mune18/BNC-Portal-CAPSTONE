@@ -7,16 +7,69 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, CommonModule],
   template: `
-    <div class="container mx-auto px-4 py-6">
-      <!-- Header Section -->
-      <div class="mb-8">
+  <div class="container mx-auto px-4 py-6">
+    <!-- Header Section -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+      <div>
         <h1 class="text-2xl font-bold text-gray-800 mb-2">Submit a Complaint</h1>
         <p class="text-gray-600">Let us know your concerns, and we will address them as soon as possible.</p>
       </div>
+      <button
+        class="mt-4 md:mt-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        (click)="openComplaintModal()"
+      >
+        Submit Complaint
+      </button>
+    </div>
 
-      <!-- Complaint Form -->
-      <div class="bg-white shadow rounded-lg p-6 mb-8">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">New Complaint</h2>
+    <!-- Complaints List (Styled like admin reports.component.ts) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Complaints List -->
+      <div class="lg:col-span-2 flex flex-col gap-8">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900 mb-6">Your Complaints</h2>
+          <div *ngIf="complaints.length > 0; else noComplaints">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div
+                *ngFor="let complaint of complaints"
+                class="bg-white rounded-2xl shadow-lg p-8 flex flex-col justify-between relative cursor-pointer transition hover:shadow-xl"
+                (click)="viewReply(complaint)"
+              >
+                <!-- 3 dots menu removed -->
+                <div>
+                  <h3 class="text-lg font-bold text-gray-800 mb-1">{{ complaint.subject }}</h3>
+                  <p class="text-gray-600 text-sm mb-2 truncate">{{ complaint.message }}</p>
+                  <p class="text-xs text-gray-500">Submitted on {{ complaint.date | date:'medium' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noComplaints>
+            <p class="text-gray-600">You have not submitted any complaints yet.</p>
+          </ng-template>
+        </div>
+      </div>
+      <!-- Side List: (empty for user, for layout match) -->
+      <div class="flex flex-col gap-6"></div>
+    </div>
+
+    <!-- Submit Complaint Modal -->
+    <div 
+      *ngIf="showComplaintModal"
+      class="fixed inset-0 flex items-center justify-center z-50"
+    >
+      <div 
+        class="absolute inset-0 backdrop-blur-md bg-black/30"
+        (click)="closeComplaintModal()"
+      ></div>
+      <div class="bg-white rounded-lg shadow-lg p-6 relative max-w-screen-md w-full z-10">
+        <button 
+          (click)="closeComplaintModal()" 
+          class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
+        >
+          ✕
+        </button>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Submit a Complaint</h2>
         <form (submit)="submitComplaint($event)" class="space-y-4">
           <div>
             <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
@@ -52,52 +105,40 @@ import { CommonModule } from '@angular/common';
           </div>
         </form>
       </div>
+    </div>
 
-      <!-- Complaints List -->
-      <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Your Complaints</h2>
-        <div *ngIf="complaints.length > 0; else noComplaints">
-          <ul class="divide-y divide-gray-200">
-            <li *ngFor="let complaint of complaints" class="py-4">
-              <div class="flex justify-between items-center">
-                <div>
-                  <h3 class="text-lg font-medium text-gray-800">{{ complaint.subject }}</h3>
-                  <p class="text-sm text-gray-600">{{ complaint.message }}</p>
-                  <p class="text-xs text-gray-500 mt-1">Submitted on {{ complaint.date | date:'medium' }}</p>
-                </div>
-                <button 
-                  (click)="viewReply(complaint)" 
-                  class="text-blue-600 hover:text-blue-800 text-sm"
-                >
-                  View Reply
-                </button>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <ng-template #noComplaints>
-          <p class="text-gray-600">You have not submitted any complaints yet.</p>
-        </ng-template>
-      </div>
-
-      <!-- Reply Modal -->
+    <!-- Reply Modal -->
+    <div 
+      *ngIf="selectedComplaint" 
+      class="fixed inset-0 flex items-center justify-center z-50"
+    >
       <div 
-        *ngIf="selectedComplaint" 
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      >
-        <div class="bg-white rounded-lg shadow-lg p-6 relative max-w-screen-md w-full">
-          <button 
-            (click)="closeReply()" 
-            class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
-          >
-            ✕
-          </button>
-          <h2 class="text-lg font-semibold text-gray-800 mb-4">Admin Reply</h2>
-          <p class="text-sm text-gray-600">{{ selectedComplaint.reply }}</p>
+        class="absolute inset-0 backdrop-blur-md bg-white/40"
+        (click)="closeReply()"
+      ></div>
+      <div class="bg-white rounded-lg shadow-lg p-6 relative max-w-screen-md w-full z-10">
+        <button 
+          (click)="closeReply()" 
+          class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl font-bold"
+        >
+          ✕
+        </button>
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Complaint Details</h2>
+        <div class="mb-4">
+          <div class="mb-2">
+            <span class="text-xs text-gray-400">Submitted on {{ selectedComplaint.date | date:'medium' }}</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">{{ selectedComplaint.subject }}</h3>
+          <p class="text-gray-700 mb-4 whitespace-pre-line">{{ selectedComplaint.message }}</p>
+        </div>
+        <div class="border-t pt-4 mt-4">
+          <h3 class="text-base font-semibold text-gray-800 mb-2">Barangay Reply</h3>
+          <p class="text-gray-600">{{ selectedComplaint.reply }}</p>
         </div>
       </div>
     </div>
-  `,
+  </div>
+`,
   styles: [`
     .fixed {
       position: fixed;
@@ -140,6 +181,16 @@ export class ComplaintsComponent {
   };
 
   selectedComplaint: any = null;
+  showComplaintModal = false;
+
+  openComplaintModal() {
+    this.showComplaintModal = true;
+  }
+
+  closeComplaintModal() {
+    this.showComplaintModal = false;
+    this.newComplaint = { subject: '', message: '' };
+  }
 
   submitComplaint(event: Event) {
     event.preventDefault();
@@ -151,6 +202,7 @@ export class ComplaintsComponent {
         reply: 'Your complaint has been received. We will get back to you shortly.'
       });
       this.newComplaint = { subject: '', message: '' }; // Reset the form
+      this.showComplaintModal = false;
       alert('Complaint submitted successfully!');
     }
   }

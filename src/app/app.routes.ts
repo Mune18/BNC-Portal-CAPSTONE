@@ -22,7 +22,7 @@ export const routes: Routes = [
         children: [
             {path: '', redirectTo: 'sign-in', pathMatch: 'full'},
             {path: 'sign-in', component: SignInFormComponent},
-            {path: 'sign-up', component: SignUpFormComponent},
+            // {path: 'sign-up', component: SignUpFormComponent},
         ]
     },
     {
@@ -36,7 +36,7 @@ export const routes: Routes = [
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: DashboardComponent},
             {path: 'residents', component: ResidentsComponent},
-            {path: 'documents', component: DocuComponent},
+            // {path: 'documents', component: DocuComponent},
             {path: 'announcements', component: AnnouncementComponent},
             {path: 'reports', component: ReportsComponent},
         ]
@@ -48,7 +48,7 @@ export const routes: Routes = [
             {path: '', redirectTo: 'home', pathMatch: 'full'},
             {path: 'profile', component: ProfileComponent},
             {path: 'home', component: HomeComponent},
-            {path: 'request', component: DocumentsComponent},
+            // {path: 'request', component: DocumentsComponent},
             {path: 'complaints', component: ComplaintsComponent},
         ]
     },

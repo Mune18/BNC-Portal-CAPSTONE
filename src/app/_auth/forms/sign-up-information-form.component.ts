@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ResidentInfoPreviewModalComponent } from './resident-info-preview-modal.component';
 
 export interface ResidentInfo {
-  // Photo will be handled separately
   personalInfo: {
     lastName: string;
     firstName: string;
     middleName: string;
-    suffix: string;
+    suffix?: string;
     gender: string;
     birthDate: string;
     birthPlace: string;
@@ -52,13 +52,31 @@ export interface ResidentInfo {
 @Component({
   selector: 'app-sign-up-information-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ResidentInfoPreviewModalComponent],
   template: `
-    <div class="relative w-full h-screen overflow-hidden">
-      <!-- Background elements -->
+    <div class="relative w-full min-h-screen overflow-hidden">
+      <!--Start Background Animation Body-->
+      <div class="area">
+        <ul class="circles">
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
+      <!--End Background Animation Body-->
+
+      <!-- Blue circular design with logo on left -->
       <div class="absolute left-0 top-0 w-1/2 h-screen z-0">
         <div class="absolute left-0 top-0 transform w-full">
           <div class="relative w-full pt-full rounded-r-full bg-blue-800">
+            <!-- Barangay Logo -->
             <div class="absolute inset-1 flex items-center justify-center">
               <div class="w-3/4 h-3/4">
                 <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
@@ -67,489 +85,422 @@ export interface ResidentInfo {
           </div>
         </div>
       </div>
-      
+      <!-- New Light blue circle in top left corner -->
       <div class="absolute left-[-15vh] top-[-15vh] w-230 h-230 z-0">
         <div class="relative left-[-2vh] top-[-2vh] w-full h-full rounded-full bg-blue-300 opacity-25"></div>
-        <div class="absolute left-1 top-1 w-215 h-215 transform -translate-x-1 -translate-y-1 bg-blue-800 rounded-full"></div>
-        <div class="absolute left-1/2 top-1/2 w-115 h-115 transform -translate-x-1/2 -translate-y-1/2 rounded-full">
+        <div class="absolute left-1 top-1 w-215 h-215 transform -translate-x-1 -translate-y-1 bg-blue-800 rounded-full z-10"></div>
+        <div class="absolute left-1/2 top-1/2 w-115 h-115 transform -translate-x-1/2 -translate-y-1/2 rounded-full z-100">
           <img src="/assets/BNC_Portal_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
-      
-      <div class="absolute top-2 right-2 z-20">
+      <!-- City seal in top right corner -->
+      <div class="absolute top-2 right-2 z-0">
         <div class="w-25 h-25">
           <img src="/assets/Olongapo_City_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
-      
-      <!-- Form Content -->
-      <div class="absolute inset-0 flex items-center justify-center p-8 z-30">
-        <div class="w-full max-w-[90rem] bg-white rounded-xl shadow-lg p-8">
-          <!-- Main Form -->
-          <div [hidden]="showPreview" class="grid grid-cols-6 gap-8">
-            <!-- Left Column - Photo and Emergency Contact -->
-            <div class="col-span-1">
-              <!-- Photo Upload Section -->
-              <div class="mb-8">
-                <div class="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                  <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-1/2 w-1/2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-                <button class="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Upload Image
-                </button>
-              </div>
 
-              <!-- Emergency Contact -->
-              <div class="bg-gray-50 rounded-lg p-4">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Emergency Contact</h3>
-                <div class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                    <input type="text" [(ngModel)]="residentInfo.emergencyContact.fullName" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
-                    <input type="text" [(ngModel)]="residentInfo.emergencyContact.relationship" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact No.</label>
-                    <input type="tel" [(ngModel)]="residentInfo.emergencyContact.contactNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                    <textarea rows="3" [(ngModel)]="residentInfo.emergencyContact.address" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Column - Forms -->
-            <div class="col-span-5">
-              <!-- Personal Information -->
-              <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-semibold mb-6 text-gray-800">Personal Information</h3>
-                <div class="grid grid-cols-6 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.lastName" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.firstName" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.middleName" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Suffix</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.suffix" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.gender" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
-                    <input type="date" [(ngModel)]="residentInfo.personalInfo.birthDate" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Birth Place</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.birthPlace" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Age</label>
-                    <input type="number" [(ngModel)]="residentInfo.personalInfo.age" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Civil Status</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.civilStatus" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="single">Single</option>
-                      <option value="married">Married</option>
-                      <option value="widowed">Widowed</option>
-                      <option value="divorced">Divorced</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.nationality" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Religion</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.religion" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.occupation" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Contact No.</label>
-                    <input type="tel" [(ngModel)]="residentInfo.personalInfo.contactNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">PWD?</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.pwd" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">PWD ID No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.pwdIdNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Family Monthly Income</label>
-                    <input type="number" [(ngModel)]="residentInfo.personalInfo.monthlyIncome" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Indigent?</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.indigent" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Solo Parent?</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.soloParent" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Solo Parent ID No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.soloParentIdNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Senior Citizen?</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.seniorCitizen" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Senior Citizen ID No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.seniorCitizenIdNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">4ps Member?</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.fourPsMember" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Registered Voter?</label>
-                    <select [(ngModel)]="residentInfo.personalInfo.registeredVoter" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Purok No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.purokNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">House No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.houseNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Street</label>
-                    <input type="text" [(ngModel)]="residentInfo.personalInfo.street" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Other Details -->
-              <div class="bg-gray-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold mb-6 text-gray-800">Other Details</h3>
-                <div class="grid grid-cols-6 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">National ID No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.otherDetails.nationalIdNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Voter's ID No.</label>
-                    <input type="text" [(ngModel)]="residentInfo.otherDetails.votersIdNo" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Covid Status</label>
-                    <select [(ngModel)]="residentInfo.otherDetails.covidStatus" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="negative">Negative</option>
-                      <option value="positive">Positive</option>
-                      <option value="recovered">Recovered</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Vaccinated</label>
-                    <select [(ngModel)]="residentInfo.otherDetails.vaccinated" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Deceased</label>
-                    <select [(ngModel)]="residentInfo.otherDetails.deceased" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                      <option value="">Select</option>
-                      <option value="alive">Alive</option>
-                      <option value="deceased">Deceased</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Date of Registration</label>
-                    <input type="date" [(ngModel)]="residentInfo.otherDetails.dateOfRegistration" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="flex justify-end space-x-4 mt-6">
-                <button 
-                  (click)="onBack()" 
-                  class="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
-                >
-                  Back
-                </button>
-                <button 
-                  (click)="onSubmit()" 
-                  class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-                >
-                  Submit
-                </button>
-              </div>
+      <!-- Form content (blurred only when modal is open) -->
+      <div [class.blur-md]="showPreviewModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-2 sm:px-6 transition-all duration-300">
+        <form
+          [ngClass]="{
+            'w-full max-w-sm': currentStep === 1,
+            'w-full max-w-4xl': currentStep === 2
+          }"
+          class="bg-white/90 backdrop-blur-lg p-4 sm:p-8 rounded-2xl shadow-2xl h-150 flex flex-col justify-center transition-all duration-300"
+          style="overflow: hidden;"
+          (ngSubmit)="onNextOrShowPreview()"
+        >
+          <!-- Stepper Navigation -->
+          <div class="flex justify-center mb-6 sm:mb-8">
+            <div class="flex items-center">
+              <div [class.bg-blue-800]="currentStep === 1" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2 transition-colors duration-300" [class.bg-gray-300]="currentStep !== 1">1</div>
+              <span class="mr-4 font-semibold" [class.text-blue-800]="currentStep === 1">Account Info</span>
+              <div class="w-8 h-1 bg-gray-300 mx-2"></div>
+              <div [class.bg-blue-800]="currentStep === 2" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2 transition-colors duration-300" [class.bg-gray-300]="currentStep !== 2">2</div>
+              <span class="font-semibold" [class.text-blue-800]="currentStep === 2">Personal Info</span>
             </div>
           </div>
 
-          <!-- Preview Modal -->
-          <div *ngIf="showPreview" class="w-full max-w-[90rem] bg-white rounded-xl shadow-lg p-8">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-2xl font-bold text-gray-800">Review Your Information</h2>
-              <button (click)="showPreview = false" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+          <!-- Section 1: Account Info -->
+          <div *ngIf="currentStep === 1" class="flex flex-col justify-center flex-1">
+            <h2 class="text-center text-2xl font-bold mb-6">Register Account</h2>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2" for="name">Name</label>
+              <input type="text" id="name" [(ngModel)]="formData.account.name" name="name"
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">Email</label>
+              <input type="email" id="email" [(ngModel)]="formData.account.email" name="email"
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
+            </div>
+            <div class="mb-8">
+              <label class="block text-gray-700 text-sm font-semibold mb-2" for="password">Password</label>
+              <input type="password" id="password" [(ngModel)]="formData.account.password" name="password"
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
+            </div>
+            <div class="flex justify-end">
+              <button type="button" (click)="nextStep()"
+                class="bg-blue-800 hover:bg-blue-700 text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400">
+                Next
               </button>
             </div>
-            
-            <div class="grid grid-cols-6 gap-8">
-              <!-- Left Column - Photo and Emergency Contact -->
-              <div class="col-span-1">
-                <!-- Photo Preview -->
-                <div class="mb-8">
-                  <div class="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-1/2 w-1/2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+            <p class="text-center mt-4">
+              Already have an account? <a href="sign-in" class="text-blue-600 hover:underline">Login Now</a>
+            </p>
+          </div>
 
-                <!-- Emergency Contact Preview -->
-                <div class="bg-gray-50 rounded-lg p-4">
-                  <h3 class="text-lg font-semibold mb-4 text-gray-800">Emergency Contact</h3>
-                  <div class="space-y-4">
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Full Name</p>
-                      <p class="text-gray-800">{{residentInfo.emergencyContact.fullName}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Relationship</p>
-                      <p class="text-gray-800">{{residentInfo.emergencyContact.relationship}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Contact No.</p>
-                      <p class="text-gray-800">{{residentInfo.emergencyContact.contactNo}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Address</p>
-                      <p class="text-gray-800">{{residentInfo.emergencyContact.address}}</p>
-                    </div>
-                  </div>
-                </div>
+          <!-- Section 2: Personal Info (all fields from sign-up-information-form) -->
+          <div *ngIf="currentStep === 2" class="flex-1 overflow-y-auto">
+            <h2 class="text-center text-2xl font-bold mb-6">Personal Information</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.lastName" name="lastName" class="w-full border-gray-300 rounded-lg shadow-sm" required>
               </div>
-
-              <!-- Right Column - Forms -->
-              <div class="col-span-5">
-                <!-- Personal Information Preview -->
-                <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                  <h3 class="text-lg font-semibold mb-6 text-gray-800">Personal Information</h3>
-                  <div class="grid grid-cols-6 gap-4">
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Last Name</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.lastName}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">First Name</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.firstName}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Middle Name</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.middleName}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Suffix</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.suffix}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Gender</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.gender}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Birth Date</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.birthDate | date}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Birth Place</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.birthPlace}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Age</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.age}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Civil Status</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.civilStatus}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Nationality</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.nationality}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Religion</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.religion}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Occupation</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.occupation}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Contact No.</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.contactNo}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">PWD</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.pwd}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">PWD ID No.</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.pwdIdNo}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Monthly Income</p>
-                      <p class="text-gray-800">₱{{residentInfo.personalInfo.monthlyIncome}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Senior Citizen</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.seniorCitizen}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Senior Citizen ID</p>
-                      <p class="text-gray-800">{{residentInfo.personalInfo.seniorCitizenIdNo}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Address</p>
-                      <p class="text-gray-800">
-                        Purok {{residentInfo.personalInfo.purokNo}}, 
-                        {{residentInfo.personalInfo.houseNo}} {{residentInfo.personalInfo.street}}
-                      </p>
-                    </div>
-                  </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.firstName" name="firstName" class="w-full border-gray-300 rounded-lg shadow-sm" required>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Middle Name</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.middleName" name="middleName" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Suffix</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.suffix" name="suffix" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
+                <select [(ngModel)]="formData.personalInfo.gender" name="gender" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Birth Date</label>
+                <input type="date" [(ngModel)]="formData.personalInfo.birthDate" name="birthDate" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Birth Place</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.birthPlace" name="birthPlace" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+                <input type="number" [(ngModel)]="formData.personalInfo.age" name="age" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Civil Status</label>
+                <select [(ngModel)]="formData.personalInfo.civilStatus" name="civilStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="single">Single</option>
+                  <option value="married">Married</option>
+                  <option value="widowed">Widowed</option>
+                  <option value="divorced">Divorced</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Nationality</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.nationality" name="nationality" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Religion</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.religion" name="religion" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Occupation</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.occupation" name="occupation" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Contact No.</label>
+                <input type="tel" [(ngModel)]="formData.personalInfo.contactNo" name="contactNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">PWD?</label>
+                <select [(ngModel)]="formData.personalInfo.pwd" name="pwd" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">PWD ID No.</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.pwdIdNo" name="pwdIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Family Monthly Income</label>
+                <input type="number" [(ngModel)]="formData.personalInfo.monthlyIncome" name="monthlyIncome" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Indigent?</label>
+                <select [(ngModel)]="formData.personalInfo.indigent" name="indigent" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent?</label>
+                <select [(ngModel)]="formData.personalInfo.soloParent" name="soloParent" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent ID No.</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.soloParentIdNo" name="soloParentIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen?</label>
+                <select [(ngModel)]="formData.personalInfo.seniorCitizen" name="seniorCitizen" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen ID No.</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.seniorCitizenIdNo" name="seniorCitizenIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">4Ps Member?</label>
+                <select [(ngModel)]="formData.personalInfo.fourPsMember" name="fourPsMember" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Registered Voter?</label>
+                <select [(ngModel)]="formData.personalInfo.registeredVoter" name="registeredVoter" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Purok No.</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.purokNo" name="purokNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">House No.</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.houseNo" name="houseNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Street</label>
+                <input type="text" [(ngModel)]="formData.personalInfo.street" name="street" class="w-full border-gray-300 rounded-lg shadow-sm">
+              </div>
+            </div>
+            <!-- Emergency Contact -->
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+                  <input type="text" [(ngModel)]="formData.emergencyContact.fullName" name="emergencyFullName" class="w-full border-gray-300 rounded-lg shadow-sm">
                 </div>
-
-                <!-- Other Details Preview -->
-                <div class="bg-gray-50 rounded-lg p-6">
-                  <h3 class="text-lg font-semibold mb-6 text-gray-800">Other Details</h3>
-                  <div class="grid grid-cols-6 gap-4">
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">National ID No.</p>
-                      <p class="text-gray-800">{{residentInfo.otherDetails.nationalIdNo}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Voter's ID No.</p>
-                      <p class="text-gray-800">{{residentInfo.otherDetails.votersIdNo}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Covid Status</p>
-                      <p class="text-gray-800">{{residentInfo.otherDetails.covidStatus}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Vaccinated</p>
-                      <p class="text-gray-800">{{residentInfo.otherDetails.vaccinated}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Deceased</p>
-                      <p class="text-gray-800">{{residentInfo.otherDetails.deceased}}</p>
-                    </div>
-                    <div class="space-y-1">
-                      <p class="text-sm font-medium text-gray-500">Date of Registration</p>
-                      <p class="text-gray-800">{{residentInfo.otherDetails.dateOfRegistration | date}}</p>
-                    </div>
-                  </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Relationship</label>
+                  <input type="text" [(ngModel)]="formData.emergencyContact.relationship" name="emergencyRelationship" class="w-full border-gray-300 rounded-lg shadow-sm">
                 </div>
-
-                <!-- Action Buttons for Preview -->
-                <div class="flex justify-end space-x-4 mt-6">
-                  <button 
-                    (click)="showPreview = false" 
-                    class="px-6 py-2.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 font-medium transition-colors"
-                  >
-                    Edit Information
-                  </button>
-                  <button 
-                    (click)="onFinalSubmit()" 
-                    class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-                  >
-                    Confirm & Submit
-                  </button>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Contact No.</label>
+                  <input type="tel" [(ngModel)]="formData.emergencyContact.contactNo" name="emergencyContactNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Address</label>
+                  <input type="text" [(ngModel)]="formData.emergencyContact.address" name="emergencyAddress" class="w-full border-gray-300 rounded-lg shadow-sm">
                 </div>
               </div>
             </div>
+            <!-- Other Details -->
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold mb-2 text-gray-800">Other Details</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
+                  <input type="text" [(ngModel)]="formData.otherDetails.nationalIdNo" name="nationalIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
+                  <input type="text" [(ngModel)]="formData.otherDetails.votersIdNo" name="votersIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
+                  <select [(ngModel)]="formData.otherDetails.covidStatus" name="covidStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
+                    <option value="">Select</option>
+                    <option value="negative">Negative</option>
+                    <option value="positive">Positive</option>
+                    <option value="recovered">Recovered</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
+                  <select [(ngModel)]="formData.otherDetails.vaccinated" name="vaccinated" class="w-full border-gray-300 rounded-lg shadow-sm">
+                    <option value="">Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
+                  <select [(ngModel)]="formData.otherDetails.deceased" name="deceased" class="w-full border-gray-300 rounded-lg shadow-sm">
+                    <option value="">Select</option>
+                    <option value="alive">Alive</option>
+                    <option value="deceased">Deceased</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Date of Registration</label>
+                  <input type="date" [(ngModel)]="formData.otherDetails.dateOfRegistration" name="dateOfRegistration" class="w-full border-gray-300 rounded-lg shadow-sm">
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-between">
+              <button type="button" (click)="prevStep()"
+                class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400">
+                Back
+              </button>
+              <button type="submit"
+                class="bg-blue-800 hover:bg-blue-700 text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400">
+                Next
+              </button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
+
+      <!-- Modal (NOT blurred, always above) -->
+      <app-resident-info-preview-modal
+        [show]="showPreviewModal"
+        [residentInfo]="formData"
+        (close)="showPreviewModal = false"
+        (confirm)="onSubmit()"
+      ></app-resident-info-preview-modal>
     </div>
   `,
   styles: [`
-    :host {
+    .area {
+      background: #f1f5f9;
+      width: 100%;
+      height: 110vh;
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+    }
+    .circles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 96%;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .circles li {
+      position: absolute;
       display: block;
-      min-height: 100vh;
-      background-color: #f3f4f6;
+      list-style: none;
+      width: 20px;
+      height: 20px;
+      background: rgba(59, 130, 246, 0.18);
+      animation: animate 25s linear infinite;
+      bottom: -150px;
+      filter: blur(8px);
     }
-    
-    input, select, textarea {
-      padding: 0.5rem;
-      font-size: 0.875rem;
-      border: 1px solid #e5e7eb;
+    .circles li:nth-child(1) {
+      left: 25%;
+      width: 80px;
+      height: 80px;
+      animation-delay: 0s;
     }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      ring: 2px;
-      ring-color: #3b82f6;
-      border-color: #3b82f6;
+    .circles li:nth-child(2) {
+      left: 10%;
+      width: 20px;
+      height: 20px;
+      animation-delay: 2s;
+      animation-duration: 12s;
+    }
+    .circles li:nth-child(3) {
+      left: 70%;
+      width: 20px;
+      height: 20px;
+      animation-delay: 4s;
+    }
+    .circles li:nth-child(4) {
+      left: 40%;
+      width: 60px;
+      height: 60px;
+      animation-delay: 0s;
+      animation-duration: 18s;
+    }
+    .circles li:nth-child(5) {
+      left: 65%;
+      width: 20px;
+      height: 20px;
+      animation-delay: 0s;
+    }
+    .circles li:nth-child(6) {
+      left: 75%;
+      width: 110px;
+      height: 110px;
+      animation-delay: 3s;
+    }
+    .circles li:nth-child(7) {
+      left: 35%;
+      width: 150px;
+      height: 150px;
+      animation-delay: 7s;
+    }
+    .circles li:nth-child(8) {
+      left: 50%;
+      width: 25px;
+      height: 25px;
+      animation-delay: 15s;
+      animation-duration: 45s;
+    }
+    .circles li:nth-child(9) {
+      left: 20%;
+      width: 15px;
+      height: 15px;
+      animation-delay: 2s;
+      animation-duration: 35s;
+    }
+    .circles li:nth-child(10) {
+      left: 85%;
+      width: 150px;
+      height: 150px;
+      animation-delay: 0s;
+      animation-duration: 11s;
+    }
+    @keyframes animate {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+        border-radius: 0;
+      }
+      100% {
+        transform: translateY(-1000px) rotate(720deg);
+        opacity: 0;
+        border-radius: 50%;
+      }
     }
   `]
 })
 export class SignUpInformationFormComponent {
-  showPreview = false;
-  residentInfo: ResidentInfo = {
+  currentStep = 1;
+  showPreviewModal = false;
+
+  formData = {
+    account: {
+      name: '',
+      email: '',
+      password: ''
+    },
     personalInfo: {
       lastName: '',
       firstName: '',
@@ -558,7 +509,7 @@ export class SignUpInformationFormComponent {
       gender: '',
       birthDate: '',
       birthPlace: '',
-      age: 0,
+      age: 0, // changed from null to 0
       civilStatus: '',
       nationality: '',
       religion: '',
@@ -566,7 +517,7 @@ export class SignUpInformationFormComponent {
       contactNo: '',
       pwd: '',
       pwdIdNo: '',
-      monthlyIncome: 0,
+      monthlyIncome: 0, // changed from null to 0
       indigent: '',
       soloParent: '',
       soloParentIdNo: '',
@@ -596,19 +547,28 @@ export class SignUpInformationFormComponent {
 
   constructor(private router: Router) {}
 
-  onBack() {
-    this.router.navigate(['/sign-up']);
+  nextStep() {
+    this.currentStep = 2;
   }
 
+  prevStep() {
+    this.currentStep = 1;
+  }
+
+  // Change form submit handler to show modal instead of submit
+  onNextOrShowPreview() {
+    if (this.currentStep === 1) {
+      this.nextStep();
+    } else if (this.currentStep === 2) {
+      this.showPreviewModal = true;
+    }
+  }
+
+  // Called when user confirms in the modal
   onSubmit() {
-    // Show the preview
-    this.showPreview = true;
-  }
-
-  onFinalSubmit() {
-    // Here you would typically send the data to your backend
-    console.log('Final form submission:', this.residentInfo);
-    // Navigate to success page or show success message
-    this.router.navigate(['/sign-up/success']);
+    // Handle final submission, e.g., send to backend
+    this.showPreviewModal = false;
+    // You can redirect or show a success message here
+    // Example: this.router.navigate(['/some-success-page']);
   }
 }
