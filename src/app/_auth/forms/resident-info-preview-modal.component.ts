@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
-import { ResidentInfo } from './sign-up-information-form.component';
+import { ResidentInfo } from '../../shared/types/resident'; 
 
 @Component({
   selector: 'app-resident-info-preview-modal',
@@ -20,6 +20,14 @@ import { ResidentInfo } from './sign-up-information-form.component';
           </div>
 
           <div class="overflow-y-auto max-h-[70vh] px-4">
+            <!-- Profile Image Preview -->
+            <div class="flex justify-center mb-4">
+              <div class="w-32 h-32 rounded-full bg-gray-200 overflow-hidden border-4 border-blue-300">
+                <img *ngIf="residentInfo.profileImage" [src]="residentInfo.profileImage" alt="Profile Image" class="object-cover w-full h-full" />
+                <span *ngIf="!residentInfo.profileImage" class="text-gray-400 text-4xl flex items-center justify-center h-full">+</span>
+              </div>
+            </div>
+
             <!-- Personal Information -->
             <div class="mb-6">
               <h4 class="text-lg font-semibold mb-4 text-gray-800">Personal Information</h4>

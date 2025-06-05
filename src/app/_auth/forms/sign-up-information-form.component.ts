@@ -3,56 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ResidentInfoPreviewModalComponent } from './resident-info-preview-modal.component';
-
-export interface ResidentInfo {
-  personalInfo: {
-    lastName: string;
-    firstName: string;
-    middleName: string;
-    suffix?: string;
-    gender: string;
-    birthDate: string;
-    birthPlace: string;
-    age: number;
-    civilStatus: string;
-    nationality: string;
-    religion: string;
-    occupation: string;
-    contactNo: string;
-    pwd: string;
-    pwdIdNo: string;
-    monthlyIncome: number;
-    indigent: string;
-    soloParent: string;
-    soloParentIdNo: string;
-    seniorCitizen: string;
-    seniorCitizenIdNo: string;
-    fourPsMember: string;
-    registeredVoter: string;
-    purokNo: string;
-    houseNo: string;
-    street: string;
-  };
-  emergencyContact: {
-    fullName: string;
-    relationship: string;
-    contactNo: string;
-    address: string;
-  };
-  otherDetails: {
-    nationalIdNo: string;
-    votersIdNo: string;
-    covidStatus: string;
-    vaccinated: string;
-    deceased: string;
-    dateOfRegistration: string;
-  };
-}
+import { ResidentInfo } from '../../shared/types/resident';
+import { AuthService } from '../../shared/services/auth.service';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'app-sign-up-information-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ResidentInfoPreviewModalComponent],
+  imports: [CommonModule, FormsModule, ResidentInfoPreviewModalComponent,],
   template: `
     <div class="relative w-full min-h-screen overflow-hidden">
       <!--Start Background Animation Body-->
@@ -126,18 +84,18 @@ export interface ResidentInfo {
           <div *ngIf="currentStep === 1" class="flex flex-col justify-center flex-1">
             <h2 class="text-center text-2xl font-bold mb-6">Register Account</h2>
             <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-semibold mb-2" for="name">Name</label>
-              <input type="text" id="name" [(ngModel)]="formData.account.name" name="name"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
-            </div>
-            <div class="mb-4">
               <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">Email</label>
               <input type="email" id="email" [(ngModel)]="formData.account.email" name="email"
                 class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
             </div>
-            <div class="mb-8">
+            <div class="mb-4">
               <label class="block text-gray-700 text-sm font-semibold mb-2" for="password">Password</label>
               <input type="password" id="password" [(ngModel)]="formData.account.password" name="password"
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
+            </div>
+            <div class="mb-8">
+              <label class="block text-gray-700 text-sm font-semibold mb-2" for="confirmPassword">Confirm Password</label>
+              <input type="password" id="confirmPassword" [(ngModel)]="formData.account.confirmPassword" name="confirmPassword"
                 class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
             </div>
             <div class="flex justify-end">
@@ -154,144 +112,167 @@ export interface ResidentInfo {
           <!-- Section 2: Personal Info (all fields from sign-up-information-form) -->
           <div *ngIf="currentStep === 2" class="flex-1 overflow-y-auto">
             <h2 class="text-center text-2xl font-bold mb-6">Personal Information</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.lastName" name="lastName" class="w-full border-gray-300 rounded-lg shadow-sm" required>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+              <!-- Left column: Profile image at top, then fields below -->
+              <div class="flex flex-col items-center md:items-stretch col-span-1">
+                <!-- Profile image at the very top -->
+                <div class="flex flex-col items-center mb-4">
+                  <div class="w-32 h-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center mb-2 border-4 border-blue-300">
+                    <img *ngIf="formData.profileImage" [src]="formData.profileImage" alt="Profile Image" class="object-cover w-full h-full" />
+                    <span *ngIf="!formData.profileImage" class="text-gray-400 text-4xl">+</span>
+                  </div>
+                  <label class="cursor-pointer bg-blue-600 text-white px-2 py-2 rounded-lg hover:bg-blue-700 transition mb-4">
+                    Upload Profile Image
+                    <input type="file" accept="image/*" (change)="onProfileImageChange($event)" hidden>
+                  </label>
+                </div>
+                <!-- Fields below the image -->
+                <div class="flex flex-col gap-4">
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.lastName" name="lastName" class="w-full border-gray-300 rounded-lg shadow-sm" required>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.firstName" name="firstName" class="w-full border-gray-300 rounded-lg shadow-sm" required>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Middle Name</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.middleName" name="middleName" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Suffix</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.suffix" name="suffix" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                </div>
               </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.firstName" name="firstName" class="w-full border-gray-300 rounded-lg shadow-sm" required>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Middle Name</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.middleName" name="middleName" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Suffix</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.suffix" name="suffix" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
-                <select [(ngModel)]="formData.personalInfo.gender" name="gender" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Birth Date</label>
-                <input type="date" [(ngModel)]="formData.personalInfo.birthDate" name="birthDate" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Birth Place</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.birthPlace" name="birthPlace" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
-                <input type="number" [(ngModel)]="formData.personalInfo.age" name="age" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Civil Status</label>
-                <select [(ngModel)]="formData.personalInfo.civilStatus" name="civilStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="single">Single</option>
-                  <option value="married">Married</option>
-                  <option value="widowed">Widowed</option>
-                  <option value="divorced">Divorced</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Nationality</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.nationality" name="nationality" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Religion</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.religion" name="religion" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Occupation</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.occupation" name="occupation" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Contact No.</label>
-                <input type="tel" [(ngModel)]="formData.personalInfo.contactNo" name="contactNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">PWD?</label>
-                <select [(ngModel)]="formData.personalInfo.pwd" name="pwd" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">PWD ID No.</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.pwdIdNo" name="pwdIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Family Monthly Income</label>
-                <input type="number" [(ngModel)]="formData.personalInfo.monthlyIncome" name="monthlyIncome" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Indigent?</label>
-                <select [(ngModel)]="formData.personalInfo.indigent" name="indigent" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent?</label>
-                <select [(ngModel)]="formData.personalInfo.soloParent" name="soloParent" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent ID No.</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.soloParentIdNo" name="soloParentIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen?</label>
-                <select [(ngModel)]="formData.personalInfo.seniorCitizen" name="seniorCitizen" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen ID No.</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.seniorCitizenIdNo" name="seniorCitizenIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">4Ps Member?</label>
-                <select [(ngModel)]="formData.personalInfo.fourPsMember" name="fourPsMember" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Registered Voter?</label>
-                <select [(ngModel)]="formData.personalInfo.registeredVoter" name="registeredVoter" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Purok No.</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.purokNo" name="purokNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">House No.</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.houseNo" name="houseNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-              </div>
-              <div>
-                <label class="block text-gray-700 text-sm font-bold mb-2">Street</label>
-                <input type="text" [(ngModel)]="formData.personalInfo.street" name="street" class="w-full border-gray-300 rounded-lg shadow-sm">
+              <!-- Right column: The rest of the fields -->
+              <div class="md:col-span-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                  <!-- Remove the fields already placed on the left column above -->
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
+                    <select [(ngModel)]="formData.personalInfo.gender" name="gender" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Birth Date</label>
+                    <input type="date" [(ngModel)]="formData.personalInfo.birthDate" name="birthDate" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Birth Place</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.birthPlace" name="birthPlace" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+                    <input type="number" [(ngModel)]="formData.personalInfo.age" name="age" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Civil Status</label>
+                    <select [(ngModel)]="formData.personalInfo.civilStatus" name="civilStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Single">Single</option>
+                      <option value="Married">Married</option>
+                      <option value="Widowed">Widowed</option>
+                      <option value="Divorced">Divorced</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Nationality</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.nationality" name="nationality" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Religion</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.religion" name="religion" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Occupation</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.occupation" name="occupation" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Contact No.</label>
+                    <input type="tel" [(ngModel)]="formData.personalInfo.contactNo" name="contactNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">PWD?</label>
+                    <select [(ngModel)]="formData.personalInfo.pwd" name="pwd" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">PWD ID No.</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.pwdIdNo" name="pwdIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Family Monthly Income</label>
+                    <input type="number" [(ngModel)]="formData.personalInfo.monthlyIncome" name="monthlyIncome" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Indigent?</label>
+                    <select [(ngModel)]="formData.personalInfo.indigent" name="indigent" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent?</label>
+                    <select [(ngModel)]="formData.personalInfo.soloParent" name="soloParent" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent ID No.</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.soloParentIdNo" name="soloParentIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen?</label>
+                    <select [(ngModel)]="formData.personalInfo.seniorCitizen" name="seniorCitizen" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen ID No.</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.seniorCitizenIdNo" name="seniorCitizenIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">4Ps Member?</label>
+                    <select [(ngModel)]="formData.personalInfo.fourPsMember" name="fourPsMember" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Registered Voter?</label>
+                    <select [(ngModel)]="formData.personalInfo.registeredVoter" name="registeredVoter" class="w-full border-gray-300 rounded-lg shadow-sm">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Purok No.</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.purokNo" name="purokNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">House No.</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.houseNo" name="houseNo" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Street</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.street" name="street" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  </div>
+                </div>
               </div>
             </div>
             <!-- Emergency Contact -->
@@ -332,25 +313,25 @@ export interface ResidentInfo {
                   <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
                   <select [(ngModel)]="formData.otherDetails.covidStatus" name="covidStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
                     <option value="">Select</option>
-                    <option value="negative">Negative</option>
-                    <option value="positive">Positive</option>
-                    <option value="recovered">Recovered</option>
+                    <option value="Negative">Negative</option>
+                    <option value="Positive">Positive</option>
+                    <option value="Recovered">Recovered</option>
                   </select>
                 </div>
                 <div>
                   <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
                   <select [(ngModel)]="formData.otherDetails.vaccinated" name="vaccinated" class="w-full border-gray-300 rounded-lg shadow-sm">
                     <option value="">Select</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
                   </select>
                 </div>
                 <div>
                   <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
                   <select [(ngModel)]="formData.otherDetails.deceased" name="deceased" class="w-full border-gray-300 rounded-lg shadow-sm">
                     <option value="">Select</option>
-                    <option value="alive">Alive</option>
-                    <option value="deceased">Deceased</option>
+                    <option value="Alive">Alive</option>
+                    <option value="Deceased">Deceased</option>
                   </select>
                 </div>
                 <div>
@@ -380,6 +361,18 @@ export interface ResidentInfo {
         (close)="showPreviewModal = false"
         (confirm)="onSubmit()"
       ></app-resident-info-preview-modal>
+
+      <!-- Registration Success Modal -->
+      <div *ngIf="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+        <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-xs w-full">
+          <svg class="w-16 h-16 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <h2 class="text-2xl font-bold mb-2 text-center">Registration Success</h2>
+          <p class="mb-6 text-center text-gray-600">Your registration was successful!</p>
+          <button (click)="onSuccessOk()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">OK</button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -494,13 +487,15 @@ export interface ResidentInfo {
 export class SignUpInformationFormComponent {
   currentStep = 1;
   showPreviewModal = false;
+  showSuccessModal = false; // <-- Add this line
 
   formData = {
     account: {
-      name: '',
       email: '',
-      password: ''
+      password: '',
+      confirmPassword: ''
     },
+    profileImage: '', // <-- Add this line
     personalInfo: {
       lastName: '',
       firstName: '',
@@ -545,7 +540,11 @@ export class SignUpInformationFormComponent {
     }
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private userService: UserService
+  ) {}
 
   nextStep() {
     this.currentStep = 2;
@@ -565,10 +564,94 @@ export class SignUpInformationFormComponent {
   }
 
   // Called when user confirms in the modal
-  onSubmit() {
-    // Handle final submission, e.g., send to backend
-    this.showPreviewModal = false;
-    // You can redirect or show a success message here
-    // Example: this.router.navigate(['/some-success-page']);
+  async onSubmit() {
+    try {
+      // 1. Register user in Appwrite Auth
+      const authResponse = await this.authService.register({
+        email: this.formData.account.email,
+        password: this.formData.account.password,
+        confirmPassword: this.formData.account.confirmPassword
+      });
+
+      // 2. Immediately log in the user to get a session
+      await this.authService.login({
+        email: this.formData.account.email,
+        password: this.formData.account.password
+      });
+
+      // 3. Save user info in Appwrite Database (users collection)
+      const userDoc = {
+        uid: authResponse.$id,
+        email: authResponse.email,
+        role: 'resident',
+        created_at: new Date().toISOString(),
+        is_active: 'true'
+      };
+      await this.userService.createUser(userDoc);
+
+      // 4. Save resident info in residents collection
+      const residentDoc = {
+        lastName: this.formData.personalInfo.lastName,
+        firstName: this.formData.personalInfo.firstName,
+        middleName: this.formData.personalInfo.middleName,
+        suffix: this.formData.personalInfo.suffix,
+        gender: this.formData.personalInfo.gender,
+        birthDate: this.formData.personalInfo.birthDate,
+        birthPlace: this.formData.personalInfo.birthPlace,
+        age: this.formData.personalInfo.age,
+        civilStatus: this.formData.personalInfo.civilStatus,
+        nationality: this.formData.personalInfo.nationality,
+        religion: this.formData.personalInfo.religion,
+        occupation: this.formData.personalInfo.occupation,
+        contactNo: this.formData.personalInfo.contactNo,
+        pwd: this.formData.personalInfo.pwd,
+        pwdIdNo: this.formData.personalInfo.pwdIdNo,
+        monthlyIncome: this.formData.personalInfo.monthlyIncome,
+        indigent: this.formData.personalInfo.indigent,
+        soloParent: this.formData.personalInfo.soloParent,
+        soloParentIdNo: this.formData.personalInfo.soloParentIdNo,
+        seniorCitizen: this.formData.personalInfo.seniorCitizen,
+        seniorCitizenIdNo: this.formData.personalInfo.seniorCitizenIdNo,
+        fourPsMember: this.formData.personalInfo.fourPsMember,
+        registeredVoter: this.formData.personalInfo.registeredVoter,
+        purokNo: this.formData.personalInfo.purokNo,
+        houseNo: this.formData.personalInfo.houseNo,
+        street: this.formData.personalInfo.street,
+        ecFullName: this.formData.emergencyContact.fullName,
+        ecRelation: this.formData.emergencyContact.relationship,
+        ecContactNo: this.formData.emergencyContact.contactNo,
+        ecAddress: this.formData.emergencyContact.address,
+        NationalIdNo: this.formData.otherDetails.nationalIdNo,
+        votersIdNo: this.formData.otherDetails.votersIdNo,
+        covidStatus: this.formData.otherDetails.covidStatus,
+        vaccinated: this.formData.otherDetails.vaccinated,
+        deceased: this.formData.otherDetails.deceased,
+        dateOfRegistration: this.formData.otherDetails.dateOfRegistration,
+        userId: authResponse.$id // Link to user
+      };
+
+      await this.userService.createResident(residentDoc);
+
+      this.showPreviewModal = false;
+      this.showSuccessModal = true;
+      console.log('User registration successful:', authResponse); // <-- Success log
+    } catch (error) {
+      console.error('User registration failed:', error); // <-- Failure log
+    }
+  }
+
+  onProfileImageChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.formData.profileImage = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  onSuccessOk() {
+    this.router.navigate(['/user/home']); // Redirect to user home page after registration
   }
 }

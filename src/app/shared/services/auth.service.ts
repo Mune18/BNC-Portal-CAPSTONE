@@ -42,4 +42,8 @@ export class AuthService extends BaseAppwriteService {
       throw error;
     }
   }
+
+  async getAccount() {
+    return this.account.get();
+  }
 }

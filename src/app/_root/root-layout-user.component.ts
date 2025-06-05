@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../shared/services/auth.service'; // Add this import
 
 @Component({
   selector: 'app-root-layout-user',
@@ -97,7 +98,7 @@ export class RootLayoutUserComponent {
   currentDateTime: Date = new Date();
   private dateTimeInterval: any;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {} // Inject AuthService
 
   ngOnInit() {
     // Update time every second
@@ -120,9 +121,14 @@ export class RootLayoutUserComponent {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
-  logout() {
-    // Implement logout logic here
-    console.log('Logging out...');
+  async logout() {
+    try {
+      await this.authService.logout();
+      this.router.navigate(['/sign-in']);
+      console.log('Logged out successfully');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   }
 
   @HostListener('document:click', ['$event'])
