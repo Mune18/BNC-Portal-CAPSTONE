@@ -42,7 +42,8 @@ import { Router } from '@angular/router';
           <!-- Profile Header -->
           <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex items-center gap-4 mb-8">
             <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+              <img *ngIf="residentInfo && residentInfo.profileImage" [src]="residentInfo.profileImage" alt="Profile Image" class="w-full h-full object-cover">
+              <svg *ngIf="!residentInfo || !residentInfo.profileImage" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
               </svg>
             </div>

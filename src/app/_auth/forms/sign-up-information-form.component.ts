@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,11 +6,13 @@ import { ResidentInfoPreviewModalComponent } from './resident-info-preview-modal
 import { ResidentInfo } from '../../shared/types/resident';
 import { AuthService } from '../../shared/services/auth.service';
 import { UserService } from '../../shared/services/user.service';
+import { Client, Storage, ID } from 'appwrite';
+import { environment } from '../../environment/environment';
 
 @Component({
   selector: 'app-sign-up-information-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ResidentInfoPreviewModalComponent,],
+  imports: [CommonModule, FormsModule, ResidentInfoPreviewModalComponent],
   template: `
     <div class="relative w-full min-h-screen overflow-hidden">
       <!--Start Background Animation Body-->
@@ -484,10 +486,10 @@ import { UserService } from '../../shared/services/user.service';
     }
   `]
 })
-export class SignUpInformationFormComponent {
+export class SignUpInformationFormComponent implements OnInit {
   currentStep = 1;
   showPreviewModal = false;
-  showSuccessModal = false; // <-- Add this line
+  showSuccessModal = false;
 
   formData = {
     account: {
@@ -495,7 +497,7 @@ export class SignUpInformationFormComponent {
       password: '',
       confirmPassword: ''
     },
-    profileImage: '', // <-- Add this line
+    profileImage: '', // This will store the URL
     personalInfo: {
       lastName: '',
       firstName: '',
@@ -540,11 +542,59 @@ export class SignUpInformationFormComponent {
     }
   };
 
+  // Initialize the Appwrite client and storage here
+  private client = new Client()
+    .setEndpoint(environment.appwriteUrl)
+    .setProject(environment.appwriteProjectId);
+    
+  private storage = new Storage(this.client);
+
   constructor(
     private router: Router,
     private authService: AuthService,
     private userService: UserService
   ) {}
+
+  ngOnInit() {
+    // Any initialization code if needed
+  }
+
+  // Add this method to handle profile image uploads
+  async onProfileImageChange(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    try {
+      console.log('Uploading image file...', file.name);
+      
+      // Create a unique ID for the file
+      const fileId = ID.unique();
+      
+      // Upload the file to Appwrite storage
+      const uploadedFile = await this.storage.createFile(
+        environment.profileImagesBucketId,
+        fileId,
+        file
+      );
+      
+      console.log('Image uploaded successfully, fileId:', uploadedFile.$id);
+      
+      // Generate the correct URL to the file
+      const fileUrl = this.storage.getFileView(
+        environment.profileImagesBucketId,
+        uploadedFile.$id
+      );
+      
+      console.log('Generated image URL:', fileUrl.href);
+      
+      // Save the complete URL to the formData
+      this.formData.profileImage = fileUrl.href;
+      
+      console.log('Updated formData.profileImage:', this.formData.profileImage);
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+    }
+  }
 
   nextStep() {
     this.currentStep = 2;
@@ -566,6 +616,9 @@ export class SignUpInformationFormComponent {
   // Called when user confirms in the modal
   async onSubmit() {
     try {
+      console.log('Starting registration process...');
+      console.log('Using profile image URL:', this.formData.profileImage);
+      
       // 1. Register user in Appwrite Auth
       const authResponse = await this.authService.register({
         email: this.formData.account.email,
@@ -589,8 +642,11 @@ export class SignUpInformationFormComponent {
       };
       await this.userService.createUser(userDoc);
 
-      // 4. Save resident info in residents collection
+      // 4. Save resident info in residents collection with profile image
       const residentDoc = {
+        // Make sure the profileImage field is included here
+        profileImage: this.formData.profileImage || '', // Ensure it's never undefined
+        userId: authResponse.$id,
         lastName: this.formData.personalInfo.lastName,
         firstName: this.formData.personalInfo.firstName,
         middleName: this.formData.personalInfo.middleName,
@@ -626,32 +682,26 @@ export class SignUpInformationFormComponent {
         covidStatus: this.formData.otherDetails.covidStatus,
         vaccinated: this.formData.otherDetails.vaccinated,
         deceased: this.formData.otherDetails.deceased,
-        dateOfRegistration: this.formData.otherDetails.dateOfRegistration,
-        userId: authResponse.$id // Link to user
+        dateOfRegistration: this.formData.otherDetails.dateOfRegistration
       };
-
+      
+      console.log('Creating resident document with profile image:', residentDoc.profileImage);
+      
       await this.userService.createResident(residentDoc);
-
+      
+      console.log('Registration completed successfully');
+      
+      // Show success modal
       this.showPreviewModal = false;
       this.showSuccessModal = true;
-      console.log('User registration successful:', authResponse); // <-- Success log
     } catch (error) {
-      console.error('User registration failed:', error); // <-- Failure log
-    }
-  }
-
-  onProfileImageChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.formData.profileImage = e.target.result;
-      };
-      reader.readAsDataURL(input.files[0]);
+      console.error('Registration error:', error);
+      // Handle error appropriately
     }
   }
 
   onSuccessOk() {
-    this.router.navigate(['/user/home']); // Redirect to user home page after registration
+    this.showSuccessModal = false;
+    this.router.navigate(['/sign-in']);
   }
 }

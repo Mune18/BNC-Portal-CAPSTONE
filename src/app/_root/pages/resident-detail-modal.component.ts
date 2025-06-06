@@ -216,6 +216,11 @@ import { ResidentInfo } from '../../shared/types/resident';
               <p class="text-sm font-medium text-gray-500 mb-1">Date of Registration</p>
               <p>{{ formatDate((resident && resident.otherDetails ? resident.otherDetails.dateOfRegistration : '') || (resident ? resident.$createdAt : '')) }}</p>
             </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 mb-1">Deceased</p>
+              <p>{{ resident && resident.otherDetails ? resident.otherDetails.deceased || '-' : '-' }}</p>
+            </div>
+            <div>
           </div>
         </div>
         

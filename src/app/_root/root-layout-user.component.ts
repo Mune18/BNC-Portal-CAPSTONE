@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { RouterModule, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../shared/services/auth.service'; // Add this import
+import { UserService } from '../shared/services/user.service'; // Import UserService
+import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo model
 
 @Component({
   selector: 'app-root-layout-user',
@@ -65,7 +67,13 @@ import { AuthService } from '../shared/services/auth.service'; // Add this impor
             <!-- Add profile dropdown -->
             <div class="relative">
               <button (click)="toggleProfileMenu()" class="profile-button flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-                <img src="/assets/profile-placeholder.png" alt="Profile" class="w-8 h-8 rounded-full">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                  <img *ngIf="userProfile && userProfile.profileImage" [src]="userProfile.profileImage" alt="Profile" class="w-full h-full object-cover">
+                  <span *ngIf="!userProfile || !userProfile.profileImage" class="text-gray-600 font-medium">
+                    {{ userProfile && userProfile.personalInfo && userProfile.personalInfo.firstName ? 
+                       userProfile.personalInfo.firstName.charAt(0) : 'U' }}
+                  </span>
+                </div>
               </button>
 
               <!-- Dropdown menu -->
@@ -92,19 +100,30 @@ import { AuthService } from '../shared/services/auth.service'; // Add this impor
     }
   `]
 })
-export class RootLayoutUserComponent {
+export class RootLayoutUserComponent implements OnInit, OnDestroy {
   isSidebarHidden = false;
   isProfileMenuOpen = false;
   currentDateTime: Date = new Date();
   private dateTimeInterval: any;
+  userProfile: ResidentInfo | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {} // Inject AuthService
+  constructor(private router: Router, private authService: AuthService, private userService: UserService) {} // Inject AuthService and UserService
 
-  ngOnInit() {
+  async ngOnInit() {
     // Update time every second
     this.dateTimeInterval = setInterval(() => {
       this.currentDateTime = new Date();
     }, 1000);
+    
+    // Load user profile
+    try {
+      const account = await this.authService.getAccount();
+      if (account) {
+        this.userProfile = await this.userService.getUserInformation(account.$id);
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
   }
 
   ngOnDestroy() {

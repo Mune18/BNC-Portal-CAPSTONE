@@ -113,10 +113,9 @@ import { ResidentDetailModalComponent } from './resident-detail-modal.component'
               <tr *ngFor="let resident of filteredResidents" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <div class="h-10 w-10 flex-shrink-0">
-                      <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <span class="text-gray-600 font-medium">{{ resident.personalInfo.firstName.charAt(0) }}</span>
-                      </div>
+                    <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                      <img *ngIf="resident.profileImage" [src]="resident.profileImage" alt="Profile" class="w-full h-full object-cover">
+                      <span *ngIf="!resident.profileImage" class="text-gray-600 font-medium">{{ resident.personalInfo.firstName.charAt(0) }}</span>
                     </div>
                     <div class="ml-4">
                       <div class="text-sm font-medium text-gray-900">
