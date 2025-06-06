@@ -1,6 +1,14 @@
 export interface ResidentInfo {
+  // Appwrite document properties
+  $id?: string;
+  $createdAt?: string;
+  $updatedAt?: string;
+  $permissions?: string[];
+  
+  // Existing properties
   profileImage?: string;
-  role?: string; // Add this line for user/admin role
+  role?: string;
+  uid?: string;
   personalInfo: {
     lastName: string;
     firstName: string;

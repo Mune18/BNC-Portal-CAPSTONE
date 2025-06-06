@@ -14,6 +14,9 @@ import { AnnouncementComponent } from './_root/pages/announcement.component';
 import { ReportsComponent } from './_root/pages/reports.component';
 import { DocumentsComponent } from './_root/userPages/documents.component';
 import { ComplaintsComponent } from './_root/userPages/complaints.component';
+import { AuthGuard } from './shared/guards/auth.guard';
+import { AdminGuard } from './shared/guards/admin.guard';
+import { ResidentGuard } from './shared/guards/resident.guard';
 
 export const routes: Routes = [
     {
@@ -32,6 +35,7 @@ export const routes: Routes = [
     {
         path: 'admin',
         component: RootLayoutAdminComponent,
+        canActivate: [AdminGuard],
         children: [
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: DashboardComponent},
@@ -44,6 +48,7 @@ export const routes: Routes = [
     {
         path: 'user',
         component: RootLayoutUserComponent,
+        canActivate: [ResidentGuard],
         children: [
             {path: '', redirectTo: 'home', pathMatch: 'full'},
             {path: 'profile', component: ProfileComponent},
@@ -52,4 +57,9 @@ export const routes: Routes = [
             {path: 'complaints', component: ComplaintsComponent},
         ]
     },
+    // Add a catch-all route that redirects to sign-in
+    {
+        path: '**',
+        redirectTo: 'sign-in'
+    }
 ];

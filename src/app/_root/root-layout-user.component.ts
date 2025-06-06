@@ -125,9 +125,9 @@ export class RootLayoutUserComponent {
     try {
       await this.authService.logout();
       this.router.navigate(['/sign-in']);
-      console.log('Logged out successfully');
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Logout error:', error);
+      this.router.navigate(['/sign-in']);
     }
   }
 

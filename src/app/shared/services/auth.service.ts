@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import { BaseAppwriteService } from './BaseAppwrite.service';
 import { Router } from '@angular/router';
 import { LoginData, RegisterData } from '../types/auth';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService extends BaseAppwriteService {
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
+  public isLoading$ = this.isLoadingSubject.asObservable();
+
   constructor(
     router: Router
   ) {
@@ -23,12 +27,19 @@ export class AuthService extends BaseAppwriteService {
     }
   }
 
-    async login(loginData: LoginData) {
+  setLoading(isLoading: boolean) {
+    this.isLoadingSubject.next(isLoading);
+  }
+
+  async login(loginData: LoginData) {
+    this.setLoading(true);
     try {
       const response = await this.account.createEmailPasswordSession(loginData.email, loginData.password);
+      this.setLoading(false);
       return response;
     } catch (error) {
       console.error('Login error:', error);
+      this.setLoading(false);
       throw error;
     }
   }

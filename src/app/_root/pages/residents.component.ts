@@ -1,22 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-interface Resident {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  address: string;
-  contactNo: string;
-  status: 'Active' | 'Inactive' | 'Pending';
-  dateRegistered: Date;
-}
+import { AdminService } from '../../shared/services/admin.service';
+import { ResidentInfo } from '../../shared/types/resident';
+import { ResidentDetailModalComponent } from './resident-detail-modal.component';
 
 @Component({
   selector: 'app-residents',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ResidentDetailModalComponent],
   template: `
     <div class="container mx-auto px-4 py-6">
       <!-- Header Section -->
@@ -70,8 +62,32 @@ interface Resident {
         </div>
       </div>
 
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="bg-white rounded-xl shadow-sm p-8 flex justify-center">
+        <div class="flex flex-col items-center">
+          <div class="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p class="text-gray-600">Loading residents data...</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage && !isLoading" class="bg-red-50 rounded-xl shadow-sm border border-red-200 p-6 mb-6">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-red-600">{{ errorMessage }}</p>
+        </div>
+        <button 
+          (click)="loadResidents()" 
+          class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm transition"
+        >
+          Try Again
+        </button>
+      </div>
+
       <!-- Residents Table -->
-      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div *ngIf="!isLoading && !errorMessage && residents.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -99,31 +115,35 @@ interface Resident {
                   <div class="flex items-center">
                     <div class="h-10 w-10 flex-shrink-0">
                       <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <span class="text-gray-600 font-medium">{{resident.name.charAt(0)}}</span>
+                        <span class="text-gray-600 font-medium">{{ resident.personalInfo.firstName.charAt(0) }}</span>
                       </div>
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{resident.name}}</div>
-                      <div class="text-sm text-gray-500">{{resident.age}} years old • {{resident.gender}}</div>
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ resident.personalInfo.firstName }} {{ resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '.' : '' }} {{ resident.personalInfo.lastName }}
+                      </div>
+                      <div class="text-sm text-gray-500">{{ resident.personalInfo.age }} years old • {{ resident.personalInfo.gender }}</div>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{resident.address}}</div>
-                  <div class="text-sm text-gray-500">{{resident.contactNo}}</div>
+                  <div class="text-sm text-gray-900">
+                    {{ getFullAddress(resident) }}
+                  </div>
+                  <div class="text-sm text-gray-500">{{ resident.personalInfo.contactNo }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span [class]="getStatusClass(resident.status)">
-                    {{resident.status}}
+                  <span [class]="getStatusClass(resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active')">
+                    {{ resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active' }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{resident.dateRegistered | date:'MMM d, yyyy'}}
+                  {{ formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button class="text-blue-600 hover:text-blue-900 mr-3">View</button>
-                  <button class="text-gray-600 hover:text-gray-900 mr-3">Edit</button>
-                  <button class="text-red-600 hover:text-red-900">Delete</button>
+                  <button class="text-blue-600 hover:text-blue-900 mr-3" (click)="viewResident(resident)">View</button>
+                  <button class="text-gray-600 hover:text-gray-900 mr-3" (click)="editResident(resident)">Edit</button>
+                  <button class="text-red-600 hover:text-red-900" (click)="deleteResident(resident)">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -143,8 +163,9 @@ interface Resident {
           <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p class="text-sm text-gray-700">
-                Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of
-                <span class="font-medium">97</span> results
+                Showing <span class="font-medium">{{ filteredResidents.length > 0 ? 1 : 0 }}</span> to 
+                <span class="font-medium">{{ Math.min(filteredResidents.length, 10) }}</span> of
+                <span class="font-medium">{{ filteredResidents.length }}</span> results
               </p>
             </div>
             <div>
@@ -155,10 +176,10 @@ interface Resident {
                     <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </button>
-                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100">
                   1
                 </button>
-                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100">
+                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                   2
                 </button>
                 <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -175,46 +196,84 @@ interface Resident {
           </div>
         </div>
       </div>
+
+      <!-- No Results State -->
+      <div *ngIf="!isLoading && !errorMessage && filteredResidents.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p class="text-gray-600 text-lg">No residents found</p>
+        <p class="text-gray-500 text-sm mt-1">Try adjusting your search or filter criteria</p>
+      </div>
+
+      <!-- Resident Detail Modal (hidden by default) -->
+      <app-resident-detail-modal
+        [show]="showResidentModal"
+        [resident]="selectedResident"
+        (close)="closeResidentModal()"
+        (edit)="editResident($event)"
+      ></app-resident-detail-modal>
     </div>
   `,
   styles: []
 })
-export class ResidentsComponent {
+export class ResidentsComponent implements OnInit {
   searchTerm: string = '';
   statusFilter: string = 'all';
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  residents: ResidentInfo[] = [];
+  Math = Math; // Make Math available in the template
 
-  // Sample data - replace with actual data from your service
-  residents: Resident[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      age: 35,
-      gender: 'Male',
-      address: '123 Purok 1, New Cabalan',
-      contactNo: '+63 912 345 6789',
-      status: 'Active',
-      dateRegistered: new Date('2024-01-15')
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      age: 28,
-      gender: 'Female',
-      address: '456 Purok 2, New Cabalan',
-      contactNo: '+63 923 456 7890',
-      status: 'Pending',
-      dateRegistered: new Date('2024-02-20')
-    },
-    // Add more sample data as needed
-  ];
+  showResidentModal: boolean = false;
+  selectedResident: ResidentInfo | null = null;
+
+  constructor(private adminService: AdminService) {}
+
+  ngOnInit() {
+    this.loadResidents();
+  }
+
+  async loadResidents() {
+    this.isLoading = true;
+    this.errorMessage = '';
+    try {
+      this.residents = await this.adminService.getAllResidents();
+    } catch (error) {
+      console.error('Failed to load residents:', error);
+      this.errorMessage = 'Failed to load residents. Please try again.';
+    } finally {
+      this.isLoading = false;
+    }
+  }
 
   get filteredResidents() {
     return this.residents.filter(resident => {
-      const matchesSearch = resident.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                          resident.address.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const matchesStatus = this.statusFilter === 'all' || resident.status === this.statusFilter;
+      // Search by name, address, contact number
+      const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName} ${resident.personalInfo.lastName}`;
+      const address = this.getFullAddress(resident);
+      
+      const matchesSearch = 
+        fullName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        address.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        resident.personalInfo.contactNo.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      // Filter by status (active/deceased)
+      const status = resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active';
+      const matchesStatus = this.statusFilter === 'all' || 
+                            (this.statusFilter === 'Active' && status === 'Active') ||
+                            (this.statusFilter === 'Inactive' && status === 'Deceased');
+      
       return matchesSearch && matchesStatus;
     });
+  }
+
+  getFullAddress(resident: ResidentInfo): string {
+    const parts = [];
+    if (resident.personalInfo.houseNo) parts.push(resident.personalInfo.houseNo);
+    if (resident.personalInfo.street) parts.push(resident.personalInfo.street);
+    if (resident.personalInfo.purokNo) parts.push(`Purok ${resident.personalInfo.purokNo}`);
+    return parts.join(', ') + ', New Cabalan';
   }
 
   getStatusClass(status: string): string {
@@ -222,12 +281,49 @@ export class ResidentsComponent {
     switch (status) {
       case 'Active':
         return baseClasses + 'bg-green-100 text-green-800';
-      case 'Inactive':
+      case 'Deceased':
         return baseClasses + 'bg-gray-100 text-gray-800';
       case 'Pending':
         return baseClasses + 'bg-yellow-100 text-yellow-800';
       default:
         return baseClasses + 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return '-';
+    }
+  }
+
+  viewResident(resident: ResidentInfo) {
+    this.selectedResident = resident;
+    this.showResidentModal = true;
+  }
+
+  closeResidentModal() {
+    this.showResidentModal = false;
+    this.selectedResident = null;
+  }
+
+  editResident(resident: ResidentInfo) {
+    console.log('Edit resident:', resident);
+    // Implement edit functionality
+  }
+
+  deleteResident(resident: ResidentInfo) {
+    if (confirm(`Are you sure you want to delete ${resident.personalInfo.firstName} ${resident.personalInfo.lastName}?`)) {
+      console.log('Delete resident:', resident);
+      // Implement delete functionality
     }
   }
 }
