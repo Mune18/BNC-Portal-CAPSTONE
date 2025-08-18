@@ -57,4 +57,12 @@ export class AuthService extends BaseAppwriteService {
   async getAccount() {
     return this.account.get();
   }
+
+  getSession() {
+    return this.account.getSession('current');
+  }
+
+  deleteSession(sessionId: string) {
+    return this.account.deleteSession(sessionId);
+  }
 }

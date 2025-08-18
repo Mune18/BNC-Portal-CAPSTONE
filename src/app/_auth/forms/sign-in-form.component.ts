@@ -68,7 +68,19 @@ export class SignInFormComponent {
   async onSubmit() {
     this.errorMessage = '';
     try {
-      // 1. Login and get session
+      // First check if there's an active session and delete it
+      try {
+        const currentSession = await this.authService.getSession();
+        if (currentSession) {
+          await this.authService.deleteSession(currentSession.$id);
+          console.log('Deleted existing session before login');
+        }
+      } catch (sessionError) {
+        // No active session, which is fine
+        console.log('No active session found, proceeding with login');
+      }
+
+      // Now proceed with the login
       await this.authService.login(this.loginData);
 
       // 2. Get current user info from Appwrite

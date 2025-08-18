@@ -626,13 +626,13 @@ export class SignUpInformationFormComponent implements OnInit {
         confirmPassword: this.formData.account.confirmPassword
       });
 
-      // 2. Immediately log in the user to get a session
-      await this.authService.login({
-        email: this.formData.account.email,
-        password: this.formData.account.password
-      });
+      // REMOVE THIS CODE - Do not login automatically
+      // await this.authService.login({
+      //   email: this.formData.account.email,
+      //   password: this.formData.account.password
+      // });
 
-      // 3. Save user info in Appwrite Database (users collection)
+      // 2. Save user info in Appwrite Database (users collection)
       const userDoc = {
         uid: authResponse.$id,
         email: authResponse.email,
@@ -642,10 +642,10 @@ export class SignUpInformationFormComponent implements OnInit {
       };
       await this.userService.createUser(userDoc);
 
-      // 4. Save resident info in residents collection with profile image
+      // 3. Save resident info in residents collection with profile image
       const residentDoc = {
         // Make sure the profileImage field is included here
-        profileImage: this.formData.profileImage || '', // Ensure it's never undefined
+        profileImage: this.formData.profileImage || '', 
         userId: authResponse.$id,
         lastName: this.formData.personalInfo.lastName,
         firstName: this.formData.personalInfo.firstName,
