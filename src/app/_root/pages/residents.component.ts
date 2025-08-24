@@ -121,7 +121,9 @@ import { ResidentDetailModalComponent } from './resident-detail-modal.component'
                       <div class="text-sm font-medium text-gray-900">
                         {{ resident.personalInfo.firstName }} {{ resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '.' : '' }} {{ resident.personalInfo.lastName }}
                       </div>
-                      <div class="text-sm text-gray-500">{{ resident.personalInfo.age }} years old • {{ resident.personalInfo.gender }}</div>
+                      <div class="text-sm text-gray-500">
+                        {{ calculateAge(resident.personalInfo.birthDate) }} years old • {{ resident.personalInfo.gender }}
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -324,5 +326,17 @@ export class ResidentsComponent implements OnInit {
       console.log('Delete resident:', resident);
       // Implement delete functionality
     }
+  }
+
+  calculateAge(birthDate: string): number | string {
+    if (!birthDate) return '-';
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : '-';
   }
 }

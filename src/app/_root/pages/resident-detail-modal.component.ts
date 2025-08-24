@@ -35,7 +35,9 @@ import { ResidentInfo } from '../../shared/types/resident';
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
               <div>
                 <span class="text-gray-500 text-sm">Age:</span>
-                <span class="ml-2">{{ resident && resident.personalInfo ? resident.personalInfo.age : '-' }} years old</span>
+                <span class="ml-2">
+                  {{ resident && resident.personalInfo ? calculateAge(resident.personalInfo.birthDate) : '-' }} years old
+                </span>
               </div>
               <div>
                 <span class="text-gray-500 text-sm">Gender:</span>
@@ -290,5 +292,17 @@ export class ResidentDetailModalComponent {
     if (this.resident) {
       this.edit.emit(this.resident);
     }
+  }
+
+  calculateAge(birthDate: string): number | string {
+    if (!birthDate) return '-';
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : '-';
   }
 }

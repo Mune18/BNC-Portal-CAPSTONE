@@ -103,7 +103,9 @@ import { Router } from '@angular/router';
               </div>
               <div>
                 <div class="text-gray-500 text-xs mb-1">Age</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.personalInfo.age : '-' }}</div>
+                <div class="text-gray-900 font-medium">
+                  {{ residentInfo ? calculateAge(residentInfo.personalInfo.birthDate) : '-' }}
+                </div>
               </div>
               <div>
                 <div class="text-gray-500 text-xs mb-1">Civil Status</div>
@@ -589,5 +591,17 @@ export class ProfileComponent implements OnInit {
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  calculateAge(birthDate: string): number | string {
+    if (!birthDate) return '-';
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : '-';
   }
 }

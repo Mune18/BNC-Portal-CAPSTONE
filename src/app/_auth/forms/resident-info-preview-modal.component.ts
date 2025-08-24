@@ -50,7 +50,7 @@ import { ResidentInfo } from '../../shared/types/resident';
                 </div>
                 <div>
                   <p class="text-sm font-medium text-gray-500">Age</p>
-                  <p class="text-base">{{ residentInfo.personalInfo.age }}</p>
+                  <p class="text-base">{{ calculateAge(residentInfo.personalInfo.birthDate) }}</p>
                 </div>
                 <div>
                   <p class="text-sm font-medium text-gray-500">Civil Status</p>
@@ -206,5 +206,17 @@ export class ResidentInfoPreviewModalComponent {
 
   onConfirm() {
     this.confirm.emit();
+  }
+
+  calculateAge(birthDate: string): number | string {
+    if (!birthDate) return '-';
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : '-';
   }
 }

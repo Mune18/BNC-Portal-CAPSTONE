@@ -169,10 +169,6 @@ import { environment } from '../../environment/environment';
                     <input type="text" [(ngModel)]="formData.personalInfo.birthPlace" name="birthPlace" class="w-full border-gray-300 rounded-lg shadow-sm">
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
-                    <input type="number" [(ngModel)]="formData.personalInfo.age" name="age" class="w-full border-gray-300 rounded-lg shadow-sm">
-                  </div>
-                  <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Civil Status</label>
                     <select [(ngModel)]="formData.personalInfo.civilStatus" name="civilStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
                       <option value="">Select</option>
@@ -497,7 +493,7 @@ export class SignUpInformationFormComponent implements OnInit {
       password: '',
       confirmPassword: ''
     },
-    profileImage: '', // This will store the URL
+    profileImage: '',
     personalInfo: {
       lastName: '',
       firstName: '',
@@ -506,7 +502,7 @@ export class SignUpInformationFormComponent implements OnInit {
       gender: '',
       birthDate: '',
       birthPlace: '',
-      age: 0, // changed from null to 0
+      age: 0,
       civilStatus: '',
       nationality: '',
       religion: '',
@@ -514,7 +510,7 @@ export class SignUpInformationFormComponent implements OnInit {
       contactNo: '',
       pwd: '',
       pwdIdNo: '',
-      monthlyIncome: 0, // changed from null to 0
+      monthlyIncome: 0,
       indigent: '',
       soloParent: '',
       soloParentIdNo: '',
@@ -654,7 +650,7 @@ export class SignUpInformationFormComponent implements OnInit {
         gender: this.formData.personalInfo.gender,
         birthDate: this.formData.personalInfo.birthDate,
         birthPlace: this.formData.personalInfo.birthPlace,
-        age: this.formData.personalInfo.age,
+        // REMOVE: age: this.formData.personalInfo.age,
         civilStatus: this.formData.personalInfo.civilStatus,
         nationality: this.formData.personalInfo.nationality,
         religion: this.formData.personalInfo.religion,
