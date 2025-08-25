@@ -12,6 +12,7 @@ import { ResidentsComponent } from './_root/pages/residents.component';
 import { DocuComponent } from './_root/pages/docu.component';
 import { AnnouncementComponent } from './_root/pages/announcement.component';
 import { ReportsComponent } from './_root/pages/reports.component';
+import { ResidentUpdateRequestsComponent } from './_root/pages/resident-update-requests.component';
 import { DocumentsComponent } from './_root/userPages/documents.component';
 import { ComplaintsComponent } from './_root/userPages/complaints.component';
 import { AuthGuard } from './shared/guards/auth.guard';
@@ -40,6 +41,7 @@ export const routes: Routes = [
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: DashboardComponent},
             {path: 'residents', component: ResidentsComponent},
+            {path: 'update-requests', component: ResidentUpdateRequestsComponent},
             // {path: 'documents', component: DocuComponent},
             {path: 'announcements', component: AnnouncementComponent},
             {path: 'reports', component: ReportsComponent},

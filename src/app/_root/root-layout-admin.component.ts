@@ -28,6 +28,12 @@ import { AuthService } from '../shared/services/auth.service';
                 <span class="flex-1 ms-3 whitespace-nowrap">Residents</span>
               </a>
             </li>
+            <li>
+              <a [routerLink]="['/admin/update-requests']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+                <img src="/assets/request.png" alt="Update Requests Icon" class="w-5 h-5">
+                <span class="flex-1 ms-3 whitespace-nowrap">Information Requests</span>
+              </a>
+            </li>
             <!-- <li>
               <a [routerLink]="['/admin/documents']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/google-docs.png" alt="Document Requests Icon" class="w-5 h-5">

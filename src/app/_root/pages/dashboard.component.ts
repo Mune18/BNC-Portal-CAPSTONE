@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { AdminService } from '../../shared/services/admin.service';
 import { AnnouncementService } from '../../shared/services/announcement.service';
 import { ComplaintService } from '../../shared/services/complaint.service';
+import { ResidentUpdateService } from '../../shared/services/resident-update.service';
 import { ResidentInfo } from '../../shared/types/resident';
 import { Announcement } from '../../shared/types/announcement';
 import { Complaint } from '../../shared/types/complaint';
@@ -56,6 +57,21 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
               <div class="ml-4">
                 <h2 class="text-lg font-semibold text-gray-800">Active Announcements</h2>
                 <p class="text-gray-600 text-2xl font-bold">{{ activeAnnouncements }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Update Requests -->
+          <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/update-requests']">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h2 class="text-lg font-semibold text-gray-800">Pending Update Requests</h2>
+                <p class="text-gray-600 text-2xl font-bold">{{ pendingUpdateRequests }}</p>
               </div>
             </div>
           </div>
@@ -260,6 +276,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   totalResidents = 0;
   activeAnnouncements = 0;
   pendingComplaints = 0;
+  pendingUpdateRequests = 0;
   newResidentsLastMonth = 0;
 
   // Recent data
@@ -286,7 +303,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private adminService: AdminService,
     private announcementService: AnnouncementService,
-    private complaintService: ComplaintService
+    private complaintService: ComplaintService,
+    private residentUpdateService: ResidentUpdateService
   ) {}
 
   async ngOnInit() {
@@ -295,7 +313,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       await Promise.all([
         this.loadResidents(),
         this.loadAnnouncements(),
-        this.loadComplaints()
+        this.loadComplaints(),
+        this.loadUpdateRequests()
       ]);
     } catch (error) {
       console.error('Error initializing dashboard:', error);
@@ -407,6 +426,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         .slice(0, 5);
     } catch (error) {
       console.error('Error loading complaints:', error);
+    }
+  }
+
+  private async loadUpdateRequests() {
+    try {
+      const updateRequests = await this.residentUpdateService.getAllUpdateRequests();
+      this.pendingUpdateRequests = updateRequests.filter(request => 
+        request.status === 'pending'
+      ).length;
+    } catch (error) {
+      console.error('Error loading update requests:', error);
     }
   }
 

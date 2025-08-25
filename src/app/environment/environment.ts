@@ -9,6 +9,7 @@ export const environment = {
   complaintsCollectionId: '67dd9d76000e155e3b15',
   announcementCollectionId: '67dd9d62003e0b3730dd',
   documentsCollectionId: '67dd9d580012329950fc',
+  residentUpdatesCollectionId: '68ab623a002fc1251d32',
   profileImagesBucketId: 'profile_images',
   platform: 'web'
 };
