@@ -33,13 +33,13 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
     </div>
 
     <!-- Complaints List -->
-    <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div *ngIf="!loading" class="grid grid-cols-1 gap-8">
       <!-- Main Complaints List -->
-      <div class="lg:col-span-2 flex flex-col gap-8">
+      <div class="flex flex-col gap-8">
         <div>
           <h2 class="text-xl font-bold text-gray-900 mb-6">Your Complaints</h2>
           <div *ngIf="complaints.length > 0; else noComplaints">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div
                 *ngFor="let complaint of complaints"
                 class="bg-white rounded-2xl shadow-lg p-8 flex flex-col justify-between relative cursor-pointer transition hover:shadow-xl"
@@ -73,8 +73,6 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
           </ng-template>
         </div>
       </div>
-      <!-- Side List: (empty for user, for layout match) -->
-      <div class="flex flex-col gap-6"></div>
     </div>
 
     <!-- Submit Complaint Modal -->
@@ -173,6 +171,35 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Success Notification Modal -->
+    <div 
+      *ngIf="showSuccessNotification"
+      class="fixed inset-0 flex items-center justify-center z-50"
+    >
+      <div 
+        class="absolute inset-0 backdrop-blur-md bg-black/30"
+        (click)="closeSuccessNotification()"
+      ></div>
+      <div class="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md z-10">
+        <div class="text-center">
+          <!-- Success icon -->
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Success!</h3>
+          <p class="text-gray-600 mb-6">{{ notificationMessage }}</p>
+          <button
+            (click)="closeSuccessNotification()"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            OK
+          </button>
+        </div>
       </div>
     </div>
 
@@ -287,6 +314,10 @@ export class ComplaintsComponent implements OnInit {
 
   selectedComplaint: Complaint | null = null;
   showComplaintModal = false;
+  
+  // New properties for custom notification
+  showSuccessNotification = false;
+  notificationMessage = '';
 
   constructor(
     private complaintService: ComplaintService,
@@ -344,7 +375,7 @@ export class ComplaintsComponent implements OnInit {
     event.preventDefault();
     
     if (!this.newComplaint.subject.trim() || !this.newComplaint.description.trim() || !this.newComplaint.category) {
-      alert('Please fill in all required fields');
+      this.showNotification('Please fill in all required fields');
       return;
     }
     
@@ -378,16 +409,28 @@ export class ComplaintsComponent implements OnInit {
         // Reload complaints
         await this.loadComplaints();
         
-        alert('Your complaint has been submitted successfully');
+        // Show success notification instead of alert
+        this.showNotification('Your complaint has been submitted successfully');
       } else {
-        alert('Failed to submit complaint. Please try again.');
+        this.showNotification('Failed to submit complaint. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting complaint:', error);
-      alert('An error occurred while submitting your complaint');
+      this.showNotification('An error occurred while submitting your complaint');
     } finally {
       this.isSubmitting = false;
     }
+  }
+
+  // New method to show custom notifications
+  showNotification(message: string) {
+    this.notificationMessage = message;
+    this.showSuccessNotification = true;
+  }
+
+  // Method to close the notification
+  closeSuccessNotification() {
+    this.showSuccessNotification = false;
   }
 
   viewReply(complaint: Complaint) {
