@@ -634,7 +634,7 @@ export class SignUpInformationFormComponent implements OnInit {
         email: authResponse.email,
         role: 'resident',
         created_at: new Date().toISOString(),
-        is_active: 'true'
+        is_active: true  // Changed from 'true' string to true boolean
       };
       await this.userService.createUser(userDoc);
 
