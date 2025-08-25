@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 import { ComplaintService } from '../../shared/services/complaint.service';
 import { Complaint, ComplaintStatus } from '../../shared/types/complaint';
 import { UserService } from '../../shared/services/user.service';
 import { ResidentInfo } from '../../shared/types/resident';
-import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [FormsModule, CommonModule, StatusFormatPipe],
+  imports: [CommonModule, FormsModule, StatusFormatPipe],
   template: `
     <div class="container mx-auto px-4 py-6">
       <!-- Loading Indicator -->
@@ -30,7 +30,7 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
             <select 
               [(ngModel)]="statusFilter" 
               (change)="applyFilters()"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -41,7 +41,7 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
             <select 
               [(ngModel)]="categoryFilter" 
               (change)="applyFilters()"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
             >
               <option value="all">All Categories</option>
               <option value="complaint">Complaints</option>
@@ -265,10 +265,98 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
           </div>
         </div>
       </div>
+
+      <!-- Custom Notification Modal -->
+      <div 
+        *ngIf="showNotificationModal"
+        class="fixed inset-0 flex items-center justify-center z-50"
+      >
+        <div 
+          class="absolute inset-0 backdrop-blur-md bg-black/30"
+          (click)="closeNotification()"
+        ></div>
+        <div class="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md z-10">
+          <div class="text-center">
+            <!-- Success icon without the green background strip -->
+            <div class="mx-auto flex items-center justify-center mb-4">
+              <svg *ngIf="notificationType === 'success'" class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <svg *ngIf="notificationType === 'error'" class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">
+              {{ notificationType === 'success' ? 'Success!' : 'Error' }}
+            </h3>
+            <p class="text-gray-600 mb-6">{{ notificationMessage }}</p>
+            <button
+              (click)="closeNotification()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Delete Confirmation Modal -->
+      <div 
+        *ngIf="showDeleteConfirmation"
+        class="fixed inset-0 flex items-center justify-center z-50"
+      >
+        <div 
+          class="absolute inset-0 backdrop-blur-md bg-black/30"
+          (click)="cancelDelete()"
+        ></div>
+        <div class="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md z-10">
+          <div class="text-center">
+            <div class="mx-auto flex items-center justify-center mb-4">
+              <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Confirm Deletion</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to delete this complaint?</p>
+            <div class="flex justify-center space-x-4">
+              <button
+                (click)="cancelDelete()"
+                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                (click)="confirmDelete()"
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
-    /* Custom styles if needed */
+    .fixed {
+      position: fixed;
+    }
+    .inset-0 {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+    .z-50 {
+      z-index: 50;
+    }
+    select {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>');
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem; /* Ensure space for the arrow */
+    }
   `]
 })
 export class ReportsComponent implements OnInit {
@@ -294,11 +382,20 @@ export class ReportsComponent implements OnInit {
     { value: 'rejected', label: 'Rejected' }
   ];
 
+  // Notification system properties
+  showNotificationModal = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' = 'success';
+  
+  // New delete confirmation properties
+  showDeleteConfirmation = false;
+  complaintToDeleteId: string | null = null;
+  
   constructor(
     private complaintService: ComplaintService,
     private userService: UserService
   ) {}
-
+  
   async ngOnInit() {
     await this.loadComplaints();
   }
@@ -366,17 +463,40 @@ export class ReportsComponent implements OnInit {
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
-  async deleteComplaint(id: string) {
-    if (confirm('Are you sure you want to delete this complaint?')) {
+  // UPDATED: Start deletion process with confirmation
+  deleteComplaint(id: string) {
+    this.complaintToDeleteId = id;
+    this.showDeleteConfirmation = true;
+  }
+  
+  // NEW: Cancel deletion
+  cancelDelete() {
+    this.showDeleteConfirmation = false;
+    this.complaintToDeleteId = null;
+  }
+  
+  // NEW: Confirm and execute deletion
+  async confirmDelete() {
+    if (!this.complaintToDeleteId) return;
+    
+    const id = this.complaintToDeleteId;
+    this.showDeleteConfirmation = false;
+    this.complaintToDeleteId = null;
+    
+    try {
       const success = await this.complaintService.deleteComplaint(id);
       if (success) {
         this.complaints = this.complaints.filter(c => c.$id !== id);
         this.applyFilters();
         if (this.openMenuId === id) this.openMenuId = null;
         if (this.selectedComplaint && this.selectedComplaint.$id === id) this.selectedComplaint = null;
+        this.showSuccessNotification('Complaint deleted successfully.');
       } else {
-        alert('Failed to delete complaint.');
+        this.showErrorNotification('Failed to delete complaint.');
       }
+    } catch (error) {
+      console.error('Error deleting complaint:', error);
+      this.showErrorNotification('An error occurred while deleting the complaint.');
     }
   }
 
@@ -413,19 +533,35 @@ export class ReportsComponent implements OnInit {
           this.applyFilters();
         }
         
-        alert('Complaint updated successfully.');
+        this.showSuccessNotification('Complaint updated successfully.');
         this.selectedComplaint = null;
       } else {
-        alert('Failed to update complaint.');
+        this.showErrorNotification('Failed to update complaint.');
       }
     } catch (error) {
       console.error('Error updating complaint:', error);
-      alert('An error occurred while updating the complaint.');
+      this.showErrorNotification('An error occurred while updating the complaint.');
     } finally {
       this.isSubmitting = false;
     }
   }
 
+  showSuccessNotification(message: string) {
+    this.notificationType = 'success';
+    this.notificationMessage = message;
+    this.showNotificationModal = true;
+  }
+  
+  showErrorNotification(message: string) {
+    this.notificationType = 'error';
+    this.notificationMessage = message;
+    this.showNotificationModal = true;
+  }
+  
+  closeNotification() {
+    this.showNotificationModal = false;
+  }
+  
   getResidentName(userId: string): string {
     return this.residentMap[userId] || 'Unknown Resident';
   }
