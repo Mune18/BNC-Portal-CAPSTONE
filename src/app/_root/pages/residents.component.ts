@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../shared/services/admin.service';
 import { ResidentInfo } from '../../shared/types/resident';
@@ -53,12 +53,92 @@ import { ResidentDetailModalComponent } from './resident-detail-modal.component'
             </svg>
             Add New Resident
           </button>
-          <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Export
-          </button>
+          
+          <!-- Export Dropdown -->
+          <div class="relative">
+            <button 
+              (click)="toggleExportDropdown()"
+              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <!-- Export Dropdown Menu -->
+            <div *ngIf="showExportDropdown" class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+              <div class="p-3 border-b border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-800">Export Residents Data</h3>
+                <p class="text-xs text-gray-600 mt-1">Choose your export options</p>
+              </div>
+              
+              <div class="p-3 space-y-2">
+                <!-- Loading state -->
+                <div *ngIf="isExporting" class="text-center py-4">
+                  <div class="inline-flex items-center text-sm text-gray-600">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Preparing export...
+                  </div>
+                </div>
+                
+                <!-- Export options -->
+                <div *ngIf="!isExporting">
+                  <!-- Export All -->
+                  <div class="border-b border-gray-100 pb-2">
+                    <p class="text-xs font-medium text-gray-700 mb-2">Export Scope</p>
+                    <button 
+                      (click)="exportResidents('all', 'csv')"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Export All Residents ({{ residents.length }}) - CSV
+                    </button>
+                    <button 
+                      (click)="exportResidents('filtered', 'csv')"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                      </svg>
+                      Export Filtered Results ({{ filteredResidents.length }}) - CSV
+                    </button>
+                  </div>
+                  
+                  <!-- PDF Options -->
+                  <div>
+                    <p class="text-xs font-medium text-gray-700 mb-2">PDF Reports</p>
+                    <button 
+                      (click)="exportResidents('all', 'pdf')"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      Official Report - All Residents (PDF)
+                    </button>
+                    <button 
+                      (click)="exportResidents('filtered', 'pdf')"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      Official Report - Filtered (PDF)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -236,11 +316,24 @@ export class ResidentsComponent implements OnInit {
 
   showResidentModal: boolean = false;
   selectedResident: ResidentInfo | null = null;
+  
+  // Export related properties
+  showExportDropdown: boolean = false;
+  isExporting: boolean = false;
 
   constructor(private adminService: AdminService) {}
 
   ngOnInit() {
     this.loadResidents();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const exportButton = target.closest('.relative');
+    if (!exportButton && this.showExportDropdown) {
+      this.closeExportDropdown();
+    }
   }
 
   async loadResidents() {
@@ -346,5 +439,211 @@ export class ResidentsComponent implements OnInit {
       age--;
     }
     return age >= 0 ? age : '-';
+  }
+
+  // Export functionality
+  toggleExportDropdown() {
+    this.showExportDropdown = !this.showExportDropdown;
+  }
+
+  closeExportDropdown() {
+    this.showExportDropdown = false;
+  }
+
+  async exportResidents(scope: 'all' | 'filtered', format: 'csv' | 'pdf') {
+    if (this.isExporting) return;
+    
+    this.isExporting = true;
+    this.closeExportDropdown();
+    
+    try {
+      const dataToExport = scope === 'all' ? this.residents : this.filteredResidents;
+      
+      if (format === 'csv') {
+        this.exportToCSV(dataToExport, scope);
+      } else if (format === 'pdf') {
+        this.exportToPDF(dataToExport, scope);
+      }
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Export failed. Please try again.');
+    } finally {
+      this.isExporting = false;
+    }
+  }
+
+  private exportToCSV(residents: ResidentInfo[], scope: string) {
+    const headers = [
+      'Full Name',
+      'Gender',
+      'Age',
+      'Birth Date',
+      'Civil Status',
+      'Address',
+      'Contact Number',
+      'Occupation',
+      'Monthly Income',
+      'PWD',
+      'Indigent',
+      'Solo Parent',
+      'Senior Citizen',
+      '4Ps Member',
+      'Registered Voter',
+      'Covid Status',
+      'Vaccinated',
+      'Date of Registration',
+      'Status'
+    ];
+
+    const csvData = residents.map(resident => {
+      const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
+      const address = this.getFullAddress(resident);
+      const age = this.calculateAge(resident.personalInfo.birthDate);
+      const status = resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active';
+      
+      return [
+        fullName,
+        resident.personalInfo.gender || '',
+        age.toString(),
+        resident.personalInfo.birthDate || '',
+        resident.personalInfo.civilStatus || '',
+        address,
+        resident.personalInfo.contactNo || '',
+        resident.personalInfo.occupation || '',
+        resident.personalInfo.monthlyIncome?.toString() || '',
+        resident.personalInfo.pwd || '',
+        resident.personalInfo.indigent || '',
+        resident.personalInfo.soloParent || '',
+        resident.personalInfo.seniorCitizen || '',
+        resident.personalInfo.fourPsMember || '',
+        resident.personalInfo.registeredVoter || '',
+        resident.otherDetails.covidStatus || '',
+        resident.otherDetails.vaccinated || '',
+        this.formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt),
+        status
+      ];
+    });
+
+    // Convert to CSV format
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(field => `"${field.replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    
+    const today = new Date().toISOString().split('T')[0];
+    const scopeText = scope === 'all' ? 'all' : 'filtered';
+    link.setAttribute('download', `residents_${scopeText}_${today}.csv`);
+    
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  private exportToPDF(residents: ResidentInfo[], scope: string) {
+    // For PDF export, we'll create a simple HTML structure and use window.print()
+    // In a production environment, you might want to use a library like jsPDF or PDFMake
+    
+    const today = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    const scopeText = scope === 'all' ? 'All Residents' : 'Filtered Residents';
+    
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Barangay New Cabalan - ${scopeText} Report</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .logo { width: 80px; height: 80px; margin: 0 auto 10px; }
+          .title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+          .subtitle { font-size: 16px; color: #666; margin-bottom: 10px; }
+          .date { font-size: 14px; color: #888; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+          th { background-color: #f5f5f5; font-weight: bold; }
+          tr:nth-child(even) { background-color: #f9f9f9; }
+          .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+          @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="title">BARANGAY NEW CABALAN</div>
+          <div class="subtitle">Residents Management Report</div>
+          <div class="subtitle">${scopeText} (${residents.length} residents)</div>
+          <div class="date">Generated on ${today}</div>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Address</th>
+              <th>Contact</th>
+              <th>Occupation</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${residents.map(resident => {
+              const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
+              const address = this.getFullAddress(resident);
+              const age = this.calculateAge(resident.personalInfo.birthDate);
+              const status = resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active';
+              
+              return `
+                <tr>
+                  <td>${fullName}</td>
+                  <td>${age}</td>
+                  <td>${resident.personalInfo.gender || '-'}</td>
+                  <td>${address}</td>
+                  <td>${resident.personalInfo.contactNo || '-'}</td>
+                  <td>${resident.personalInfo.occupation || '-'}</td>
+                  <td>${status}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        
+        <div class="footer">
+          <p>This document was generated automatically by the Barangay New Cabalan Portal System.</p>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+            window.onafterprint = function() {
+              window.close();
+            }
+          }
+        </script>
+      </body>
+      </html>
+    `;
+    
+    // Open in new window and print
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+    }
   }
 }
