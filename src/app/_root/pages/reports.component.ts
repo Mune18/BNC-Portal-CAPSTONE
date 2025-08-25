@@ -51,14 +51,15 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
           </div>
         </div>
 
-        <!-- Complaints Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Complaints Grid - MODIFIED TO USE FULL WIDTH -->
+        <div>
           <!-- Main Complaints List -->
-          <div class="lg:col-span-2 flex flex-col gap-8">
+          <div class="flex flex-col gap-8">
             <div>
               <h2 class="text-xl font-bold text-gray-900 mb-6">Complaints</h2>
               <div *ngIf="filteredComplaints.length > 0; else noComplaints">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Modified grid to use 3 columns on large screens -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   <div
                     *ngFor="let complaint of filteredComplaints"
                     class="bg-white rounded-2xl shadow-lg p-5 pb-9 flex flex-col justify-between relative cursor-pointer transition hover:shadow-xl"
@@ -109,8 +110,6 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
               </ng-template>
             </div>
           </div>
-          <!-- Side List: Complaint Details and Reply (hidden, now handled by modal) -->
-          <div class="flex flex-col gap-6"></div>
         </div>
       </div>
 
