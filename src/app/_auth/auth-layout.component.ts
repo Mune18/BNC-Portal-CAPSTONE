@@ -50,7 +50,7 @@ import { RouterOutlet } from '@angular/router';
         </div>
       </div>
       <!-- Content area -->
-      <div class="absolute right-20 top-0 w-1/2 h-screen p-8 z-10">
+      <div class="absolute right-20 top-0 w-1/2 h-screen z-10">
         <router-outlet/>
       </div>
     </div>
