@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../shared/services/admin.service';
 import { ResidentInfo } from '../../shared/types/resident';
 import { ResidentDetailModalComponent } from './resident-detail-modal.component';
+import { ResidentEditModalComponent } from './resident-edit-modal.component';
 
 @Component({
   selector: 'app-residents',
   standalone: true,
-  imports: [CommonModule, FormsModule, ResidentDetailModalComponent],
+  imports: [CommonModule, FormsModule, ResidentDetailModalComponent, ResidentEditModalComponent],
   template: `
     <div class="container mx-auto px-4 py-6">
       <!-- Header Section -->
@@ -294,6 +295,14 @@ import { ResidentDetailModalComponent } from './resident-detail-modal.component'
         (close)="closeResidentModal()"
         (edit)="editResident($event)"
       ></app-resident-detail-modal>
+
+      <!-- Resident Edit Modal (hidden by default) -->
+      <app-resident-edit-modal
+        [show]="showEditModal"
+        [resident]="selectedResident"
+        (close)="closeEditModal()"
+        (save)="onResidentUpdated($event)"
+      ></app-resident-edit-modal>
     </div>
   `,
   styles: [`
@@ -315,6 +324,7 @@ export class ResidentsComponent implements OnInit {
   Math = Math; // Make Math available in the template
 
   showResidentModal: boolean = false;
+  showEditModal: boolean = false;
   selectedResident: ResidentInfo | null = null;
   
   // Export related properties
@@ -418,8 +428,22 @@ export class ResidentsComponent implements OnInit {
   }
 
   editResident(resident: ResidentInfo) {
-    console.log('Edit resident:', resident);
-    // Implement edit functionality
+    this.selectedResident = resident;
+    this.showEditModal = true;
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+    this.selectedResident = null;
+  }
+
+  onResidentUpdated(updatedResident: ResidentInfo) {
+    // Find and update the resident in the array
+    const index = this.residents.findIndex(r => r.$id === updatedResident.$id);
+    if (index !== -1) {
+      this.residents[index] = updatedResident;
+    }
+    this.closeEditModal();
   }
 
   deleteResident(resident: ResidentInfo) {

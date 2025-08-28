@@ -168,4 +168,62 @@ export class AdminService extends BaseAppwriteService {
       throw error;
     }
   }
+
+  async updateResident(residentId: string, residentData: ResidentInfo) {
+    try {
+      // Map ResidentInfo back to database format
+      const dbData = {
+        lastName: residentData.personalInfo.lastName,
+        firstName: residentData.personalInfo.firstName,
+        middleName: residentData.personalInfo.middleName,
+        suffix: residentData.personalInfo.suffix,
+        gender: residentData.personalInfo.gender,
+        birthDate: residentData.personalInfo.birthDate,
+        birthPlace: residentData.personalInfo.birthPlace,
+        age: residentData.personalInfo.age,
+        civilStatus: residentData.personalInfo.civilStatus,
+        nationality: residentData.personalInfo.nationality,
+        religion: residentData.personalInfo.religion,
+        occupation: residentData.personalInfo.occupation,
+        contactNo: residentData.personalInfo.contactNo,
+        pwd: residentData.personalInfo.pwd,
+        pwdIdNo: residentData.personalInfo.pwdIdNo,
+        monthlyIncome: residentData.personalInfo.monthlyIncome,
+        indigent: residentData.personalInfo.indigent,
+        soloParent: residentData.personalInfo.soloParent,
+        soloParentIdNo: residentData.personalInfo.soloParentIdNo,
+        seniorCitizen: residentData.personalInfo.seniorCitizen,
+        seniorCitizenIdNo: residentData.personalInfo.seniorCitizenIdNo,
+        fourPsMember: residentData.personalInfo.fourPsMember,
+        registeredVoter: residentData.personalInfo.registeredVoter,
+        purokNo: residentData.personalInfo.purokNo,
+        houseNo: residentData.personalInfo.houseNo,
+        street: residentData.personalInfo.street,
+        ecFullName: residentData.emergencyContact.fullName,
+        ecRelation: residentData.emergencyContact.relationship,
+        ecContactNo: residentData.emergencyContact.contactNo,
+        ecAddress: residentData.emergencyContact.address,
+        NationalIdNo: residentData.otherDetails.nationalIdNo,
+        votersIdNo: residentData.otherDetails.votersIdNo,
+        covidStatus: residentData.otherDetails.covidStatus,
+        vaccinated: residentData.otherDetails.vaccinated,
+        deceased: residentData.otherDetails.deceased,
+        dateOfRegistration: residentData.otherDetails.dateOfRegistration
+      };
+
+      // Update the resident document
+      const response = await this.database.updateDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId,
+        dbData
+      );
+
+      // Return the updated resident in ResidentInfo format
+      return this.mapToResidentInfo(response, residentData.role || 'resident');
+    } catch (error) {
+      console.error('Error updating resident document:', error);
+      throw error;
+    }
+  }
 }
