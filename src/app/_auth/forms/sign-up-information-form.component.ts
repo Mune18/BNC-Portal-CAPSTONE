@@ -61,11 +61,13 @@ import { environment } from '../../environment/environment';
       </div>
 
       <!-- Form content (blurred only when modal is open) -->
-      <div [class.blur-md]="showPreviewModal || showTermsModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-2 sm:px-6 transition-all duration-300">
+      <div [class.blur-md]="showPreviewModal || showTermsModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-2 sm:px-6 ml-auto mr-8 sm:mr-0 transition-all duration-300" style="width: 60%">
         <form
           [ngClass]="{
-            'w-full max-w-sm': currentStep === 1,
-            'w-full max-w-4xl': currentStep === 2
+            'w-full max-w-md': currentStep === 1,
+            'w-full max-w-4xl': currentStep === 2,
+            'w-full max-w-2xl': currentStep === 3,
+            'w-full max-w-3xl': currentStep === 4
           }"
           class="bg-white/90 backdrop-blur-lg p-4 sm:p-8 rounded-2xl shadow-2xl h-150 flex flex-col justify-center transition-all duration-300"
           style="overflow: hidden;"
@@ -73,12 +75,14 @@ import { environment } from '../../environment/environment';
         >
           <!-- Stepper Navigation -->
           <div class="flex justify-center mb-6 sm:mb-8">
-            <div class="flex items-center">
-              <div [class.bg-blue-800]="currentStep === 1" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2 transition-colors duration-300" [class.bg-gray-300]="currentStep !== 1">1</div>
-              <span class="mr-4 font-semibold" [class.text-blue-800]="currentStep === 1">Account Info</span>
-              <div class="w-8 h-1 bg-gray-300 mx-2"></div>
-              <div [class.bg-blue-800]="currentStep === 2" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2 transition-colors duration-300" [class.bg-gray-300]="currentStep !== 2">2</div>
-              <span class="font-semibold" [class.text-blue-800]="currentStep === 2">Personal Info</span>
+            <div class="flex items-center gap-3">
+              <div [class.bg-blue-800]="currentStep === 1" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 1">1</div>
+              <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
+              <div [class.bg-blue-800]="currentStep === 2" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 2">2</div>
+              <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
+              <div [class.bg-blue-800]="currentStep === 3" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 3">3</div>
+              <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
+              <div [class.bg-blue-800]="currentStep === 4" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 4">4</div>
             </div>
           </div>
 
@@ -197,7 +201,7 @@ import { environment } from '../../environment/environment';
             </p>
           </div>
 
-          <!-- Section 2: Personal Info (all fields from sign-up-information-form) -->
+          <!-- Section 2: Personal Info (personal details only) -->
           <div *ngIf="currentStep === 2" class="flex-1 overflow-y-auto">
             <h2 class="text-center text-2xl font-bold mb-6">Personal Information</h2>
             
@@ -542,100 +546,165 @@ import { environment } from '../../environment/environment';
                 </div>
               </div>
             </div>
-            <!-- Emergency Contact -->
-            <div class="mb-4">
-              <h3 class="text-lg font-semibold mb-2 text-gray-800">Emergency Contact</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="formData.emergencyContact.fullName" 
-                    name="emergencyFullName" 
-                    [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecFullName') ? 'border-red-500' : 'border-gray-300')"
-                    placeholder="Enter emergency contact full name"
-                  >
-                  <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecFullName') }}</div>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Relationship *</label>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="formData.emergencyContact.relationship" 
-                    name="emergencyRelationship" 
-                    [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecRelationship') ? 'border-red-500' : 'border-gray-300')"
-                    placeholder="Enter relationship (e.g., Mother, Father, Spouse)"
-                  >
-                  <div *ngIf="hasFieldError('ecRelationship')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecRelationship') }}</div>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Contact No. *</label>
-                  <input 
-                    type="tel" 
-                    [(ngModel)]="formData.emergencyContact.contactNo" 
-                    name="emergencyContactNo" 
-                    [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
-                    placeholder="Enter contact number"
-                  >
-                  <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecContactNo') }}</div>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Address *</label>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="formData.emergencyContact.address" 
-                    name="emergencyAddress" 
-                    [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecAddress') ? 'border-red-500' : 'border-gray-300')"
-                    placeholder="Enter emergency contact address"
-                  >
-                  <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecAddress') }}</div>
-                </div>
-              </div>
-            </div>
-            <!-- Other Details -->
-            <div class="mb-4">
-              <h3 class="text-lg font-semibold mb-2 text-gray-800">Other Details</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
-                  <input type="text" [(ngModel)]="formData.otherDetails.nationalIdNo" name="nationalIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
-                  <input type="text" [(ngModel)]="formData.otherDetails.votersIdNo" name="votersIdNo" class="w-full border-gray-300 rounded-lg shadow-sm">
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
-                  <select [(ngModel)]="formData.otherDetails.covidStatus" name="covidStatus" class="w-full border-gray-300 rounded-lg shadow-sm">
-                    <option value="">Select</option>
-                    <option value="Negative">Negative</option>
-                    <option value="Positive">Positive</option>
-                    <option value="Recovered">Recovered</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
-                  <select [(ngModel)]="formData.otherDetails.vaccinated" name="vaccinated" class="w-full border-gray-300 rounded-lg shadow-sm">
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
-                  <select [(ngModel)]="formData.otherDetails.deceased" name="deceased" class="w-full border-gray-300 rounded-lg shadow-sm">
-                    <option value="">Select</option>
-                    <option value="Alive">Alive</option>
-                    <option value="Deceased">Deceased</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Date of Registration</label>
-                  <input type="date" [(ngModel)]="formData.otherDetails.dateOfRegistration" name="dateOfRegistration" class="w-full border-gray-300 rounded-lg shadow-sm">
-                </div>
-              </div>
-            </div>
+            
             <div class="flex justify-between">
+              <button 
+                type="button" 
+                (click)="prevStep()"
+                [disabled]="isLoading"
+                class="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Back
+              </button>
+              <button 
+                type="button"
+                (click)="nextStep()"
+                [disabled]="isLoading"
+                class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: Emergency Contact -->
+          <div *ngIf="currentStep === 3" class="flex-1 flex flex-col">
+            <h2 class="text-center text-2xl font-bold mb-6">Emergency Contact</h2>
+            
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {{ errorMessage }}
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center">
+              <div class="max-w-2xl mx-auto">
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold mb-4 text-gray-800">Emergency Contact Information</h3>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
+                      <input 
+                        type="text" 
+                        [(ngModel)]="formData.emergencyContact.fullName" 
+                        name="emergencyFullName" 
+                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecFullName') ? 'border-red-500' : 'border-gray-300')"
+                        placeholder="Enter emergency contact full name"
+                      >
+                      <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecFullName') }}</div>
+                    </div>
+                    <div>
+                      <label class="block text-gray-700 text-sm font-bold mb-2">Relationship *</label>
+                      <input 
+                        type="text" 
+                        [(ngModel)]="formData.emergencyContact.relationship" 
+                        name="emergencyRelationship" 
+                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecRelationship') ? 'border-red-500' : 'border-gray-300')"
+                        placeholder="Enter relationship (e.g., Mother, Father, Spouse)"
+                      >
+                      <div *ngIf="hasFieldError('ecRelationship')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecRelationship') }}</div>
+                    </div>
+                    <div>
+                      <label class="block text-gray-700 text-sm font-bold mb-2">Contact No. *</label>
+                      <input 
+                        type="tel" 
+                        [(ngModel)]="formData.emergencyContact.contactNo" 
+                        name="emergencyContactNo" 
+                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
+                        placeholder="Enter contact number"
+                      >
+                      <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecContactNo') }}</div>
+                    </div>
+                    <div>
+                      <label class="block text-gray-700 text-sm font-bold mb-2">Address *</label>
+                      <input 
+                        type="text" 
+                        [(ngModel)]="formData.emergencyContact.address" 
+                        name="emergencyAddress" 
+                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecAddress') ? 'border-red-500' : 'border-gray-300')"
+                        placeholder="Enter emergency contact address"
+                      >
+                      <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecAddress') }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-between mt-6">
+              <button 
+                type="button" 
+                (click)="prevStep()"
+                [disabled]="isLoading"
+                class="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400"
+              >
+                Back
+              </button>
+              <button 
+                type="button"
+                (click)="nextStep()"
+                [disabled]="isLoading"
+                class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 4: Other Details & Review -->
+          <div *ngIf="currentStep === 4" class="flex-1 flex flex-col">
+            <h2 class="text-center text-2xl font-bold mb-6">Other Details</h2>
+            
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {{ errorMessage }}
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center">
+              <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Additional Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
+                    <input type="text" [(ngModel)]="formData.otherDetails.nationalIdNo" name="nationalIdNo" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
+                    <input type="text" [(ngModel)]="formData.otherDetails.votersIdNo" name="votersIdNo" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
+                    <select [(ngModel)]="formData.otherDetails.covidStatus" name="covidStatus" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                      <option value="">Select</option>
+                      <option value="Negative">Negative</option>
+                      <option value="Positive">Positive</option>
+                      <option value="Recovered">Recovered</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
+                    <select [(ngModel)]="formData.otherDetails.vaccinated" name="vaccinated" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
+                    <select [(ngModel)]="formData.otherDetails.deceased" name="deceased" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                      <option value="">Select</option>
+                      <option value="Alive">Alive</option>
+                      <option value="Deceased">Deceased</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Date of Registration</label>
+                    <input type="date" [(ngModel)]="formData.otherDetails.dateOfRegistration" name="dateOfRegistration" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-between mt-6">
               <button 
                 type="button" 
                 (click)="prevStep()"
@@ -1053,13 +1122,19 @@ export class SignUpInformationFormComponent implements OnInit {
   }
 
   nextStep() {
-    if (this.validateStep1()) {
+    if (this.currentStep === 1 && this.validateStep1()) {
       this.currentStep = 2;
+    } else if (this.currentStep === 2 && this.validatePersonalInfo()) {
+      this.currentStep = 3;
+    } else if (this.currentStep === 3 && this.validateEmergencyContact()) {
+      this.currentStep = 4;
     }
   }
 
   prevStep() {
-    this.currentStep = 1;
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
   }
 
   // Validation methods
@@ -1103,12 +1178,11 @@ export class SignUpInformationFormComponent implements OnInit {
     return isValid;
   }
 
-  validateStep2(): boolean {
+  validatePersonalInfo(): boolean {
     this.validationErrors = {};
     let isValid = true;
 
     const personalInfo = this.formData.personalInfo;
-    const otherDetails = this.formData.otherDetails;
 
     // Required personal info fields
     if (!personalInfo.lastName || personalInfo.lastName.trim() === '') {
@@ -1238,26 +1312,24 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     }
 
-    // Other details validation
-    if (!otherDetails.votersIdNo || otherDetails.votersIdNo.trim() === '') {
-      this.validationErrors['votersIdNo'] = 'Voters ID number is required';
-      isValid = false;
+    // Date validation
+    if (personalInfo.birthDate) {
+      const birthDate = new Date(personalInfo.birthDate);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      
+      if (age < 0 || age > 150) {
+        this.validationErrors['birthDate'] = 'Please enter a valid birth date';
+        isValid = false;
+      }
     }
 
-    if (!otherDetails.covidStatus || otherDetails.covidStatus.trim() === '') {
-      this.validationErrors['covidStatus'] = 'COVID status is required';
-      isValid = false;
-    }
+    return isValid;
+  }
 
-    if (!otherDetails.vaccinated || otherDetails.vaccinated.trim() === '') {
-      this.validationErrors['vaccinated'] = 'Vaccination status is required';
-      isValid = false;
-    }
-
-    if (!otherDetails.deceased || otherDetails.deceased.trim() === '') {
-      this.validationErrors['deceased'] = 'Deceased status is required';
-      isValid = false;
-    }
+  validateEmergencyContact(): boolean {
+    this.validationErrors = {};
+    let isValid = true;
 
     // Emergency contact validation
     if (!this.formData.emergencyContact.fullName || this.formData.emergencyContact.fullName.trim() === '') {
@@ -1280,24 +1352,20 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     }
 
-    // Date validation
-    if (personalInfo.birthDate) {
-      const birthDate = new Date(personalInfo.birthDate);
-      const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
-      
-      if (age < 0 || age > 150) {
-        this.validationErrors['birthDate'] = 'Please enter a valid birth date';
-        isValid = false;
-      }
-    }
+    return isValid;
+  }
+
+  validateOtherDetails(): boolean {
+    const otherDetails = this.formData.otherDetails;
 
     // Set default date of registration if not provided
     if (!otherDetails.dateOfRegistration) {
       otherDetails.dateOfRegistration = new Date().toISOString().split('T')[0];
     }
 
-    return isValid;
+    // For other details, we'll make them optional since they're not critical
+    // but we can add validation here if needed
+    return true;
   }
 
   isValidEmail(email: string): boolean {
@@ -1355,14 +1423,14 @@ export class SignUpInformationFormComponent implements OnInit {
   onNextOrShowPreview() {
     this.errorMessage = ''; // Clear any previous errors
     
-    if (this.currentStep === 1) {
-      this.nextStep();
-    } else if (this.currentStep === 2) {
+    if (this.currentStep === 4) {
       // Validate all form steps before showing preview
       const step1Valid = this.validateStep1();
-      const step2Valid = this.validateStep2();
+      const step2Valid = this.validatePersonalInfo();
+      const step3Valid = this.validateEmergencyContact();
+      const step4Valid = this.validateOtherDetails();
       
-      if (step1Valid && step2Valid) {
+      if (step1Valid && step2Valid && step3Valid && step4Valid) {
         this.showPreviewModal = true;
       } else {
         this.errorMessage = 'Please input your information in the required fields before proceeding.';
@@ -1389,7 +1457,7 @@ export class SignUpInformationFormComponent implements OnInit {
       console.log('Using profile image URL:', this.formData.profileImage);
       
       // Final validation before submission
-      if (!this.validateStep1() || !this.validateStep2()) {
+      if (!this.validateStep1() || !this.validatePersonalInfo() || !this.validateEmergencyContact() || !this.validateOtherDetails()) {
         this.errorMessage = 'Please fill in all required fields correctly.';
         this.isLoading = false;
         return;
