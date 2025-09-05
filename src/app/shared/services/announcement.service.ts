@@ -5,6 +5,7 @@ import { environment } from '../../environment/environment';
 import { Announcement, NewAnnouncement } from '../types/announcement';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,8 @@ export class AnnouncementService extends BaseAppwriteService {
 
   constructor(
     private authService: AuthService,
-    protected override router: Router
+    protected override router: Router,
+    private cacheService: CacheService
   ) {
     super(router);
     this.storage = new Storage(this.client);
@@ -22,6 +24,10 @@ export class AnnouncementService extends BaseAppwriteService {
 
   // Get all announcements (admin view)
   async getAllAnnouncements(): Promise<Announcement[]> {
+    const cacheKey = 'all_announcements';
+    const cached = this.cacheService.get<Announcement[]>(cacheKey);
+    if (cached) return cached;
+
     try {
       const response = await this.database.listDocuments(
         environment.appwriteDatabaseId,
@@ -29,7 +35,9 @@ export class AnnouncementService extends BaseAppwriteService {
         [Query.orderDesc('createdAt')]
       );
 
-      return response.documents as unknown as Announcement[];
+      const announcements = response.documents as unknown as Announcement[];
+      this.cacheService.set(cacheKey, announcements, 2 * 60 * 1000); // Cache for 2 minutes
+      return announcements;
     } catch (error) {
       console.error('Error fetching announcements:', error);
       return [];
@@ -38,6 +46,10 @@ export class AnnouncementService extends BaseAppwriteService {
 
   // Get active announcements only (resident view)
   async getActiveAnnouncements(): Promise<Announcement[]> {
+    const cacheKey = 'active_announcements';
+    const cached = this.cacheService.get<Announcement[]>(cacheKey);
+    if (cached) return cached;
+
     try {
       const response = await this.database.listDocuments(
         environment.appwriteDatabaseId,
@@ -48,7 +60,9 @@ export class AnnouncementService extends BaseAppwriteService {
         ]
       );
 
-      return response.documents as unknown as Announcement[];
+      const announcements = response.documents as unknown as Announcement[];
+      this.cacheService.set(cacheKey, announcements, 1 * 60 * 1000); // Cache for 1 minute
+      return announcements;
     } catch (error) {
       console.error('Error fetching active announcements:', error);
       return [];

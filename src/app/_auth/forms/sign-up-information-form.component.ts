@@ -66,8 +66,7 @@ import { environment } from '../../environment/environment';
           [ngClass]="{
             'w-full max-w-md': currentStep === 1,
             'w-full max-w-4xl': currentStep === 2,
-            'w-full max-w-2xl': currentStep === 3,
-            'w-full max-w-3xl': currentStep === 4
+            'w-full max-w-2xl': currentStep === 3
           }"
           class="bg-white/90 backdrop-blur-lg p-4 sm:p-8 rounded-2xl shadow-2xl h-150 flex flex-col justify-center transition-all duration-300"
           style="overflow: hidden;"
@@ -81,8 +80,6 @@ import { environment } from '../../environment/environment';
               <div [class.bg-blue-800]="currentStep === 2" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 2">2</div>
               <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
               <div [class.bg-blue-800]="currentStep === 3" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 3">3</div>
-              <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
-              <div [class.bg-blue-800]="currentStep === 4" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 4">4</div>
             </div>
           </div>
 
@@ -543,6 +540,26 @@ import { environment } from '../../environment/environment';
                     >
                     <div *ngIf="hasFieldError('street')" class="text-red-500 text-sm mt-1">{{ getFieldError('street') }}</div>
                   </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="formData.otherDetails.nationalIdNo" 
+                      name="nationalIdNo" 
+                      class="w-full border-gray-300 rounded-lg shadow-sm p-2"
+                      placeholder="Enter National ID Number (optional)"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="formData.otherDetails.votersIdNo" 
+                      name="votersIdNo" 
+                      class="w-full border-gray-300 rounded-lg shadow-sm p-2"
+                      placeholder="Enter Voter's ID Number (optional)"
+                    >
+                  </div>
                 </div>
               </div>
             </div>
@@ -640,80 +657,6 @@ import { environment } from '../../environment/environment';
                 Back
               </button>
               <button 
-                type="button"
-                (click)="nextStep()"
-                [disabled]="isLoading"
-                class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 4: Other Details & Review -->
-          <div *ngIf="currentStep === 4" class="flex-1 flex flex-col">
-            <h2 class="text-center text-2xl font-bold mb-6">Other Details</h2>
-            
-            <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {{ errorMessage }}
-            </div>
-            
-            <div class="flex-1 flex flex-col justify-center">
-              <div class="mb-4">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Additional Information</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
-                    <input type="text" [(ngModel)]="formData.otherDetails.nationalIdNo" name="nationalIdNo" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
-                    <input type="text" [(ngModel)]="formData.otherDetails.votersIdNo" name="votersIdNo" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
-                    <select [(ngModel)]="formData.otherDetails.covidStatus" name="covidStatus" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                      <option value="">Select</option>
-                      <option value="Negative">Negative</option>
-                      <option value="Positive">Positive</option>
-                      <option value="Recovered">Recovered</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
-                    <select [(ngModel)]="formData.otherDetails.vaccinated" name="vaccinated" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                      <option value="">Select</option>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
-                    <select [(ngModel)]="formData.otherDetails.deceased" name="deceased" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                      <option value="">Select</option>
-                      <option value="Alive">Alive</option>
-                      <option value="Deceased">Deceased</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Date of Registration</label>
-                    <input type="date" [(ngModel)]="formData.otherDetails.dateOfRegistration" name="dateOfRegistration" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="flex justify-between mt-6">
-              <button 
-                type="button" 
-                (click)="prevStep()"
-                [disabled]="isLoading"
-                class="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400"
-              >
-                Back
-              </button>
-              <button 
                 type="submit"
                 [disabled]="isLoading"
                 class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-2"
@@ -767,7 +710,7 @@ import { environment } from '../../environment/environment';
       </div>
 
       <!-- Registration Success Modal -->
-      <div *ngIf="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div *ngIf="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg bg-white/30">
         <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-xs w-full">
           <svg class="w-16 h-16 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -1060,9 +1003,7 @@ export class SignUpInformationFormComponent implements OnInit {
     otherDetails: {
       nationalIdNo: '',
       votersIdNo: '',
-      covidStatus: '',
-      vaccinated: '',
-      deceased: '',
+      deceased: 'Alive',
       dateOfRegistration: ''
     }
   };
@@ -1126,8 +1067,6 @@ export class SignUpInformationFormComponent implements OnInit {
       this.currentStep = 2;
     } else if (this.currentStep === 2 && this.validatePersonalInfo()) {
       this.currentStep = 3;
-    } else if (this.currentStep === 3 && this.validateEmergencyContact()) {
-      this.currentStep = 4;
     }
   }
 
@@ -1358,7 +1297,10 @@ export class SignUpInformationFormComponent implements OnInit {
   validateOtherDetails(): boolean {
     const otherDetails = this.formData.otherDetails;
 
-    // Set default date of registration if not provided
+    // Automatically set deceased to "Alive" 
+    otherDetails.deceased = 'Alive';
+
+    // Set default date of registration to current date and time
     if (!otherDetails.dateOfRegistration) {
       otherDetails.dateOfRegistration = new Date().toISOString().split('T')[0];
     }
@@ -1423,14 +1365,13 @@ export class SignUpInformationFormComponent implements OnInit {
   onNextOrShowPreview() {
     this.errorMessage = ''; // Clear any previous errors
     
-    if (this.currentStep === 4) {
+    if (this.currentStep === 3) {
       // Validate all form steps before showing preview
       const step1Valid = this.validateStep1();
       const step2Valid = this.validatePersonalInfo();
       const step3Valid = this.validateEmergencyContact();
-      const step4Valid = this.validateOtherDetails();
       
-      if (step1Valid && step2Valid && step3Valid && step4Valid) {
+      if (step1Valid && step2Valid && step3Valid) {
         this.showPreviewModal = true;
       } else {
         this.errorMessage = 'Please input your information in the required fields before proceeding.';
@@ -1456,14 +1397,109 @@ export class SignUpInformationFormComponent implements OnInit {
       console.log('Starting registration process...');
       console.log('Using profile image URL:', this.formData.profileImage);
       
-      // Final validation before submission
-      if (!this.validateStep1() || !this.validatePersonalInfo() || !this.validateEmergencyContact() || !this.validateOtherDetails()) {
-        this.errorMessage = 'Please fill in all required fields correctly.';
-        this.isLoading = false;
-        return;
+      // STEP 0: Comprehensive validation before creating any accounts
+      console.log('Step 0: Validating all data...');
+      
+      // Validate all form steps
+      const step1Valid = this.validateStep1();
+      const step2Valid = this.validatePersonalInfo();  
+      const step3Valid = this.validateEmergencyContact();
+      
+      if (!step1Valid || !step2Valid || !step3Valid) {
+        throw new Error('Please fill in all required fields correctly.');
       }
 
-      // 1. Register user in Appwrite Auth
+      // Set automatic values for other details
+      this.validateOtherDetails();
+
+      // STEP 0.5: Validate critical data completeness
+      console.log('Step 0.5: Validating data completeness...');
+      
+      // Check all required personal info fields are present and not empty
+      const requiredFields = [
+        { field: this.formData.personalInfo.lastName, name: 'Last Name' },
+        { field: this.formData.personalInfo.firstName, name: 'First Name' },
+        { field: this.formData.personalInfo.middleName, name: 'Middle Name' },
+        { field: this.formData.personalInfo.gender, name: 'Gender' },
+        { field: this.formData.personalInfo.birthDate, name: 'Birth Date' },
+        { field: this.formData.personalInfo.birthPlace, name: 'Birth Place' },
+        { field: this.formData.personalInfo.civilStatus, name: 'Civil Status' },
+        { field: this.formData.personalInfo.nationality, name: 'Nationality' },
+        { field: this.formData.personalInfo.religion, name: 'Religion' },
+        { field: this.formData.personalInfo.occupation, name: 'Occupation' },
+        { field: this.formData.personalInfo.contactNo, name: 'Contact Number' },
+        { field: this.formData.personalInfo.purokNo, name: 'Purok Number' },
+        { field: this.formData.personalInfo.houseNo, name: 'House Number' },
+        { field: this.formData.personalInfo.street, name: 'Street' },
+        { field: this.formData.emergencyContact.fullName, name: 'Emergency Contact Name' },
+        { field: this.formData.emergencyContact.relationship, name: 'Emergency Contact Relationship' },
+        { field: this.formData.emergencyContact.contactNo, name: 'Emergency Contact Number' },
+        { field: this.formData.emergencyContact.address, name: 'Emergency Contact Address' }
+      ];
+
+      for (const req of requiredFields) {
+        if (!req.field || req.field.toString().trim() === '') {
+          throw new Error(`${req.name} is required and cannot be empty.`);
+        }
+      }
+
+      // Check numeric fields
+      if (!this.formData.personalInfo.monthlyIncome || this.formData.personalInfo.monthlyIncome <= 0) {
+        throw new Error('Monthly income must be a positive number.');
+      }
+
+      // Check dropdown selections
+      const dropdownFields = [
+        { field: this.formData.personalInfo.pwd, name: 'PWD Status' },
+        { field: this.formData.personalInfo.indigent, name: 'Indigent Status' },
+        { field: this.formData.personalInfo.soloParent, name: 'Solo Parent Status' },
+        { field: this.formData.personalInfo.seniorCitizen, name: 'Senior Citizen Status' },
+        { field: this.formData.personalInfo.fourPsMember, name: '4Ps Member Status' },
+        { field: this.formData.personalInfo.registeredVoter, name: 'Registered Voter Status' }
+      ];
+
+      for (const dropdown of dropdownFields) {
+        if (!dropdown.field || dropdown.field.trim() === '') {
+          throw new Error(`${dropdown.name} must be selected.`);
+        }
+      }
+
+      // Validate conditional fields
+      if (this.formData.personalInfo.pwd === 'Yes') {
+        if (!this.formData.personalInfo.pwdIdNo || this.formData.personalInfo.pwdIdNo.trim() === '') {
+          throw new Error('PWD ID Number is required when PWD status is Yes.');
+        }
+      }
+
+      if (this.formData.personalInfo.soloParent === 'Yes') {
+        if (!this.formData.personalInfo.soloParentIdNo || this.formData.personalInfo.soloParentIdNo.trim() === '') {
+          throw new Error('Solo Parent ID Number is required when Solo Parent status is Yes.');
+        }
+      }
+
+      if (this.formData.personalInfo.seniorCitizen === 'Yes') {
+        if (!this.formData.personalInfo.seniorCitizenIdNo || this.formData.personalInfo.seniorCitizenIdNo.trim() === '') {
+          throw new Error('Senior Citizen ID Number is required when Senior Citizen status is Yes.');
+        }
+      }
+
+      // Validate email format one more time
+      if (!this.isValidEmail(this.formData.account.email)) {
+        throw new Error('Please enter a valid email address.');
+      }
+
+      // Validate password requirements
+      if (this.formData.account.password.length < 8) {
+        throw new Error('Password must be at least 8 characters long.');
+      }
+
+      if (this.formData.account.password !== this.formData.account.confirmPassword) {
+        throw new Error('Passwords do not match.');
+      }
+
+      console.log('All validation passed. Proceeding with account creation...');
+
+      // STEP 1: Create user in Appwrite Auth
       console.log('Step 1: Creating user account...');
       const authResponse = await this.authService.register({
         email: this.formData.account.email,
@@ -1471,21 +1507,20 @@ export class SignUpInformationFormComponent implements OnInit {
         confirmPassword: this.formData.account.confirmPassword
       });
 
+      // STEP 2: Create user document in users collection
       console.log('Step 2: Creating user document...');
-      // 2. Save user info in Appwrite Database (users collection)
       const userDoc = {
         uid: authResponse.$id,
         email: authResponse.email,
         role: 'resident',
         created_at: new Date().toISOString(),
-        is_active: true  // Changed from 'true' string to true boolean
+        is_active: true
       };
       await this.userService.createUser(userDoc);
 
+      // STEP 3: Create resident document
       console.log('Step 3: Creating resident document...');
-      // 3. Save resident info in residents collection with profile image
       const residentDoc = {
-        // Make sure the profileImage field is included here
         profileImage: this.formData.profileImage || '', 
         userId: authResponse.$id,
         lastName: this.formData.personalInfo.lastName,
@@ -1500,16 +1535,16 @@ export class SignUpInformationFormComponent implements OnInit {
         religion: this.formData.personalInfo.religion,
         occupation: this.formData.personalInfo.occupation,
         contactNo: this.formData.personalInfo.contactNo,
-        pwd: this.formData.personalInfo.pwd || 'No', // Ensure PWD has a valid value
-        pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '', // Clear PWD ID if PWD is No
+        pwd: this.formData.personalInfo.pwd,
+        pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '',
         monthlyIncome: this.formData.personalInfo.monthlyIncome,
-        indigent: this.formData.personalInfo.indigent || 'No',
-        soloParent: this.formData.personalInfo.soloParent || 'No',
+        indigent: this.formData.personalInfo.indigent,
+        soloParent: this.formData.personalInfo.soloParent,
         soloParentIdNo: this.formData.personalInfo.soloParent === 'Yes' ? this.formData.personalInfo.soloParentIdNo : '',
-        seniorCitizen: this.formData.personalInfo.seniorCitizen || 'No',
+        seniorCitizen: this.formData.personalInfo.seniorCitizen,
         seniorCitizenIdNo: this.formData.personalInfo.seniorCitizen === 'Yes' ? this.formData.personalInfo.seniorCitizenIdNo : '',
-        fourPsMember: this.formData.personalInfo.fourPsMember || 'No',
-        registeredVoter: this.formData.personalInfo.registeredVoter || 'No',
+        fourPsMember: this.formData.personalInfo.fourPsMember,
+        registeredVoter: this.formData.personalInfo.registeredVoter,
         purokNo: this.formData.personalInfo.purokNo,
         houseNo: this.formData.personalInfo.houseNo,
         street: this.formData.personalInfo.street,
@@ -1519,10 +1554,8 @@ export class SignUpInformationFormComponent implements OnInit {
         ecAddress: this.formData.emergencyContact.address,
         NationalIdNo: this.formData.otherDetails.nationalIdNo,
         votersIdNo: this.formData.otherDetails.votersIdNo,
-        covidStatus: this.formData.otherDetails.covidStatus || 'Unknown',
-        vaccinated: this.formData.otherDetails.vaccinated || 'No',
-        deceased: this.formData.otherDetails.deceased || 'No',
-        dateOfRegistration: this.formData.otherDetails.dateOfRegistration
+        deceased: 'Alive',
+        dateOfRegistration: new Date().toISOString()
       };
       
       console.log('Creating resident document with profile image:', residentDoc.profileImage);
@@ -1534,6 +1567,7 @@ export class SignUpInformationFormComponent implements OnInit {
       // Show success modal
       this.showPreviewModal = false;
       this.showSuccessModal = true;
+      
     } catch (error: any) {
       console.error('Registration error:', error);
       
@@ -1542,6 +1576,15 @@ export class SignUpInformationFormComponent implements OnInit {
         this.errorMessage = 'An account with this email already exists. Please use a different email or try logging in.';
       } else if (error.message && error.message.includes('Invalid document structure')) {
         this.errorMessage = 'There was an error with the registration data. Please check all fields and try again.';
+      } else if (error.message && (
+          error.message.includes('required') || 
+          error.message.includes('cannot be empty') || 
+          error.message.includes('must be selected') ||
+          error.message.includes('valid email') ||
+          error.message.includes('password') ||
+          error.message.includes('ID Number')
+        )) {
+        this.errorMessage = error.message;
       } else if (error.message) {
         this.errorMessage = error.message;
       } else {

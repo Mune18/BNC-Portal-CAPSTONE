@@ -176,36 +176,13 @@ import { Router } from '@angular/router';
                   {{ residentInfo ? residentInfo.personalInfo.houseNo : '-' }} {{ residentInfo ? residentInfo.personalInfo.street : '-' }}
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Other Details Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-            <h2 class="text-base font-semibold text-gray-900 mb-4">Other Details</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
               <div>
                 <div class="text-gray-500 text-xs mb-1">National ID No.</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.nationalIdNo : '-' }}</div>
+                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.nationalIdNo || 'Not provided' : '-' }}</div>
               </div>
               <div>
                 <div class="text-gray-500 text-xs mb-1">Voter's ID No.</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.votersIdNo : '-' }}</div>
-              </div>
-              <div>
-                <div class="text-gray-500 text-xs mb-1">Covid Status</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.covidStatus : '-' }}</div>
-              </div>
-              <div>
-                <div class="text-gray-500 text-xs mb-1">Vaccinated</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.vaccinated : '-' }}</div>
-              </div>
-              <div>
-                <div class="text-gray-500 text-xs mb-1">Deceased</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.deceased : '-' }}</div>
-              </div>
-              <div>
-                <div class="text-gray-500 text-xs mb-1">Date of Registration</div>
-                <div class="text-gray-900 font-medium">{{ residentInfo ? formatDate(residentInfo.otherDetails.dateOfRegistration) : '-' }}</div>
+                <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.otherDetails.votersIdNo || 'Not provided' : '-' }}</div>
               </div>
             </div>
           </div>
@@ -476,6 +453,16 @@ import { Router } from '@angular/router';
                     <input type="text" [(ngModel)]="editInfo.personalInfo.street" name="street" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
+                    <input type="text" [(ngModel)]="editInfo.otherDetails.nationalIdNo" name="nationalIdNo" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
+                    <input type="text" [(ngModel)]="editInfo.otherDetails.votersIdNo" name="votersIdNo" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  </div>
                 </div>
               </div>
 
@@ -501,57 +488,6 @@ import { Router } from '@angular/router';
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Address</label>
                     <input type="text" [(ngModel)]="editInfo.emergencyContact.address" name="emergencyAddress" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Other Details Section -->
-              <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Other Details</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
-                    <input type="text" [(ngModel)]="editInfo.otherDetails.nationalIdNo" name="nationalIdNo" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
-                    <input type="text" [(ngModel)]="editInfo.otherDetails.votersIdNo" name="votersIdNo" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
-                    <select [(ngModel)]="editInfo.otherDetails.covidStatus" name="covidStatus" 
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select</option>
-                      <option value="Negative">Negative</option>
-                      <option value="Positive">Positive</option>
-                      <option value="Recovered">Recovered</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
-                    <select [(ngModel)]="editInfo.otherDetails.vaccinated" name="vaccinated" 
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select</option>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                      <option value="Partially">Partially</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
-                    <select [(ngModel)]="editInfo.otherDetails.deceased" name="deceased" 
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                      <option value="">Select</option>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Date of Registration</label>
-                    <input type="date" [(ngModel)]="editInfo.otherDetails.dateOfRegistration" name="dateOfRegistration" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                 </div>
@@ -630,8 +566,6 @@ export class ProfileComponent implements OnInit {
     otherDetails: {
       nationalIdNo: '',
       votersIdNo: '',
-      covidStatus: '',
-      vaccinated: '',
       deceased: '',
       dateOfRegistration: ''
     }
@@ -783,8 +717,6 @@ export class ProfileComponent implements OnInit {
       otherDetails: {
         nationalIdNo: '',
         votersIdNo: '',
-        covidStatus: '',
-        vaccinated: '',
         deceased: '',
         dateOfRegistration: ''
       }

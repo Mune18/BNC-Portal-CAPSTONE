@@ -24,8 +24,30 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
       </div>
 
       <!-- Loading Indicator -->
-      <div *ngIf="loading" class="flex justify-center items-center my-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div *ngIf="loading" class="space-y-6">
+        <!-- Skeleton Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div *ngFor="let i of [1,2,3,4]" class="bg-white shadow rounded-lg p-6 animate-pulse">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-gray-200 w-12 h-12"></div>
+              <div class="ml-4 flex-1">
+                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div class="h-6 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Skeleton Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white shadow rounded-lg p-6 animate-pulse">
+            <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+            <div class="h-32 bg-gray-200 rounded"></div>
+          </div>
+          <div class="lg:col-span-2 bg-white shadow rounded-lg p-6 animate-pulse">
+            <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div class="h-48 bg-gray-200 rounded"></div>
+          </div>
+        </div>
       </div>
 
       <div *ngIf="!loading">
@@ -310,17 +332,96 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   async ngOnInit() {
     this.loading = true;
     try {
-      await Promise.all([
-        this.loadResidents(),
-        this.loadAnnouncements(),
-        this.loadComplaints(),
-        this.loadUpdateRequests()
-      ]);
+      // Load critical stats first for immediate display
+      await this.loadCriticalStats();
+      this.loading = false;
+      
+      // Load additional data in background
+      this.loadBackgroundData();
     } catch (error) {
       console.error('Error initializing dashboard:', error);
-    } finally {
       this.loading = false;
     }
+  }
+
+  private async loadCriticalStats() {
+    try {
+      // Load only essential stats for immediate display
+      const [residentStats, announcements] = await Promise.all([
+        this.adminService.getResidentStats(),
+        this.announcementService.getActiveAnnouncements()
+      ]);
+
+      // Set immediate stats
+      this.totalResidents = (residentStats as any).total || 0;
+      this.newResidentsLastMonth = (residentStats as any).recent || 0;
+      this.activeAnnouncements = announcements.length;
+      this.recentAnnouncements = announcements.slice(0, 3);
+    } catch (error) {
+      console.error('Error loading critical stats:', error);
+    }
+  }
+
+  private async loadBackgroundData() {
+    try {
+      // Load remaining data in background
+      const [complaints, updateRequests, newestResidents] = await Promise.all([
+        this.loadComplaints(),
+        this.loadUpdateRequests(),
+        this.adminService.getNewestResidents(5)
+      ]);
+
+      this.newestResidents = newestResidents;
+
+      // Load full resident data for charts only if needed
+      setTimeout(() => this.loadFullResidentDataForCharts(), 100);
+    } catch (error) {
+      console.error('Error loading background data:', error);
+    }
+  }
+
+  private async loadFullResidentDataForCharts() {
+    try {
+      const residents = await this.adminService.getAllResidents();
+      this.calculateGenderStats(residents);
+      this.calculateAgeGroups(residents);
+      
+      // Render charts after data is ready
+      setTimeout(() => this.renderCharts(), 100);
+    } catch (error) {
+      console.error('Error loading full resident data for charts:', error);
+    }
+  }
+
+  private calculateGenderStats(residents: ResidentInfo[]) {
+    this.genderStats = { male: 0, female: 0, other: 0 };
+    residents.forEach(resident => {
+      if (resident.personalInfo.gender?.toLowerCase() === 'male') {
+        this.genderStats.male++;
+      } else if (resident.personalInfo.gender?.toLowerCase() === 'female') {
+        this.genderStats.female++;
+      } else {
+        this.genderStats.other++;
+      }
+    });
+  }
+
+  private calculateAgeGroups(residents: ResidentInfo[]) {
+    this.ageGroups.data = [0, 0, 0, 0, 0];
+    residents.forEach(resident => {
+      const age = this.calculateAge(resident.personalInfo.birthDate);
+      if (age <= 12) {
+        this.ageGroups.data[0]++;
+      } else if (age <= 19) {
+        this.ageGroups.data[1]++;
+      } else if (age <= 35) {
+        this.ageGroups.data[2]++;
+      } else if (age <= 59) {
+        this.ageGroups.data[3]++;
+      } else {
+        this.ageGroups.data[4]++;
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -344,59 +445,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     if (this.genderChart) this.genderChart.destroy();
     if (this.ageGroupChart) this.ageGroupChart.destroy();
-  }
-
-  private async loadResidents() {
-    try {
-      const residents = await this.adminService.getAllResidents();
-      this.totalResidents = residents.length;
-      
-      // Calculate gender stats
-      residents.forEach(resident => {
-        if (resident.personalInfo.gender?.toLowerCase() === 'male') {
-          this.genderStats.male++;
-        } else if (resident.personalInfo.gender?.toLowerCase() === 'female') {
-          this.genderStats.female++;
-        } else {
-          this.genderStats.other++;
-        }
-        
-        // Calculate age groups
-        const age = this.calculateAge(resident.personalInfo.birthDate);
-        if (age <= 12) {
-          this.ageGroups.data[0]++;
-        } else if (age <= 19) {
-          this.ageGroups.data[1]++;
-        } else if (age <= 35) {
-          this.ageGroups.data[2]++;
-        } else if (age <= 59) {
-          this.ageGroups.data[3]++;
-        } else {
-          this.ageGroups.data[4]++;
-        }
-      });
-      
-      // Get newest residents
-      this.newestResidents = [...residents]
-        .sort((a, b) => {
-          const dateA = new Date(a.otherDetails.dateOfRegistration || a.$createdAt || 0);
-          const dateB = new Date(b.otherDetails.dateOfRegistration || b.$createdAt || 0);
-          return dateB.getTime() - dateA.getTime();
-        })
-        .slice(0, 5);
-      
-      // Calculate new registrations in last 30 days
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      
-      this.newResidentsLastMonth = residents.filter(resident => {
-        const registrationDate = new Date(resident.otherDetails.dateOfRegistration || resident.$createdAt || 0);
-        return registrationDate >= thirtyDaysAgo;
-      }).length;
-      
-    } catch (error) {
-      console.error('Error loading residents:', error);
-    }
   }
 
   private async loadAnnouncements() {

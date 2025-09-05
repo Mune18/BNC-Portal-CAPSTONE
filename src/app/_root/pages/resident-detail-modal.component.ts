@@ -49,8 +49,8 @@ import { ResidentInfo } from '../../shared/types/resident';
               </div>
               <div>
                 <span class="text-gray-500 text-sm">Status:</span>
-                <span class="ml-2" [ngClass]="{'text-red-600': resident && resident.otherDetails && resident.otherDetails.deceased === 'Yes'}">
-                  {{ resident && resident.otherDetails ? (resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active') : '-' }}
+                <span class="ml-2" [ngClass]="{'text-red-600': resident && resident.otherDetails && resident.otherDetails.deceased === 'Deceased'}">
+                  {{ resident && resident.otherDetails ? (resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active') : '-' }}
                 </span>
               </div>
             </div>
@@ -145,6 +145,14 @@ import { ResidentInfo } from '../../shared/types/resident';
               <p class="text-sm font-medium text-gray-500 mb-1">Registered Voter</p>
               <p>{{ resident && resident.personalInfo ? resident.personalInfo.registeredVoter : '-' }}</p>
             </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 mb-1">National ID No.</p>
+              <p>{{ resident && resident.otherDetails ? resident.otherDetails.nationalIdNo || '-' : '-' }}</p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500 mb-1">Voter's ID No.</p>
+              <p>{{ resident && resident.otherDetails ? resident.otherDetails.votersIdNo || '-' : '-' }}</p>
+            </div>
           </div>
         </div>
         
@@ -199,30 +207,13 @@ import { ResidentInfo } from '../../shared/types/resident';
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Other Details</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p class="text-sm font-medium text-gray-500 mb-1">National ID No.</p>
-              <p>{{ resident && resident.otherDetails ? resident.otherDetails.nationalIdNo || '-' : '-' }}</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-500 mb-1">Voter's ID No.</p>
-              <p>{{ resident && resident.otherDetails ? resident.otherDetails.votersIdNo || '-' : '-' }}</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-500 mb-1">COVID-19 Status</p>
-              <p>{{ resident && resident.otherDetails ? resident.otherDetails.covidStatus || '-' : '-' }}</p>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-gray-500 mb-1">Vaccinated</p>
-              <p>{{ resident && resident.otherDetails ? resident.otherDetails.vaccinated || '-' : '-' }}</p>
-            </div>
-            <div>
               <p class="text-sm font-medium text-gray-500 mb-1">Date of Registration</p>
               <p>{{ formatDate((resident && resident.otherDetails ? resident.otherDetails.dateOfRegistration : '') || (resident ? resident.$createdAt : '')) }}</p>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-500 mb-1">Deceased</p>
+              <p class="text-sm font-medium text-gray-500 mb-1">Status</p>
               <p>{{ resident && resident.otherDetails ? resident.otherDetails.deceased || '-' : '-' }}</p>
             </div>
-            <div>
           </div>
         </div>
         

@@ -42,7 +42,6 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
             <option value="all">All Status</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
-            <option value="Pending">Pending</option>
           </select>
         </div>
 
@@ -215,8 +214,8 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
                   <div class="text-sm text-gray-500">{{ resident.personalInfo.contactNo }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span [class]="getStatusClass(resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active')">
-                    {{ resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active' }}
+                  <span [class]="getStatusClass(resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active')">
+                    {{ resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active' }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -232,48 +231,47 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
           </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- Load More / Pagination -->
         <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div class="flex-1 flex justify-between sm:hidden">
-            <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-              Previous
-            </button>
-            <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-              Next
+            <p class="text-sm text-gray-700">
+              Showing {{ filteredResidents.length }} of {{ totalResidents }} residents
+            </p>
+            <button 
+              *ngIf="hasMore && !searchTerm && statusFilter === 'all'" 
+              (click)="loadMoreResidents()"
+              [disabled]="isLoadingMore"
+              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            >
+              <span *ngIf="!isLoadingMore">Load More</span>
+              <span *ngIf="isLoadingMore" class="flex items-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500 mr-2"></div>
+                Loading...
+              </span>
             </button>
           </div>
           <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p class="text-sm text-gray-700">
-                Showing <span class="font-medium">{{ filteredResidents.length > 0 ? 1 : 0 }}</span> to 
-                <span class="font-medium">{{ Math.min(filteredResidents.length, 10) }}</span> of
-                <span class="font-medium">{{ filteredResidents.length }}</span> results
+                Showing <span class="font-medium">{{ Math.min(filteredResidents.length, residents.length) }}</span> of
+                <span class="font-medium">{{ totalResidents }}</span> residents
+                <span *ngIf="searchTerm || statusFilter !== 'all'" class="text-gray-500">
+                  ({{ filteredResidents.length }} filtered)
+                </span>
               </p>
             </div>
-            <div>
-              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                  <span class="sr-only">Previous</span>
-                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100">
-                  1
-                </button>
-                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                  2
-                </button>
-                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                  3
-                </button>
-                <button class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                  <span class="sr-only">Next</span>
-                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </nav>
+            <div *ngIf="hasMore && !searchTerm && statusFilter === 'all'">
+              <button 
+                (click)="loadMoreResidents()"
+                [disabled]="isLoadingMore"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              >
+                <span *ngIf="!isLoadingMore">Load More Residents</span>
+                <span *ngIf="isLoadingMore" class="flex items-center">
+                  <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500 mr-2"></div>
+                  Loading...
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -321,7 +319,15 @@ export class ResidentsComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string = '';
   residents: ResidentInfo[] = [];
+  allResidents: ResidentInfo[] = []; // Keep full list for search/filter
   Math = Math; // Make Math available in the template
+
+  // Pagination properties
+  currentPage: number = 1;
+  pageSize: number = 20;
+  totalResidents: number = 0;
+  hasMore: boolean = true;
+  isLoadingMore: boolean = false;
 
   showResidentModal: boolean = false;
   showEditModal: boolean = false;
@@ -334,7 +340,57 @@ export class ResidentsComponent implements OnInit {
   constructor(private adminService: AdminService) {}
 
   ngOnInit() {
-    this.loadResidents();
+    this.loadResidentsOptimized();
+  }
+
+  async loadResidentsOptimized() {
+    this.isLoading = true;
+    this.errorMessage = '';
+    try {
+      // Load first page quickly
+      const result = await this.adminService.getResidentsPaginated(1, this.pageSize) as any;
+      this.residents = result.residents || [];
+      this.totalResidents = result.total || 0;
+      this.hasMore = result.hasMore || false;
+      
+      // Load all residents in background for search functionality
+      setTimeout(() => this.loadAllResidentsBackground(), 100);
+    } catch (error) {
+      console.error('Failed to load residents:', error);
+      this.errorMessage = 'Failed to load residents. Please try again.';
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private async loadAllResidentsBackground() {
+    try {
+      this.allResidents = await this.adminService.getAllResidents();
+    } catch (error) {
+      console.error('Failed to load all residents in background:', error);
+    }
+  }
+
+  async loadMoreResidents() {
+    if (this.isLoadingMore || !this.hasMore) return;
+    
+    this.isLoadingMore = true;
+    try {
+      this.currentPage++;
+      const result = await this.adminService.getResidentsPaginated(this.currentPage, this.pageSize) as any;
+      this.residents = [...this.residents, ...(result.residents || [])];
+      this.hasMore = result.hasMore || false;
+    } catch (error) {
+      console.error('Failed to load more residents:', error);
+      this.currentPage--; // Revert page increment on error
+    } finally {
+      this.isLoadingMore = false;
+    }
+  }
+
+  async loadResidents() {
+    // Fallback method for manual refresh
+    this.loadResidentsOptimized();
   }
 
   @HostListener('document:click', ['$event'])
@@ -346,21 +402,11 @@ export class ResidentsComponent implements OnInit {
     }
   }
 
-  async loadResidents() {
-    this.isLoading = true;
-    this.errorMessage = '';
-    try {
-      this.residents = await this.adminService.getAllResidents();
-    } catch (error) {
-      console.error('Failed to load residents:', error);
-      this.errorMessage = 'Failed to load residents. Please try again.';
-    } finally {
-      this.isLoading = false;
-    }
-  }
-
   get filteredResidents() {
-    return this.residents.filter(resident => {
+    // Use all residents for filtering if search/filter is active, otherwise use paginated results
+    const sourceData = (this.searchTerm || this.statusFilter !== 'all') ? this.allResidents : this.residents;
+    
+    return sourceData.filter(resident => {
       // Search by name, address, contact number
       const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName} ${resident.personalInfo.lastName}`;
       const address = this.getFullAddress(resident);
@@ -370,11 +416,11 @@ export class ResidentsComponent implements OnInit {
         address.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         resident.personalInfo.contactNo.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      // Filter by status (active/deceased)
-      const status = resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active';
+      // Filter by status (active/inactive based on deceased status)
+      const status = resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
       const matchesStatus = this.statusFilter === 'all' || 
                             (this.statusFilter === 'Active' && status === 'Active') ||
-                            (this.statusFilter === 'Inactive' && status === 'Deceased');
+                            (this.statusFilter === 'Inactive' && status === 'Inactive');
       
       return matchesSearch && matchesStatus;
     });
@@ -393,6 +439,8 @@ export class ResidentsComponent implements OnInit {
     switch (status) {
       case 'Active':
         return baseClasses + 'bg-green-100 text-green-800';
+      case 'Inactive':
+        return baseClasses + 'bg-red-100 text-red-800';
       case 'Deceased':
         return baseClasses + 'bg-gray-100 text-gray-800';
       case 'Pending':
@@ -513,8 +561,6 @@ export class ResidentsComponent implements OnInit {
       'Senior Citizen',
       '4Ps Member',
       'Registered Voter',
-      'Covid Status',
-      'Vaccinated',
       'Date of Registration',
       'Status'
     ];
@@ -523,7 +569,7 @@ export class ResidentsComponent implements OnInit {
       const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
       const address = this.getFullAddress(resident);
       const age = this.calculateAge(resident.personalInfo.birthDate);
-      const status = resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active';
+      const status = resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
       
       return [
         fullName,
@@ -541,8 +587,6 @@ export class ResidentsComponent implements OnInit {
         resident.personalInfo.seniorCitizen || '',
         resident.personalInfo.fourPsMember || '',
         resident.personalInfo.registeredVoter || '',
-        resident.otherDetails.covidStatus || '',
-        resident.otherDetails.vaccinated || '',
         this.formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt),
         status
       ];
@@ -630,7 +674,7 @@ export class ResidentsComponent implements OnInit {
               const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
               const address = this.getFullAddress(resident);
               const age = this.calculateAge(resident.personalInfo.birthDate);
-              const status = resident.otherDetails.deceased === 'Yes' ? 'Deceased' : 'Active';
+              const status = resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
               
               return `
                 <tr>

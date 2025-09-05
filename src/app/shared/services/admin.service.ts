@@ -4,6 +4,7 @@ import { BaseAppwriteService } from './BaseAppwrite.service';
 import { environment } from '../../environment/environment';
 import { Query } from 'appwrite';
 import { ResidentInfo } from '../types/resident';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,13 +12,203 @@ import { ResidentInfo } from '../types/resident';
 export class AdminService extends BaseAppwriteService {
 
   constructor(
-    router: Router
+    router: Router,
+    private cacheService: CacheService
   ) {
     super(router);
   }
 
+  // Fast method to get resident counts and basic stats without full data
+  async getResidentStats() {
+    const cacheKey = 'resident_stats';
+    const cached = this.cacheService.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+      // Get total count
+      const totalResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [Query.select(['$id'])]
+      );
+
+      // Get active residents (non-deceased)
+      const activeResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [
+          Query.select(['$id']),
+          Query.notEqual('deceased', 'Deceased')
+        ]
+      );
+
+      // Get recent registrations (last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const recentResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [
+          Query.select(['$id']),
+          Query.greaterThan('$createdAt', thirtyDaysAgo.toISOString())
+        ]
+      );
+
+      const stats = {
+        total: totalResponse.total,
+        active: activeResponse.total,
+        recent: recentResponse.total
+      };
+
+      this.cacheService.set(cacheKey, stats, 2 * 60 * 1000); // Cache for 2 minutes
+      return stats;
+    } catch (error) {
+      console.error('Error fetching resident stats:', error);
+      throw error;
+    }
+  }
+
+  // Fast method to get newest residents with minimal data
+  async getNewestResidents(limit: number = 5) {
+    const cacheKey = `newest_residents_${limit}`;
+    const cached = this.cacheService.get<ResidentInfo[]>(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const response = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [
+          Query.select(['$id', '$createdAt', 'firstName', 'lastName', 'contactNo', 'profileImage', 'dateOfRegistration']),
+          Query.orderDesc('$createdAt'),
+          Query.limit(limit)
+        ]
+      );
+
+      const residents = response.documents.map(doc => this.mapToLightResidentInfo(doc));
+      this.cacheService.set(cacheKey, residents, 2 * 60 * 1000); // Cache for 2 minutes
+      return residents;
+    } catch (error) {
+      console.error('Error fetching newest residents:', error);
+      throw error;
+    }
+  }
+
+  // Light mapping for basic resident info
+  private mapToLightResidentInfo(doc: any): ResidentInfo {
+    return {
+      $id: doc.$id,
+      $createdAt: doc.$createdAt,
+      $updatedAt: doc.$updatedAt || '',
+      $permissions: doc.$permissions || [],
+      uid: doc['userId'] || '',
+      role: 'resident',
+      profileImage: doc.profileImage || '',
+      personalInfo: {
+        lastName: doc.lastName || '',
+        firstName: doc.firstName || '',
+        middleName: '',
+        suffix: '',
+        gender: '',
+        birthDate: '',
+        birthPlace: '',
+        age: 0,
+        civilStatus: '',
+        nationality: '',
+        religion: '',
+        occupation: '',
+        contactNo: doc.contactNo || '',
+        pwd: '',
+        pwdIdNo: '',
+        monthlyIncome: 0,
+        indigent: '',
+        soloParent: '',
+        soloParentIdNo: '',
+        seniorCitizen: '',
+        seniorCitizenIdNo: '',
+        fourPsMember: '',
+        registeredVoter: '',
+        purokNo: '',
+        houseNo: '',
+        street: ''
+      },
+      emergencyContact: {
+        fullName: '',
+        relationship: '',
+        contactNo: '',
+        address: ''
+      },
+      otherDetails: {
+        nationalIdNo: '',
+        votersIdNo: '',
+        deceased: '',
+        dateOfRegistration: doc.dateOfRegistration || ''
+      }
+    };
+  }
+
+  // Paginated method for residents
+  async getResidentsPaginated(page: number = 1, limit: number = 50) {
+    const cacheKey = `residents_page_${page}_${limit}`;
+    const cached = this.cacheService.get(cacheKey);
+    if (cached) return cached;
+
+    try {
+      const offset = (page - 1) * limit;
+      
+      const response = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [
+          Query.limit(limit),
+          Query.offset(offset),
+          Query.orderDesc('$createdAt')
+        ]
+      );
+
+      // Get user roles in a single query
+      const userIds = [...new Set(response.documents.map(doc => doc['userId']).filter(Boolean))];
+      let userRoleMap = new Map();
+      
+      if (userIds.length > 0) {
+        const usersResponse = await this.database.listDocuments(
+          environment.appwriteDatabaseId,
+          environment.userCollectionId,
+          [Query.equal('uid', userIds)]
+        );
+
+        usersResponse.documents.forEach(user => {
+          userRoleMap.set(user['uid'], user['role']);
+        });
+      }
+
+      const residents = response.documents.map(doc => {
+        return this.mapToResidentInfo(doc, userRoleMap.get(doc['userId']) || 'resident');
+      });
+
+      const result = {
+        residents,
+        total: response.total,
+        page,
+        limit,
+        hasMore: offset + limit < response.total
+      };
+
+      this.cacheService.set(cacheKey, result, 1 * 60 * 1000); // Cache for 1 minute
+      return result;
+    } catch (error) {
+      console.error('Error fetching paginated residents:', error);
+      throw error;
+    }
+  }
+
   // Add this new method to fetch all residents
   async getAllResidents() {
+    const cacheKey = 'all_residents';
+    const cached = this.cacheService.get<ResidentInfo[]>(cacheKey);
+    if (cached) return cached;
+
     try {
       // Fetch all resident documents from the residents collection
       const response = await this.database.listDocuments(
@@ -46,6 +237,7 @@ export class AdminService extends BaseAppwriteService {
         return this.mapToResidentInfo(doc, userRoleMap.get(doc['userId']) || 'resident');
       });
 
+      this.cacheService.set(cacheKey, residents, 3 * 60 * 1000); // Cache for 3 minutes
       return residents;
     } catch (error) {
       console.error('Error fetching residents:', error);
@@ -100,8 +292,6 @@ export class AdminService extends BaseAppwriteService {
       otherDetails: {
         nationalIdNo: doc.NationalIdNo || '',
         votersIdNo: doc.votersIdNo || '',
-        covidStatus: doc.covidStatus || '',
-        vaccinated: doc.vaccinated || '',
         deceased: doc.deceased || '',
         dateOfRegistration: doc.dateOfRegistration || ''
       }
@@ -122,20 +312,6 @@ export class AdminService extends BaseAppwriteService {
       return users;
     } catch (error) {
       console.error('Error fetching user document:', error);
-      throw error;
-    }
-  }
-
-  async deleteUser(userId: string) {
-    try {
-      const response = await this.database.deleteDocument(
-        environment.appwriteDatabaseId,
-        environment.userCollectionId,
-        userId
-      );
-      return response;
-    } catch (error) {
-      console.error('Error deleting user document:', error);
       throw error;
     }
   }
@@ -205,8 +381,6 @@ export class AdminService extends BaseAppwriteService {
         ecAddress: residentData.emergencyContact.address,
         NationalIdNo: residentData.otherDetails.nationalIdNo,
         votersIdNo: residentData.otherDetails.votersIdNo,
-        covidStatus: residentData.otherDetails.covidStatus,
-        vaccinated: residentData.otherDetails.vaccinated,
         deceased: residentData.otherDetails.deceased,
         dateOfRegistration: residentData.otherDetails.dateOfRegistration
       };
@@ -219,10 +393,37 @@ export class AdminService extends BaseAppwriteService {
         dbData
       );
 
+      // Invalidate related caches
+      this.invalidateResidentCaches();
+
       // Return the updated resident in ResidentInfo format
       return this.mapToResidentInfo(response, residentData.role || 'resident');
     } catch (error) {
       console.error('Error updating resident document:', error);
+      throw error;
+    }
+  }
+
+  // Cache invalidation methods
+  private invalidateResidentCaches() {
+    this.cacheService.invalidatePattern('.*residents.*');
+    this.cacheService.invalidate('resident_stats');
+  }
+
+  async deleteUser(userId: string) {
+    try {
+      const response = await this.database.deleteDocument(
+        environment.appwriteDatabaseId,
+        environment.userCollectionId,
+        userId
+      );
+
+      // Invalidate caches
+      this.invalidateResidentCaches();
+      
+      return response;
+    } catch (error) {
+      console.error('Error deleting user document:', error);
       throw error;
     }
   }

@@ -6,6 +6,7 @@ import { Complaint, NewComplaint } from '../types/complaint';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 import { Router } from '@angular/router';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,8 @@ export class ComplaintService extends BaseAppwriteService {
     private authService: AuthService,
     private userService: UserService,
     // Add the override keyword to the router parameter
-    protected override router: Router
+    protected override router: Router,
+    private cacheService: CacheService
   ) {
     super(router);
     this.storage = new Storage(this.client);
@@ -45,13 +47,20 @@ export class ComplaintService extends BaseAppwriteService {
 
   // Get all complaints (for admin)
   async getAllComplaints(): Promise<Complaint[]> {
+    const cacheKey = 'all_complaints';
+    const cached = this.cacheService.get<Complaint[]>(cacheKey);
+    if (cached) return cached;
+
     try {
       const response = await this.database.listDocuments( // Fix: database not databases
         environment.appwriteDatabaseId,
-        environment.complaintsCollectionId
+        environment.complaintsCollectionId,
+        [Query.orderDesc('createdAt')]
       );
 
-      return response.documents as unknown as Complaint[];
+      const complaints = response.documents as unknown as Complaint[];
+      this.cacheService.set(cacheKey, complaints, 1 * 60 * 1000); // Cache for 1 minute
+      return complaints;
     } catch (error) {
       console.error('Error fetching all complaints:', error);
       return [];
@@ -116,6 +125,9 @@ export class ComplaintService extends BaseAppwriteService {
         ID.unique(),
         complaintData
       );
+
+      // Invalidate caches
+      this.cacheService.invalidate('all_complaints');
       
       return response as unknown as Complaint;
     } catch (error) {
@@ -148,6 +160,9 @@ export class ComplaintService extends BaseAppwriteService {
         complaintId,
         data
       );
+
+      // Invalidate caches
+      this.cacheService.invalidate('all_complaints');
       
       return true;
     } catch (error) {
@@ -186,6 +201,10 @@ export class ComplaintService extends BaseAppwriteService {
         environment.complaintsCollectionId,
         complaintId
       );
+
+      // Invalidate caches
+      this.cacheService.invalidate('all_complaints');
+      
       return true;
     } catch (error) {
       console.error('Error deleting complaint:', error);

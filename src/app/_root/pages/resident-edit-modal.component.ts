@@ -308,6 +308,26 @@ import Swal from 'sweetalert2';
                     </select>
                   </div>
                   <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="editedResident.otherDetails.votersIdNo" 
+                      name="votersIdNo" 
+                      placeholder="Enter Voter's ID Number"
+                      class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="editedResident.otherDetails.nationalIdNo" 
+                      name="nationalIdNo" 
+                      placeholder="Enter National ID Number"
+                      class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
+                    >
+                  </div>
+                  <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Purok No. *</label>
                     <input 
                       type="text" 
@@ -400,50 +420,7 @@ import Swal from 'sweetalert2';
               <h3 class="text-lg font-semibold mb-2 text-gray-800">Other Details</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="editedResident.otherDetails.nationalIdNo" 
-                    name="nationalIdNo" 
-                    class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
-                  >
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
-                  <input 
-                    type="text" 
-                    [(ngModel)]="editedResident.otherDetails.votersIdNo" 
-                    name="votersIdNo" 
-                    class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
-                  >
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Covid Status</label>
-                  <select 
-                    [(ngModel)]="editedResident.otherDetails.covidStatus" 
-                    name="covidStatus" 
-                    class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
-                  >
-                    <option value="">Select</option>
-                    <option value="Negative">Negative</option>
-                    <option value="Positive">Positive</option>
-                    <option value="Recovered">Recovered</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Vaccinated</label>
-                  <select 
-                    [(ngModel)]="editedResident.otherDetails.vaccinated" 
-                    name="vaccinated" 
-                    class="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
-                  >
-                    <option value="">Select</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-gray-700 text-sm font-bold mb-2">Deceased</label>
+                  <label class="block text-gray-700 text-sm font-bold mb-2">Status</label>
                   <select 
                     [(ngModel)]="editedResident.otherDetails.deceased" 
                     name="deceased" 
@@ -560,8 +537,6 @@ export class ResidentEditModalComponent implements OnInit, OnChanges {
       otherDetails: {
         nationalIdNo: '',
         votersIdNo: '',
-        covidStatus: '',
-        vaccinated: '',
         deceased: 'No',
         dateOfRegistration: new Date().toISOString()
       }

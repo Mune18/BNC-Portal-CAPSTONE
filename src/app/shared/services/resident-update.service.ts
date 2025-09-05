@@ -158,8 +158,6 @@ export class ResidentUpdateService extends BaseAppwriteService {
         otherDetails: {
           nationalIdNo: response['nationalIdNo'] || '',
           votersIdNo: response['votersIdNo'] || '',
-          covidStatus: response['covidStatus'] || '',
-          vaccinated: response['vaccinated'] || '',
           deceased: response['deceased'] || '',
           dateOfRegistration: response['dateOfRegistration'] || ''
         }
@@ -300,8 +298,6 @@ export class ResidentUpdateService extends BaseAppwriteService {
       otherDetails: {
         nationalIdNo: 'National ID Number',
         votersIdNo: 'Voter\'s ID Number',
-        covidStatus: 'COVID Status',
-        vaccinated: 'Vaccinated',
         deceased: 'Deceased',
         dateOfRegistration: 'Date of Registration'
       }

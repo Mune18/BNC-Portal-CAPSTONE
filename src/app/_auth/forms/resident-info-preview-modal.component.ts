@@ -110,6 +110,14 @@ import { ResidentInfo } from '../../shared/types/resident';
                 <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Address</p>
                 <p class="text-sm font-medium text-gray-800">{{ residentInfo.personalInfo.houseNo }} {{ residentInfo.personalInfo.street }}, Purok {{ residentInfo.personalInfo.purokNo }}</p>
               </div>
+              <div class="bg-white/70 rounded-lg p-3 border border-white/50">
+                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">National ID No.</p>
+                <p class="text-sm font-medium text-gray-800">{{ residentInfo.otherDetails.nationalIdNo || 'Not provided' }}</p>
+              </div>
+              <div class="bg-white/70 rounded-lg p-3 border border-white/50">
+                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Voter's ID No.</p>
+                <p class="text-sm font-medium text-gray-800">{{ residentInfo.otherDetails.votersIdNo || 'Not provided' }}</p>
+              </div>
             </div>
             
             <!-- Status Badges -->
@@ -164,44 +172,6 @@ import { ResidentInfo } from '../../shared/types/resident';
               <div class="bg-white/70 rounded-lg p-4 border border-white/50">
                 <p class="text-xs font-semibold text-red-600 uppercase tracking-wide mb-1">Address</p>
                 <p class="text-sm font-medium text-gray-800">{{ residentInfo.emergencyContact.address }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Other Details Card -->
-          <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-6 border border-green-100 shadow-sm">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h4 class="text-lg font-bold text-gray-800">Additional Information</h4>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div class="bg-white/70 rounded-lg p-4 border border-white/50">
-                <p class="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">National ID No.</p>
-                <p class="text-sm font-medium text-gray-800">{{ residentInfo.otherDetails.nationalIdNo || 'Not provided' }}</p>
-              </div>
-              <div class="bg-white/70 rounded-lg p-4 border border-white/50">
-                <p class="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Voter's ID No.</p>
-                <p class="text-sm font-medium text-gray-800">{{ residentInfo.otherDetails.votersIdNo || 'Not provided' }}</p>
-              </div>
-              <div class="bg-white/70 rounded-lg p-4 border border-white/50">
-                <p class="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Covid Status</p>
-                <p class="text-sm font-medium text-gray-800 capitalize">{{ residentInfo.otherDetails.covidStatus || 'Not specified' }}</p>
-              </div>
-              <div class="bg-white/70 rounded-lg p-4 border border-white/50">
-                <p class="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Vaccinated</p>
-                <p class="text-sm font-medium text-gray-800 capitalize">{{ residentInfo.otherDetails.vaccinated || 'Not specified' }}</p>
-              </div>
-              <div class="bg-white/70 rounded-lg p-4 border border-white/50">
-                <p class="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Status</p>
-                <p class="text-sm font-medium text-gray-800 capitalize">{{ residentInfo.otherDetails.deceased || 'Alive' }}</p>
-              </div>
-              <div class="bg-white/70 rounded-lg p-4 border border-white/50">
-                <p class="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">Registration Date</p>
-                <p class="text-sm font-medium text-gray-800">{{ residentInfo.otherDetails.dateOfRegistration | date:'mediumDate' }}</p>
               </div>
             </div>
           </div>

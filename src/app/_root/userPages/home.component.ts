@@ -119,17 +119,16 @@ export class HomeComponent implements OnInit {
   constructor(private announcementService: AnnouncementService) {}
 
   async ngOnInit() {
-    await this.loadAnnouncements();
+    // Show content immediately, load announcements in background
+    this.loading = false;
+    this.loadAnnouncements();
   }
 
   async loadAnnouncements() {
-    this.loading = true;
     try {
       this.announcements = await this.announcementService.getActiveAnnouncements();
     } catch (error) {
       console.error('Error loading announcements:', error);
-    } finally {
-      this.loading = false;
     }
   }
 
