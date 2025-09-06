@@ -5,9 +5,11 @@ import { AdminService } from '../../shared/services/admin.service';
 import { AnnouncementService } from '../../shared/services/announcement.service';
 import { ComplaintService } from '../../shared/services/complaint.service';
 import { ResidentUpdateService } from '../../shared/services/resident-update.service';
+import { DataRefreshService } from '../../shared/services/data-refresh.service';
 import { ResidentInfo } from '../../shared/types/resident';
 import { Announcement } from '../../shared/types/announcement';
 import { Complaint } from '../../shared/types/complaint';
+import { Subscription } from 'rxjs';
 import Chart from 'chart.js/auto';
 import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 
@@ -321,12 +323,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private genderChart: Chart | null = null;
   private ageGroupChart: Chart | null = null;
   private chartsRendered = false;
+  private refreshSubscription?: Subscription;
 
   constructor(
     private adminService: AdminService,
     private announcementService: AnnouncementService,
     private complaintService: ComplaintService,
-    private residentUpdateService: ResidentUpdateService
+    private residentUpdateService: ResidentUpdateService,
+    private dataRefreshService: DataRefreshService
   ) {}
 
   async ngOnInit() {
@@ -338,6 +342,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       
       // Load additional data in background
       this.loadBackgroundData();
+      
+      // Subscribe to dashboard stats refresh notifications
+      this.refreshSubscription = this.dataRefreshService.onRefresh('dashboard-stats').subscribe(() => {
+        this.loadCriticalStats();
+        this.loadBackgroundData();
+      });
     } catch (error) {
       console.error('Error initializing dashboard:', error);
       this.loading = false;
@@ -445,6 +455,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     if (this.genderChart) this.genderChart.destroy();
     if (this.ageGroupChart) this.ageGroupChart.destroy();
+    this.refreshSubscription?.unsubscribe();
   }
 
   private async loadAnnouncements() {

@@ -6,6 +6,7 @@ import { ResidentInfo } from '../../shared/types/resident';
 import { ResidentUpdateService } from '../../shared/services/resident-update.service';
 import { AuthService } from '../../shared/services/auth.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-resident-update-requests',
@@ -284,11 +285,15 @@ export class ResidentUpdateRequestsComponent implements OnInit {
         reviewedBy: account.$id
       });
       
+      // Show success message with SweetAlert2
+      const actionText = action === 'approve' ? 'approved' : 'rejected';
+      await this.showCustomAlert(`Request ${actionText} successfully`, 'success');
+      
       // Reload the requests
       await this.loadUpdateRequests();
     } catch (error) {
       console.error('Error reviewing request:', error);
-      this.errorMessage = 'Failed to review request. Please try again.';
+      await this.showCustomAlert('Failed to review request. Please try again.', 'error');
     } finally {
       this.reviewLoading[requestId] = false;
     }
@@ -312,9 +317,65 @@ export class ResidentUpdateRequestsComponent implements OnInit {
       this.rejectReason = '';
     } catch (error) {
       console.error('Error rejecting request:', error);
+      await this.showCustomAlert('Failed to reject request. Please try again.', 'error');
     } finally {
       this.rejectLoading = false;
     }
+  }
+
+  async showCustomAlert(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    const config: any = {
+      text: message,
+      confirmButtonText: 'OK',
+      background: '#ffffff',
+      color: '#374151',
+      timer: 3000,
+      timerProgressBar: true,
+      width: '350px',
+      padding: '1.5rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0 backdrop-blur-sm',
+        title: 'text-lg font-bold mb-2 leading-tight',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-4',
+        confirmButton: 'font-semibold py-2 px-5 rounded-lg transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm',
+        timerProgressBar: 'rounded-full h-1'
+      },
+      backdrop: 'rgba(15, 23, 42, 0.3)',
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      buttonsStyling: false
+    };
+
+    if (type === 'success') {
+      config.icon = 'success';
+      config.title = 'Success!';
+      config.iconColor = '#10B981';
+      config.customClass.title += ' text-emerald-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-emerald-400 to-emerald-500';
+    } else if (type === 'error') {
+      config.icon = 'error';
+      config.title = 'Error';
+      config.iconColor = '#EF4444';
+      config.customClass.title += ' text-red-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-red-400 to-red-500';
+    } else if (type === 'warning') {
+      config.icon = 'warning';
+      config.title = 'Warning';
+      config.iconColor = '#F59E0B';
+      config.customClass.title += ' text-amber-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-amber-400 to-amber-500';
+    }
+
+    await Swal.fire(config);
   }
 
   async retryLoadResident(residentId: string) {

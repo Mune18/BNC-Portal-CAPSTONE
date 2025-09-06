@@ -6,6 +6,7 @@ import { Announcement, NewAnnouncement } from '../types/announcement';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
 import { CacheService } from './cache.service';
+import { DataRefreshService } from './data-refresh.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class AnnouncementService extends BaseAppwriteService {
   constructor(
     private authService: AuthService,
     protected override router: Router,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private dataRefreshService: DataRefreshService
   ) {
     super(router);
     this.storage = new Storage(this.client);
@@ -122,6 +124,13 @@ export class AnnouncementService extends BaseAppwriteService {
         announcementData
       );
       
+      // Invalidate cache after creating announcement
+      this.cacheService.invalidate('all_announcements');
+      this.cacheService.invalidate('active_announcements');
+      
+      // Trigger refresh for all components listening to announcements
+      this.dataRefreshService.triggerMultipleRefresh(['announcements', 'dashboard-stats']);
+      
       return response as unknown as Announcement;
     } catch (error) {
       console.error('Error creating announcement:', error);
@@ -171,6 +180,13 @@ export class AnnouncementService extends BaseAppwriteService {
         data
       );
       
+      // Invalidate cache after updating announcement
+      this.cacheService.invalidate('all_announcements');
+      this.cacheService.invalidate('active_announcements');
+      
+      // Trigger refresh for all components listening to announcements
+      this.dataRefreshService.triggerMultipleRefresh(['announcements', 'dashboard-stats']);
+      
       return response as unknown as Announcement;
     } catch (error) {
       console.error('Error updating announcement:', error);
@@ -191,6 +207,13 @@ export class AnnouncementService extends BaseAppwriteService {
         }
       );
       
+      // Invalidate cache after archiving announcement
+      this.cacheService.invalidate('all_announcements');
+      this.cacheService.invalidate('active_announcements');
+      
+      // Trigger refresh for all components listening to announcements
+      this.dataRefreshService.triggerMultipleRefresh(['announcements', 'dashboard-stats']);
+      
       return true;
     } catch (error) {
       console.error('Error archiving announcement:', error);
@@ -206,6 +229,13 @@ export class AnnouncementService extends BaseAppwriteService {
         environment.announcementCollectionId,
         id
       );
+      
+      // Invalidate cache after deleting announcement
+      this.cacheService.invalidate('all_announcements');
+      this.cacheService.invalidate('active_announcements');
+      
+      // Trigger refresh for all components listening to announcements
+      this.dataRefreshService.triggerMultipleRefresh(['announcements', 'dashboard-stats']);
       
       return true;
     } catch (error) {

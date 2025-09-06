@@ -75,7 +75,7 @@ import { AuthService } from '../shared/services/auth.service';
               <!-- Add profile dropdown -->
               <div class="relative">
                 <button (click)="toggleProfileMenu()" class="profile-button flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-                  <img src="/assets/profile-placeholder.png" alt="Profile" class="w-8 h-8 rounded-full">
+                  <img src="/assets/BNC_Portal_Logo.png" alt="Profile" class="w-8 h-8 rounded-full">
                 </button>
 
                 <!-- Dropdown menu -->

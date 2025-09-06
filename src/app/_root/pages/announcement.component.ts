@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AnnouncementService } from '../../shared/services/announcement.service';
+import { DataRefreshService } from '../../shared/services/data-refresh.service';
 import { Announcement, NewAnnouncement } from '../../shared/types/announcement';
+import { Subscription } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-announcement',
@@ -404,10 +407,11 @@ import { Announcement, NewAnnouncement } from '../../shared/types/announcement';
     }
   `]
 })
-export class AnnouncementComponent implements OnInit {
+export class AnnouncementComponent implements OnInit, OnDestroy {
   announcements: Announcement[] = [];
   loading = true;
   isSubmitting = false;
+  private refreshSubscription?: Subscription;
   
   // New announcement form data
   newAnnouncement: NewAnnouncement = {
@@ -428,20 +432,36 @@ export class AnnouncementComponent implements OnInit {
   openMenuId: string | null = null;
   selectedAnnouncement: Announcement | null = null;
 
-  constructor(private announcementService: AnnouncementService) {}
+  constructor(
+    private announcementService: AnnouncementService,
+    private dataRefreshService: DataRefreshService
+  ) {}
 
   async ngOnInit() {
     await this.loadAnnouncements();
+    
+    // Subscribe to refresh notifications from other instances/components
+    this.refreshSubscription = this.dataRefreshService.onRefresh('announcements').subscribe(() => {
+      this.loadAnnouncements(false); // Refresh without showing loading
+    });
   }
 
-  async loadAnnouncements() {
-    this.loading = true;
+  ngOnDestroy() {
+    this.refreshSubscription?.unsubscribe();
+  }
+
+  async loadAnnouncements(showLoading: boolean = true) {
+    if (showLoading) {
+      this.loading = true;
+    }
     try {
       this.announcements = await this.announcementService.getAllAnnouncements();
     } catch (error) {
       console.error('Error loading announcements:', error);
     } finally {
-      this.loading = false;
+      if (showLoading) {
+        this.loading = false;
+      }
     }
   }
 
@@ -479,7 +499,7 @@ export class AnnouncementComponent implements OnInit {
     event.preventDefault();
     
     if (!this.newAnnouncement.title.trim() || !this.newAnnouncement.content.trim()) {
-      alert('Please fill in all required fields');
+      await this.showCustomAlert('Please fill in all required fields', 'warning');
       return;
     }
     
@@ -504,16 +524,13 @@ export class AnnouncementComponent implements OnInit {
         this.imageFileName = '';
         this.showCreate = false;
         
-        // Refresh announcements list
-        await this.loadAnnouncements();
-        
-        alert('Announcement published successfully');
+        await this.showCustomAlert('Announcement published successfully', 'success');
       } else {
-        alert('Failed to publish announcement');
+        await this.showCustomAlert('Failed to publish announcement', 'error');
       }
     } catch (error) {
       console.error('Error creating announcement:', error);
-      alert('An error occurred while publishing the announcement');
+      await this.showCustomAlert('An error occurred while publishing the announcement', 'error');
     } finally {
       this.isSubmitting = false;
     }
@@ -544,7 +561,7 @@ export class AnnouncementComponent implements OnInit {
     event.preventDefault();
     
     if (!this.editingAnnouncement.title?.trim() || !this.editingAnnouncement.content?.trim() || !this.editingAnnouncement.$id) {
-      alert('Please fill in all required fields');
+      await this.showCustomAlert('Please fill in all required fields', 'warning');
       return;
     }
     
@@ -566,16 +583,13 @@ export class AnnouncementComponent implements OnInit {
         this.editImageFile = null;
         this.editImageFileName = '';
         
-        // Refresh announcements list
-        await this.loadAnnouncements();
-        
-        alert('Announcement updated successfully');
+        await this.showCustomAlert('Announcement updated successfully', 'success');
       } else {
-        alert('Failed to update announcement');
+        await this.showCustomAlert('Failed to update announcement', 'error');
       }
     } catch (error) {
       console.error('Error updating announcement:', error);
-      alert('An error occurred while updating the announcement');
+      await this.showCustomAlert('An error occurred while updating the announcement', 'error');
     } finally {
       this.isSubmitting = false;
     }
@@ -602,14 +616,13 @@ export class AnnouncementComponent implements OnInit {
     try {
       const success = await this.announcementService.archiveAnnouncement(id);
       if (success) {
-        await this.loadAnnouncements();
-        alert('Announcement archived successfully');
+        await this.showCustomAlert('Announcement archived successfully', 'success');
       } else {
-        alert('Failed to archive announcement');
+        await this.showCustomAlert('Failed to archive announcement', 'error');
       }
     } catch (error) {
       console.error('Error archiving announcement:', error);
-      alert('An error occurred while archiving the announcement');
+      await this.showCustomAlert('An error occurred while archiving the announcement', 'error');
     }
   }
 
@@ -623,14 +636,13 @@ export class AnnouncementComponent implements OnInit {
         'active');
       
       if (success) {
-        await this.loadAnnouncements();
-        alert('Announcement activated successfully');
+        await this.showCustomAlert('Announcement activated successfully', 'success');
       } else {
-        alert('Failed to activate announcement');
+        await this.showCustomAlert('Failed to activate announcement', 'error');
       }
     } catch (error) {
       console.error('Error activating announcement:', error);
-      alert('An error occurred while activating the announcement');
+      await this.showCustomAlert('An error occurred while activating the announcement', 'error');
     }
   }
 
@@ -646,13 +658,13 @@ export class AnnouncementComponent implements OnInit {
       const success = await this.announcementService.deleteAnnouncement(id);
       if (success) {
         this.announcements = this.announcements.filter(a => a.$id !== id);
-        alert('Announcement deleted successfully');
+        await this.showCustomAlert('Announcement deleted successfully', 'success');
       } else {
-        alert('Failed to delete announcement');
+        await this.showCustomAlert('Failed to delete announcement', 'error');
       }
     } catch (error) {
       console.error('Error deleting announcement:', error);
-      alert('An error occurred while deleting the announcement');
+      await this.showCustomAlert('An error occurred while deleting the announcement', 'error');
     }
   }
 
@@ -667,5 +679,60 @@ export class AnnouncementComponent implements OnInit {
   getImageUrl(imageUrl: string | undefined): string {
     if (!imageUrl) return '';
     return this.announcementService.getImageUrl(imageUrl);
+  }
+
+  async showCustomAlert(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    const config: any = {
+      text: message,
+      confirmButtonText: 'OK',
+      background: '#ffffff',
+      color: '#374151',
+      timer: 3000,
+      timerProgressBar: true,
+      width: '350px',
+      padding: '1.5rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0 backdrop-blur-sm',
+        title: 'text-lg font-bold mb-2 leading-tight',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-4',
+        confirmButton: 'font-semibold py-2 px-5 rounded-lg transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm',
+        timerProgressBar: 'rounded-full h-1'
+      },
+      backdrop: 'rgba(15, 23, 42, 0.3)',
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      buttonsStyling: false
+    };
+
+    if (type === 'success') {
+      config.icon = 'success';
+      config.title = 'Success!';
+      config.iconColor = '#10B981';
+      config.customClass.title += ' text-emerald-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-emerald-400 to-emerald-500';
+    } else if (type === 'error') {
+      config.icon = 'error';
+      config.title = 'Error';
+      config.iconColor = '#EF4444';
+      config.customClass.title += ' text-red-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-red-400 to-red-500';
+    } else if (type === 'warning') {
+      config.icon = 'warning';
+      config.title = 'Warning';
+      config.iconColor = '#F59E0B';
+      config.customClass.title += ' text-amber-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-amber-400 to-amber-500';
+    }
+
+    await Swal.fire(config);
   }
 }

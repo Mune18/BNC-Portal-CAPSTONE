@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 import { Router } from '@angular/router';
 import { CacheService } from './cache.service';
+import { DataRefreshService } from './data-refresh.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,8 @@ export class ComplaintService extends BaseAppwriteService {
     private userService: UserService,
     // Add the override keyword to the router parameter
     protected override router: Router,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private dataRefreshService: DataRefreshService
   ) {
     super(router);
     this.storage = new Storage(this.client);
@@ -129,6 +131,9 @@ export class ComplaintService extends BaseAppwriteService {
       // Invalidate caches
       this.cacheService.invalidate('all_complaints');
       
+      // Trigger refresh for components listening to complaints
+      this.dataRefreshService.triggerMultipleRefresh(['complaints', 'dashboard-stats']);
+      
       return response as unknown as Complaint;
     } catch (error) {
       console.error('Error submitting complaint:', error);
@@ -163,6 +168,9 @@ export class ComplaintService extends BaseAppwriteService {
 
       // Invalidate caches
       this.cacheService.invalidate('all_complaints');
+      
+      // Trigger refresh for components listening to complaints
+      this.dataRefreshService.triggerMultipleRefresh(['complaints', 'dashboard-stats']);
       
       return true;
     } catch (error) {
