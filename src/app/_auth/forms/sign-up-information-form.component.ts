@@ -32,8 +32,8 @@ import { environment } from '../../environment/environment';
       </div>
       <!--End Background Animation Body-->
 
-      <!-- Blue circular design with logo on left -->
-      <div class="absolute left-0 top-0 w-1/2 h-screen z-0">
+      <!-- Blue circular design with logo on left - Hidden on mobile -->
+      <div class="hidden lg:block absolute left-0 top-0 w-1/2 h-screen z-0">
         <div class="absolute left-0 top-0 transform w-full">
           <div class="relative w-full pt-full rounded-r-full bg-blue-800">
             <!-- Barangay Logo -->
@@ -45,79 +45,94 @@ import { environment } from '../../environment/environment';
           </div>
         </div>
       </div>
-      <!-- New Light blue circle in top left corner -->
-      <div class="absolute left-[-15vh] top-[-15vh] w-230 h-230 z-0">
+      
+      <!-- New Light blue circle in top left corner - Hidden on mobile -->
+      <div class="hidden lg:block absolute left-[-15vh] top-[-15vh] w-230 h-230 z-0">
         <div class="relative left-[-2vh] top-[-2vh] w-full h-full rounded-full bg-blue-300 opacity-25"></div>
         <div class="absolute left-1 top-1 w-215 h-215 transform -translate-x-1 -translate-y-1 bg-blue-800 rounded-full z-10"></div>
         <div class="absolute left-1/2 top-1/2 w-115 h-115 transform -translate-x-1/2 -translate-y-1/2 rounded-full z-100">
           <img src="/assets/BNC_Portal_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
-      <!-- City seal in top right corner -->
-      <div class="absolute top-2 right-2 z-0">
-        <div class="w-25 h-25">
+      
+      <!-- City seal in top right corner - Smaller on mobile -->
+      <div class="absolute top-2 right-2 z-20">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-25 lg:h-25">
           <img src="/assets/Olongapo_City_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
 
+      <!-- Mobile logo at top center - Only visible on mobile -->
+      <div class="lg:hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+        <div class="w-20 h-20 sm:w-24 sm:h-24">
+          <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
+        </div>
+      </div>
+
       <!-- Form content (blurred only when modal is open) -->
-      <div [class.blur-md]="showPreviewModal || showTermsModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-2 sm:px-6 ml-auto mr-8 sm:mr-0 transition-all duration-300" style="width: 60%">
+      <div [class.blur-md]="showPreviewModal || showTermsModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-3 sm:px-6 lg:ml-auto lg:mr-8 lg:px-0 transition-all duration-300 w-full lg:w-3/5 py-4 pt-20 lg:pt-4">
         <form
           [ngClass]="{
-            'w-full max-w-md': currentStep === 1,
-            'w-full max-w-4xl': currentStep === 2,
-            'w-full max-w-2xl': currentStep === 3
+            'w-full max-w-sm sm:max-w-md': currentStep === 1,
+            'w-full max-w-full sm:max-w-5xl lg:max-w-6xl': currentStep === 2,
+            'w-full max-w-lg sm:max-w-2xl lg:max-w-3xl': currentStep === 3
           }"
-          class="bg-white/90 backdrop-blur-lg p-4 sm:p-8 rounded-2xl shadow-2xl h-150 flex flex-col justify-center transition-all duration-300"
-          style="overflow: hidden;"
+          class="bg-white/90 backdrop-blur-lg p-4 sm:p-6 lg:p-8 rounded-2xl shadow-2xl transition-all duration-300 overflow-y-auto"
+          [ngClass]="{
+            'h-auto max-h-[85vh]': currentStep === 1,
+            'min-h-[85vh] max-h-[90vh]': currentStep === 2,
+            'h-auto max-h-[80vh]': currentStep === 3
+          }"
           (ngSubmit)="onNextOrShowPreview()"
         >
           <!-- Stepper Navigation -->
-          <div class="flex justify-center mb-6 sm:mb-8">
-            <div class="flex items-center gap-3">
-              <div [class.bg-blue-800]="currentStep === 1" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 1">1</div>
-              <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
-              <div [class.bg-blue-800]="currentStep === 2" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 2">2</div>
-              <div class="w-3 sm:w-4 h-1 bg-gray-300"></div>
-              <div [class.bg-blue-800]="currentStep === 3" class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300" [class.bg-gray-300]="currentStep !== 3">3</div>
+          <div class="flex justify-center mb-3 sm:mb-4 lg:mb-6">
+            <div class="flex items-center gap-2 sm:gap-3">
+              <div [class.bg-blue-800]="currentStep === 1" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm" [class.bg-gray-300]="currentStep !== 1">1</div>
+              <div class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 bg-gray-300"></div>
+              <div [class.bg-blue-800]="currentStep === 2" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm" [class.bg-gray-300]="currentStep !== 2">2</div>
+              <div class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 bg-gray-300"></div>
+              <div [class.bg-blue-800]="currentStep === 3" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm" [class.bg-gray-300]="currentStep !== 3">3</div>
             </div>
           </div>
 
           <!-- Section 1: Account Info -->
-          <div *ngIf="currentStep === 1" class="flex flex-col justify-center flex-1">
-            <h2 class="text-center text-2xl font-bold mb-6">Register Account</h2>
+          <div *ngIf="currentStep === 1" class="flex flex-col justify-center">
+            <h2 class="text-center text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mb-6">Register Account</h2>
             
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {{ errorMessage }}
+            <div *ngIf="errorMessage" class="mb-3 sm:mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <span class="text-sm sm:text-base">{{ errorMessage }}</span>
             </div>
             
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">Email *</label>
+            <div class="mb-2 sm:mb-3 lg:mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-1 sm:mb-2" for="email">Email *</label>
               <input 
                 type="email" 
                 id="email" 
                 [(ngModel)]="formData.account.email" 
-                name="email"
+                name="email" 
+                placeholder="Enter your email address"
                 [class.border-red-500]="hasFieldError('email')"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
-                required 
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 sm:py-2.5 lg:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                required
               />
               <div *ngIf="hasFieldError('email')" class="text-red-500 text-xs mt-1">
                 {{ getFieldError('email') }}
               </div>
             </div>
             
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-semibold mb-2" for="password">Password *</label>
+            <div class="mb-2 sm:mb-3 lg:mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-1 sm:mb-2" for="password">Password *</label>
               <input 
                 type="password" 
                 id="password" 
                 [(ngModel)]="formData.account.password" 
-                name="password"
+                name="password" 
+                placeholder="Create a strong password"
                 [class.border-red-500]="hasFieldError('password')"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
-                required 
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 sm:py-2.5 lg:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                required
               />
               <div *ngIf="hasFieldError('password')" class="text-red-500 text-xs mt-1">
                 {{ getFieldError('password') }}
@@ -127,24 +142,25 @@ import { environment } from '../../environment/environment';
               </div>
             </div>
             
-            <div class="mb-8">
-              <label class="block text-gray-700 text-sm font-semibold mb-2" for="confirmPassword">Confirm Password *</label>
+            <div class="mb-2 sm:mb-3 lg:mb-4">
+              <label class="block text-gray-700 text-sm font-semibold mb-1 sm:mb-2" for="confirmPassword">Confirm Password *</label>
               <input 
                 type="password" 
                 id="confirmPassword" 
                 [(ngModel)]="formData.account.confirmPassword" 
-                name="confirmPassword"
+                name="confirmPassword" 
+                placeholder="Re-enter your password"
                 [class.border-red-500]="hasFieldError('confirmPassword')"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 transition" 
-                required 
+                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 sm:py-2.5 lg:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                required
               />
               <div *ngIf="hasFieldError('confirmPassword')" class="text-red-500 text-xs mt-1">
                 {{ getFieldError('confirmPassword') }}
               </div>
             </div>
-            
+
             <!-- Terms and Conditions -->
-            <div class="mb-6">
+            <div class="mb-3 sm:mb-4 lg:mb-6">
               <div class="flex items-start">
                 <input 
                   type="checkbox" 
@@ -152,9 +168,9 @@ import { environment } from '../../environment/environment';
                   [(ngModel)]="acceptedTerms"
                   name="acceptTerms"
                   [class.border-red-500]="hasFieldError('acceptedTerms')"
-                  class="mt-1 mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  class="mt-1 mr-2 sm:mr-3 h-3 w-3 sm:h-4 sm:w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label for="acceptTerms" class="text-sm text-gray-700">
+                <label for="acceptTerms" class="text-xs sm:text-sm text-gray-700 leading-tight">
                   I agree to the 
                   <button 
                     type="button"
@@ -174,63 +190,60 @@ import { environment } from '../../environment/environment';
                   *
                 </label>
               </div>
-              <div *ngIf="hasFieldError('acceptedTerms')" class="text-red-500 text-xs mt-1 ml-7">
+              <div *ngIf="hasFieldError('acceptedTerms')" class="text-red-500 text-xs mt-1 ml-5 sm:ml-7">
                 {{ getFieldError('acceptedTerms') }}
               </div>
             </div>
             
-            <div class="flex justify-end">
+            <div class="flex justify-end pt-2">
               <button 
                 type="button" 
                 (click)="nextStep()"
                 [disabled]="isLoading || !acceptedTerms"
-                class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-2"
+                class="w-full sm:w-auto bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 lg:py-3 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Next
+                {{ isLoading ? 'Processing...' : 'Next' }}
               </button>
             </div>
-            <p class="text-center mt-4">
-              Already have an account? <a href="sign-in" class="text-blue-600 hover:underline">Login Now</a>
-            </p>
           </div>
 
           <!-- Section 2: Personal Info (personal details only) -->
           <div *ngIf="currentStep === 2" class="flex-1 overflow-y-auto">
-            <h2 class="text-center text-2xl font-bold mb-6">Personal Information</h2>
+            <h2 class="text-center text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mb-6">Personal Information</h2>
             
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {{ errorMessage }}
+            <div *ngIf="errorMessage" class="mb-3 sm:mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <span class="text-sm">{{ errorMessage }}</span>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
-              <!-- Left column: Profile image at top, then fields below -->
-              <div class="flex flex-col items-center md:items-stretch col-span-1">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
+              <!-- Left column: Profile image at top, then fields below (Full width on mobile) -->
+              <div class="flex flex-col items-center lg:items-stretch lg:col-span-1">
                 <!-- Profile image at the very top -->
-                <div class="flex flex-col items-center mb-4">
-                  <div class="w-32 h-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center mb-2 border-4 border-blue-300">
+                <div class="flex flex-col items-center mb-3 sm:mb-4">
+                  <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center mb-2 border-4 border-blue-300">
                     <img *ngIf="formData.profileImage" [src]="formData.profileImage" alt="Profile Image" class="object-cover w-full h-full" />
-                    <span *ngIf="!formData.profileImage" class="text-gray-400 text-4xl">+</span>
+                    <span *ngIf="!formData.profileImage" class="text-gray-400 text-2xl sm:text-3xl lg:text-4xl">+</span>
                   </div>
-                  <label class="cursor-pointer bg-blue-600 text-white px-2 py-2 rounded-lg hover:bg-blue-700 transition mb-4">
+                  <label class="cursor-pointer bg-blue-600 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition mb-3 sm:mb-4 text-xs sm:text-sm">
                     Upload Profile Image
                     <input type="file" accept="image/*" (change)="onProfileImageChange($event)" hidden>
                   </label>
                 </div>
-                <!-- Fields below the image -->
-                <div class="flex flex-col gap-4">
+                <!-- Fields below the image - Mobile: 2 columns, Desktop: 1 column -->
+                <div class="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 lg:gap-4 w-full">
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Last Name *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Last Name *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.lastName" 
                       name="lastName" 
                       [class.border-red-500]="hasFieldError('lastName')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm" 
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2" 
                       required
                     >
                     <div *ngIf="hasFieldError('lastName')" class="text-red-500 text-xs mt-1">
@@ -238,47 +251,47 @@ import { environment } from '../../environment/environment';
                     </div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">First Name *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">First Name *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.firstName" 
                       name="firstName" 
                       [class.border-red-500]="hasFieldError('firstName')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm" 
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2" 
                       required
                     >
                     <div *ngIf="hasFieldError('firstName')" class="text-red-500 text-xs mt-1">
                       {{ getFieldError('firstName') }}
                     </div>
                   </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Middle Name *</label>
+                  <div class="col-span-2 lg:col-span-1">
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Middle Name *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.middleName" 
                       name="middleName" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('middleName') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('middleName') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter middle name"
                     >
-                    <div *ngIf="hasFieldError('middleName')" class="text-red-500 text-sm mt-1">{{ getFieldError('middleName') }}</div>
+                    <div *ngIf="hasFieldError('middleName')" class="text-red-500 text-xs mt-1">{{ getFieldError('middleName') }}</div>
                   </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Suffix</label>
-                    <input type="text" [(ngModel)]="formData.personalInfo.suffix" name="suffix" class="w-full border-gray-300 rounded-lg shadow-sm">
+                  <div class="col-span-2 lg:col-span-1">
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Suffix</label>
+                    <input type="text" [(ngModel)]="formData.personalInfo.suffix" name="suffix" class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2">
                   </div>
                 </div>
               </div>
               <!-- Right column: The rest of the fields -->
-              <div class="md:col-span-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              <div class="lg:col-span-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4 mb-3 sm:mb-4">
                   <!-- Remove the fields already placed on the left column above -->
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Gender *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Gender *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.gender" 
                       name="gender" 
                       [class.border-red-500]="hasFieldError('gender')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm"
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                     >
                       <option value="">Select</option>
                       <option value="Male">Male</option>
@@ -289,28 +302,28 @@ import { environment } from '../../environment/environment';
                     </div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Birth Date *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Birth Date *</label>
                     <input 
                       type="date" 
                       [(ngModel)]="formData.personalInfo.birthDate" 
                       name="birthDate" 
                       [class.border-red-500]="hasFieldError('birthDate')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm"
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                     >
                     <div *ngIf="hasFieldError('birthDate')" class="text-red-500 text-xs mt-1">
                       {{ getFieldError('birthDate') }}
                     </div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Birth Place *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Birth Place *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.birthPlace" 
                       name="birthPlace" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('birthPlace') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('birthPlace') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter birth place"
                     >
-                    <div *ngIf="hasFieldError('birthPlace')" class="text-red-500 text-sm mt-1">{{ getFieldError('birthPlace') }}</div>
+                    <div *ngIf="hasFieldError('birthPlace')" class="text-red-500 text-xs mt-1">{{ getFieldError('birthPlace') }}</div>
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Civil Status *</label>
@@ -564,12 +577,12 @@ import { environment } from '../../environment/environment';
               </div>
             </div>
             
-            <div class="flex justify-between">
+            <div class="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
               <button 
                 type="button" 
                 (click)="prevStep()"
                 [disabled]="isLoading"
-                class="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400"
+                class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base order-2 sm:order-1"
               >
                 Back
               </button>
@@ -577,7 +590,7 @@ import { environment } from '../../environment/environment';
                 type="button"
                 (click)="nextStep()"
                 [disabled]="isLoading"
-                class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400"
+                class="w-full sm:w-auto bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base order-1 sm:order-2"
               >
                 Next
               </button>
@@ -586,80 +599,80 @@ import { environment } from '../../environment/environment';
 
           <!-- Section 3: Emergency Contact -->
           <div *ngIf="currentStep === 3" class="flex-1 flex flex-col">
-            <h2 class="text-center text-2xl font-bold mb-6">Emergency Contact</h2>
+            <h2 class="text-center text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mb-6">Emergency Contact</h2>
             
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {{ errorMessage }}
+            <div *ngIf="errorMessage" class="mb-3 sm:mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              <span class="text-sm">{{ errorMessage }}</span>
             </div>
             
             <div class="flex-1 flex flex-col justify-center">
-              <div class="max-w-2xl mx-auto">
+              <div class="max-w-4xl mx-auto w-full">
                 <div class="mb-4">
-                  <h3 class="text-lg font-semibold mb-4 text-gray-800">Emergency Contact Information</h3>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Emergency Contact Information</h3>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label class="block text-gray-700 text-sm font-bold mb-2">Full Name *</label>
+                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Full Name *</label>
                       <input 
                         type="text" 
                         [(ngModel)]="formData.emergencyContact.fullName" 
                         name="emergencyFullName" 
-                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecFullName') ? 'border-red-500' : 'border-gray-300')"
+                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecFullName') ? 'border-red-500' : 'border-gray-300')"
                         placeholder="Enter emergency contact full name"
                       >
-                      <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecFullName') }}</div>
+                      <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecFullName') }}</div>
                     </div>
                     <div>
-                      <label class="block text-gray-700 text-sm font-bold mb-2">Relationship *</label>
+                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Relationship *</label>
                       <input 
                         type="text" 
                         [(ngModel)]="formData.emergencyContact.relationship" 
                         name="emergencyRelationship" 
-                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecRelationship') ? 'border-red-500' : 'border-gray-300')"
+                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecRelationship') ? 'border-red-500' : 'border-gray-300')"
                         placeholder="Enter relationship (e.g., Mother, Father, Spouse)"
                       >
-                      <div *ngIf="hasFieldError('ecRelationship')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecRelationship') }}</div>
+                      <div *ngIf="hasFieldError('ecRelationship')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecRelationship') }}</div>
                     </div>
                     <div>
-                      <label class="block text-gray-700 text-sm font-bold mb-2">Contact No. *</label>
+                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Contact No. *</label>
                       <input 
                         type="tel" 
                         [(ngModel)]="formData.emergencyContact.contactNo" 
                         name="emergencyContactNo" 
-                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
+                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
                         placeholder="Enter contact number"
                       >
-                      <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecContactNo') }}</div>
+                      <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecContactNo') }}</div>
                     </div>
                     <div>
-                      <label class="block text-gray-700 text-sm font-bold mb-2">Address *</label>
+                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Address *</label>
                       <input 
                         type="text" 
                         [(ngModel)]="formData.emergencyContact.address" 
                         name="emergencyAddress" 
-                        [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('ecAddress') ? 'border-red-500' : 'border-gray-300')"
+                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecAddress') ? 'border-red-500' : 'border-gray-300')"
                         placeholder="Enter emergency contact address"
                       >
-                      <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-sm mt-1">{{ getFieldError('ecAddress') }}</div>
+                      <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecAddress') }}</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div class="flex justify-between mt-6">
+            <div class="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
               <button 
                 type="button" 
                 (click)="prevStep()"
                 [disabled]="isLoading"
-                class="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400"
+                class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base order-2 sm:order-1"
               >
                 Back
               </button>
               <button 
                 type="submit"
                 [disabled]="isLoading"
-                class="bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center gap-2"
+                class="w-full sm:w-auto bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2"
               >
                 <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

@@ -24,8 +24,8 @@ import { RouterOutlet } from '@angular/router';
       </div>
       <!--End Background Animation Body-->
 
-      <!-- Blue circular design with logo on left -->
-      <div class="absolute left-0 top-0 w-1/2 h-screen">
+      <!-- Blue circular design with logo on left - Hidden on mobile, visible on larger screens -->
+      <div class="hidden lg:block absolute left-0 top-0 w-1/2 h-screen">
         <div class="absolute left-0 top-0 transform w-full">
           <div class="relative w-full pt-full rounded-r-full bg-blue-800">
             <!-- Barangay Logo -->
@@ -37,20 +37,32 @@ import { RouterOutlet } from '@angular/router';
           </div>
         </div>
       </div>
-      <!-- New Light blue circle in top left corner -->
-      <div class="absolute left-[-15vh] top-[-15vh] w-230 h-230">
+      
+      <!-- New Light blue circle in top left corner - Hidden on mobile -->
+      <div class="hidden lg:block absolute left-[-15vh] top-[-15vh] w-230 h-230">
         <div class="relative left-[-2vh] top-[-2vh] w-full h-full rounded-full bg-blue-300 opacity-25"></div>
         <div class="absolute left-1 top-1 w-215 h-215 transform -translate-x-1 -translate-y-1 bg-blue-800 rounded-full z-10"></div>
-        <div class="absolute left-1/2 top-1/2 w-115 h-115 transform -translate-x-1/2 -translate-y-1/2 rounded-full z-100"><img src="/assets/BNC_Portal_Logo.png" alt="Olongapo City Seal" class="w-full h-full"></div>
+        <div class="absolute left-1/2 top-1/2 w-115 h-115 transform -translate-x-1/2 -translate-y-1/2 rounded-full z-100">
+          <img src="/assets/BNC_Portal_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
+        </div>
       </div>
-      <!-- City seal in top right corner -->
-      <div class="absolute top-2 right-2">
-        <div class="w-25 h-25">
+      
+      <!-- City seal in top right corner - Visible on all screens but smaller on mobile -->
+      <div class="absolute top-2 right-2 z-20">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-25 lg:h-25">
           <img src="/assets/Olongapo_City_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
-      <!-- Content area -->
-      <div class="absolute right-20 top-0 w-1/2 h-screen z-10">
+      
+      <!-- Mobile logo at top center - Only visible on mobile -->
+      <div class="lg:hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+        <div class="w-24 h-24 sm:w-28 sm:h-28">
+          <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
+        </div>
+      </div>
+      
+      <!-- Content area - Full width on mobile, positioned properly on desktop -->
+      <div class="relative w-full h-screen z-10 lg:absolute lg:right-0 lg:top-0 lg:w-1/2">
         <router-outlet/>
       </div>
     </div>
