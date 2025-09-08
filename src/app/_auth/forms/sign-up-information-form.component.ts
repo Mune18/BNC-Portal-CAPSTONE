@@ -326,11 +326,11 @@ import { environment } from '../../environment/environment';
                     <div *ngIf="hasFieldError('birthPlace')" class="text-red-500 text-xs mt-1">{{ getFieldError('birthPlace') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Civil Status *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Civil Status *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.civilStatus" 
                       name="civilStatus" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('civilStatus') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('civilStatus') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Single">Single</option>
@@ -338,70 +338,70 @@ import { environment } from '../../environment/environment';
                       <option value="Widowed">Widowed</option>
                       <option value="Divorced">Divorced</option>
                     </select>
-                    <div *ngIf="hasFieldError('civilStatus')" class="text-red-500 text-sm mt-1">{{ getFieldError('civilStatus') }}</div>
+                    <div *ngIf="hasFieldError('civilStatus')" class="text-red-500 text-xs mt-1">{{ getFieldError('civilStatus') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Nationality *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Nationality *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.nationality" 
                       name="nationality" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter nationality"
                     >
-                    <div *ngIf="hasFieldError('nationality')" class="text-red-500 text-sm mt-1">{{ getFieldError('nationality') }}</div>
+                    <div *ngIf="hasFieldError('nationality')" class="text-red-500 text-xs mt-1">{{ getFieldError('nationality') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Religion *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Religion *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.religion" 
                       name="religion" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('religion') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('religion') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter religion"
                     >
-                    <div *ngIf="hasFieldError('religion')" class="text-red-500 text-sm mt-1">{{ getFieldError('religion') }}</div>
+                    <div *ngIf="hasFieldError('religion')" class="text-red-500 text-xs mt-1">{{ getFieldError('religion') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Occupation *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Occupation *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.occupation" 
                       name="occupation" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('occupation') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('occupation') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter occupation"
                     >
-                    <div *ngIf="hasFieldError('occupation')" class="text-red-500 text-sm mt-1">{{ getFieldError('occupation') }}</div>
+                    <div *ngIf="hasFieldError('occupation')" class="text-red-500 text-xs mt-1">{{ getFieldError('occupation') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Contact No. *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Contact No. *</label>
                     <input 
                       type="tel" 
                       [(ngModel)]="formData.personalInfo.contactNo" 
                       name="contactNo" 
                       [class.border-red-500]="hasFieldError('contactNo')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm"
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                     >
                     <div *ngIf="hasFieldError('contactNo')" class="text-red-500 text-xs mt-1">
                       {{ getFieldError('contactNo') }}
                     </div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">PWD? *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">PWD? *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.pwd" 
                       name="pwd" 
                       (ngModelChange)="onPwdChange()"
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('pwd') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('pwd') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('pwd')" class="text-red-500 text-sm mt-1">{{ getFieldError('pwd') }}</div>
+                    <div *ngIf="hasFieldError('pwd')" class="text-red-500 text-xs mt-1">{{ getFieldError('pwd') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
                       PWD ID No. <span *ngIf="formData.personalInfo.pwd === 'Yes'" class="text-red-500">*</span>
                     </label>
                     <input 
@@ -409,51 +409,51 @@ import { environment } from '../../environment/environment';
                       [(ngModel)]="formData.personalInfo.pwdIdNo" 
                       name="pwdIdNo" 
                       [disabled]="formData.personalInfo.pwd !== 'Yes'"
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('pwdIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.pwd !== 'Yes' ? ' bg-gray-100' : '')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('pwdIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.pwd !== 'Yes' ? ' bg-gray-100' : '')"
                       placeholder="Enter PWD ID Number"
                     >
-                    <div *ngIf="hasFieldError('pwdIdNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('pwdIdNo') }}</div>
+                    <div *ngIf="hasFieldError('pwdIdNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('pwdIdNo') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Family Monthly Income *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Family Monthly Income *</label>
                     <input 
                       type="number" 
                       [(ngModel)]="formData.personalInfo.monthlyIncome" 
                       name="monthlyIncome" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('monthlyIncome') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('monthlyIncome') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter monthly income"
                     >
-                    <div *ngIf="hasFieldError('monthlyIncome')" class="text-red-500 text-sm mt-1">{{ getFieldError('monthlyIncome') }}</div>
+                    <div *ngIf="hasFieldError('monthlyIncome')" class="text-red-500 text-xs mt-1">{{ getFieldError('monthlyIncome') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Indigent? *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Indigent? *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.indigent" 
                       name="indigent" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('indigent') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('indigent') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('indigent')" class="text-red-500 text-sm mt-1">{{ getFieldError('indigent') }}</div>
+                    <div *ngIf="hasFieldError('indigent')" class="text-red-500 text-xs mt-1">{{ getFieldError('indigent') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Solo Parent? *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Solo Parent? *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.soloParent" 
                       name="soloParent" 
                       (ngModelChange)="onSoloParentChange()"
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('soloParent') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('soloParent') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('soloParent')" class="text-red-500 text-sm mt-1">{{ getFieldError('soloParent') }}</div>
+                    <div *ngIf="hasFieldError('soloParent')" class="text-red-500 text-xs mt-1">{{ getFieldError('soloParent') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
                       Solo Parent ID No. <span *ngIf="formData.personalInfo.soloParent === 'Yes'" class="text-red-500">*</span>
                     </label>
                     <input 
@@ -461,27 +461,27 @@ import { environment } from '../../environment/environment';
                       [(ngModel)]="formData.personalInfo.soloParentIdNo" 
                       name="soloParentIdNo" 
                       [disabled]="formData.personalInfo.soloParent !== 'Yes'"
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('soloParentIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.soloParent !== 'Yes' ? ' bg-gray-100' : '')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('soloParentIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.soloParent !== 'Yes' ? ' bg-gray-100' : '')"
                       placeholder="Enter Solo Parent ID Number"
                     >
-                    <div *ngIf="hasFieldError('soloParentIdNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('soloParentIdNo') }}</div>
+                    <div *ngIf="hasFieldError('soloParentIdNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('soloParentIdNo') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Senior Citizen? *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Senior Citizen? *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.seniorCitizen" 
                       name="seniorCitizen" 
                       (ngModelChange)="onSeniorCitizenChange()"
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('seniorCitizen') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('seniorCitizen') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('seniorCitizen')" class="text-red-500 text-sm mt-1">{{ getFieldError('seniorCitizen') }}</div>
+                    <div *ngIf="hasFieldError('seniorCitizen')" class="text-red-500 text-xs mt-1">{{ getFieldError('seniorCitizen') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
                       Senior Citizen ID No. <span *ngIf="formData.personalInfo.seniorCitizen === 'Yes'" class="text-red-500">*</span>
                     </label>
                     <input 
@@ -489,87 +489,87 @@ import { environment } from '../../environment/environment';
                       [(ngModel)]="formData.personalInfo.seniorCitizenIdNo" 
                       name="seniorCitizenIdNo" 
                       [disabled]="formData.personalInfo.seniorCitizen !== 'Yes'"
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('seniorCitizenIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.seniorCitizen !== 'Yes' ? ' bg-gray-100' : '')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('seniorCitizenIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.seniorCitizen !== 'Yes' ? ' bg-gray-100' : '')"
                       placeholder="Enter Senior Citizen ID Number"
                     >
-                    <div *ngIf="hasFieldError('seniorCitizenIdNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('seniorCitizenIdNo') }}</div>
+                    <div *ngIf="hasFieldError('seniorCitizenIdNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('seniorCitizenIdNo') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">4Ps Member? *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">4Ps Member? *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.fourPsMember" 
                       name="fourPsMember" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('fourPsMember') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('fourPsMember') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('fourPsMember')" class="text-red-500 text-sm mt-1">{{ getFieldError('fourPsMember') }}</div>
+                    <div *ngIf="hasFieldError('fourPsMember')" class="text-red-500 text-xs mt-1">{{ getFieldError('fourPsMember') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Registered Voter? *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Registered Voter? *</label>
                     <select 
                       [(ngModel)]="formData.personalInfo.registeredVoter" 
                       name="registeredVoter" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('registeredVoter') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('registeredVoter') ? 'border-red-500' : 'border-gray-300')"
                     >
                       <option value="">Select</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('registeredVoter')" class="text-red-500 text-sm mt-1">{{ getFieldError('registeredVoter') }}</div>
+                    <div *ngIf="hasFieldError('registeredVoter')" class="text-red-500 text-xs mt-1">{{ getFieldError('registeredVoter') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Purok No. *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Purok No. *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.purokNo" 
                       name="purokNo" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('purokNo') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('purokNo') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter purok number"
                     >
-                    <div *ngIf="hasFieldError('purokNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('purokNo') }}</div>
+                    <div *ngIf="hasFieldError('purokNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('purokNo') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">House No. *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">House No. *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.houseNo" 
                       name="houseNo" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('houseNo') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('houseNo') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter house number"
                     >
-                    <div *ngIf="hasFieldError('houseNo')" class="text-red-500 text-sm mt-1">{{ getFieldError('houseNo') }}</div>
+                    <div *ngIf="hasFieldError('houseNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('houseNo') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Street *</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Street *</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.street" 
                       name="street" 
-                      [class]="'w-full border rounded-lg shadow-sm p-2 ' + (hasFieldError('street') ? 'border-red-500' : 'border-gray-300')"
+                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('street') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter street name"
                     >
-                    <div *ngIf="hasFieldError('street')" class="text-red-500 text-sm mt-1">{{ getFieldError('street') }}</div>
+                    <div *ngIf="hasFieldError('street')" class="text-red-500 text-xs mt-1">{{ getFieldError('street') }}</div>
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">National ID No.</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.otherDetails.nationalIdNo" 
                       name="nationalIdNo" 
-                      class="w-full border-gray-300 rounded-lg shadow-sm p-2"
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                       placeholder="Enter National ID Number (optional)"
                     >
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Voter's ID No.</label>
+                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Voter's ID No.</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.otherDetails.votersIdNo" 
                       name="votersIdNo" 
-                      class="w-full border-gray-300 rounded-lg shadow-sm p-2"
+                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                       placeholder="Enter Voter's ID Number (optional)"
                     >
                   </div>
