@@ -208,4 +208,56 @@ export class UserService extends BaseAppwriteService {
       throw error;
     }
   }
+
+  async deleteUser(userId: string): Promise<void> {
+    try {
+      // Find and delete the user document by uid
+      const userResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.userCollectionId,
+        [Query.equal('uid', userId)]
+      );
+
+      if (userResponse.documents.length > 0) {
+        const userDoc = userResponse.documents[0];
+        await this.database.deleteDocument(
+          environment.appwriteDatabaseId,
+          environment.userCollectionId,
+          userDoc.$id
+        );
+        console.log('User document deleted successfully');
+      } else {
+        console.log('No user document found to delete for userId:', userId);
+      }
+    } catch (error) {
+      console.error('Error deleting user document:', error);
+      throw error;
+    }
+  }
+
+  async deleteResident(userId: string): Promise<void> {
+    try {
+      // Find and delete the resident document by userId
+      const residentResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [Query.equal('userId', userId)]
+      );
+
+      if (residentResponse.documents.length > 0) {
+        const residentDoc = residentResponse.documents[0];
+        await this.database.deleteDocument(
+          environment.appwriteDatabaseId,
+          environment.residentCollectionId,
+          residentDoc.$id
+        );
+        console.log('Resident document deleted successfully');
+      } else {
+        console.log('No resident document found to delete for userId:', userId);
+      }
+    } catch (error) {
+      console.error('Error deleting resident document:', error);
+      throw error;
+    }
+  }
 }

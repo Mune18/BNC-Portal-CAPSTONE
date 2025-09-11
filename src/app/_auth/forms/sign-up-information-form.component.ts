@@ -88,11 +88,55 @@ import { environment } from '../../environment/environment';
           <!-- Stepper Navigation -->
           <div class="flex justify-center mb-3 sm:mb-4 lg:mb-6">
             <div class="flex items-center gap-2 sm:gap-3">
-              <div [class.bg-blue-800]="currentStep === 1" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm" [class.bg-gray-300]="currentStep !== 1">1</div>
-              <div class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 bg-gray-300"></div>
-              <div [class.bg-blue-800]="currentStep === 2" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm" [class.bg-gray-300]="currentStep !== 2">2</div>
-              <div class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 bg-gray-300"></div>
-              <div [class.bg-blue-800]="currentStep === 3" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm" [class.bg-gray-300]="currentStep !== 3">3</div>
+              <!-- Step 1 -->
+              <div [ngClass]="{
+                'bg-green-500': currentStep > 1,
+                'bg-blue-800': currentStep === 1,
+                'bg-gray-300': currentStep < 1
+              }" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm">
+                <!-- Show checkmark if step is completed -->
+                <svg *ngIf="currentStep > 1" class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <!-- Show number if step is current or not completed -->
+                <span *ngIf="currentStep <= 1">1</span>
+              </div>
+              <!-- Connector line -->
+              <div [ngClass]="{
+                'bg-green-500': currentStep > 1,
+                'bg-gray-300': currentStep <= 1
+              }" class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 transition-colors duration-300"></div>
+              <!-- Step 2 -->
+              <div [ngClass]="{
+                'bg-green-500': currentStep > 2,
+                'bg-blue-800': currentStep === 2,
+                'bg-gray-300': currentStep < 2
+              }" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm">
+                <!-- Show checkmark if step is completed -->
+                <svg *ngIf="currentStep > 2" class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <!-- Show number if step is current or not completed -->
+                <span *ngIf="currentStep <= 2">2</span>
+              </div>
+              <!-- Connector line -->
+              <div [ngClass]="{
+                'bg-green-500': currentStep > 2,
+                'bg-gray-300': currentStep <= 2
+              }" class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 transition-colors duration-300"></div>
+              <!-- Step 3 -->
+              <div [ngClass]="{
+                'bg-green-500': currentStep > 3,
+                'bg-blue-800': currentStep === 3,
+                'bg-gray-300': currentStep < 3
+              }" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm">
+                <!-- Show checkmark if step is completed (when form is submitted successfully) -->
+                <svg *ngIf="currentStep > 3" class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <!-- Show number if step is current or not completed -->
+                <span *ngIf="currentStep <= 3">3</span>
+              </div>
             </div>
           </div>
 
@@ -1512,96 +1556,156 @@ export class SignUpInformationFormComponent implements OnInit {
 
       console.log('All validation passed. Proceeding with account creation...');
 
-      // STEP 1: Create user in Appwrite Auth
-      console.log('Step 1: Creating user account...');
-      const authResponse = await this.authService.register({
-        email: this.formData.account.email,
-        password: this.formData.account.password,
-        confirmPassword: this.formData.account.confirmPassword
-      });
+      // Variables to track what was created for rollback
+      let authResponse: any = null;
+      let userDocCreated = false;
+      let residentDocCreated = false;
 
-      // STEP 2: Create user document in users collection
-      console.log('Step 2: Creating user document...');
-      const userDoc = {
-        uid: authResponse.$id,
-        email: authResponse.email,
-        role: 'resident',
-        created_at: new Date().toISOString(),
-        is_active: true
-      };
-      await this.userService.createUser(userDoc);
+      try {
+        // STEP 1: Create user in Appwrite Auth
+        console.log('Step 1: Creating user account...');
+        authResponse = await this.authService.register({
+          email: this.formData.account.email,
+          password: this.formData.account.password,
+          confirmPassword: this.formData.account.confirmPassword
+        });
+        console.log('Auth account created successfully with ID:', authResponse.$id);
 
-      // STEP 3: Create resident document
-      console.log('Step 3: Creating resident document...');
-      const residentDoc = {
-        profileImage: this.formData.profileImage || '', 
-        userId: authResponse.$id,
-        lastName: this.formData.personalInfo.lastName,
-        firstName: this.formData.personalInfo.firstName,
-        middleName: this.formData.personalInfo.middleName,
-        suffix: this.formData.personalInfo.suffix,
-        gender: this.formData.personalInfo.gender,
-        birthDate: this.formData.personalInfo.birthDate,
-        birthPlace: this.formData.personalInfo.birthPlace,
-        civilStatus: this.formData.personalInfo.civilStatus,
-        nationality: this.formData.personalInfo.nationality,
-        religion: this.formData.personalInfo.religion,
-        occupation: this.formData.personalInfo.occupation,
-        contactNo: this.formData.personalInfo.contactNo,
-        pwd: this.formData.personalInfo.pwd,
-        pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '',
-        monthlyIncome: this.formData.personalInfo.monthlyIncome,
-        indigent: this.formData.personalInfo.indigent,
-        soloParent: this.formData.personalInfo.soloParent,
-        soloParentIdNo: this.formData.personalInfo.soloParent === 'Yes' ? this.formData.personalInfo.soloParentIdNo : '',
-        seniorCitizen: this.formData.personalInfo.seniorCitizen,
-        seniorCitizenIdNo: this.formData.personalInfo.seniorCitizen === 'Yes' ? this.formData.personalInfo.seniorCitizenIdNo : '',
-        fourPsMember: this.formData.personalInfo.fourPsMember,
-        registeredVoter: this.formData.personalInfo.registeredVoter,
-        purokNo: this.formData.personalInfo.purokNo,
-        houseNo: this.formData.personalInfo.houseNo,
-        street: this.formData.personalInfo.street,
-        ecFullName: this.formData.emergencyContact.fullName,
-        ecRelation: this.formData.emergencyContact.relationship,
-        ecContactNo: this.formData.emergencyContact.contactNo,
-        ecAddress: this.formData.emergencyContact.address,
-        NationalIdNo: this.formData.otherDetails.nationalIdNo,
-        votersIdNo: this.formData.otherDetails.votersIdNo,
-        deceased: 'Alive',
-        dateOfRegistration: new Date().toISOString()
-      };
-      
-      console.log('Creating resident document with profile image:', residentDoc.profileImage);
-      
-      await this.userService.createResident(residentDoc);
-      
-      console.log('Registration completed successfully');
-      
-      // Show success modal
-      this.showPreviewModal = false;
-      this.showSuccessModal = true;
+        // STEP 2: Create user document in users collection
+        console.log('Step 2: Creating user document...');
+        const userDoc = {
+          uid: authResponse.$id,
+          email: authResponse.email,
+          role: 'resident',
+          created_at: new Date().toISOString(),
+          is_active: true
+        };
+        await this.userService.createUser(userDoc);
+        userDocCreated = true;
+        console.log('User document created successfully');
+
+        // STEP 3: Create resident document
+        console.log('Step 3: Creating resident document...');
+        const residentDoc = {
+          profileImage: this.formData.profileImage || '', 
+          userId: authResponse.$id,
+          lastName: this.formData.personalInfo.lastName,
+          firstName: this.formData.personalInfo.firstName,
+          middleName: this.formData.personalInfo.middleName,
+          suffix: this.formData.personalInfo.suffix,
+          gender: this.formData.personalInfo.gender,
+          birthDate: this.formData.personalInfo.birthDate,
+          birthPlace: this.formData.personalInfo.birthPlace,
+          civilStatus: this.formData.personalInfo.civilStatus,
+          nationality: this.formData.personalInfo.nationality,
+          religion: this.formData.personalInfo.religion,
+          occupation: this.formData.personalInfo.occupation,
+          contactNo: this.formData.personalInfo.contactNo,
+          pwd: this.formData.personalInfo.pwd,
+          pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '',
+          monthlyIncome: this.formData.personalInfo.monthlyIncome,
+          indigent: this.formData.personalInfo.indigent,
+          soloParent: this.formData.personalInfo.soloParent,
+          soloParentIdNo: this.formData.personalInfo.soloParent === 'Yes' ? this.formData.personalInfo.soloParentIdNo : '',
+          seniorCitizen: this.formData.personalInfo.seniorCitizen,
+          seniorCitizenIdNo: this.formData.personalInfo.seniorCitizen === 'Yes' ? this.formData.personalInfo.seniorCitizenIdNo : '',
+          fourPsMember: this.formData.personalInfo.fourPsMember,
+          registeredVoter: this.formData.personalInfo.registeredVoter,
+          purokNo: this.formData.personalInfo.purokNo,
+          houseNo: this.formData.personalInfo.houseNo,
+          street: this.formData.personalInfo.street,
+          ecFullName: this.formData.emergencyContact.fullName,
+          ecRelation: this.formData.emergencyContact.relationship,
+          ecContactNo: this.formData.emergencyContact.contactNo,
+          ecAddress: this.formData.emergencyContact.address,
+          NationalIdNo: this.formData.otherDetails.nationalIdNo,
+          votersIdNo: this.formData.otherDetails.votersIdNo,
+          deceased: 'Alive',
+          dateOfRegistration: new Date().toISOString()
+        };
+        
+        console.log('Creating resident document with profile image:', residentDoc.profileImage);
+        
+        await this.userService.createResident(residentDoc);
+        residentDocCreated = true;
+        console.log('Resident document created successfully');
+        
+        console.log('Registration completed successfully');
+        
+        // Show success modal
+        this.showPreviewModal = false;
+        this.showSuccessModal = true;
+
+      } catch (dbError: any) {
+        console.error('Database operation failed:', dbError);
+        
+        // ROLLBACK: Attempt to clean up database records if they were created
+        console.log('Starting rollback process...');
+        
+        try {
+          // Try to delete resident document if it was created
+          if (residentDocCreated && authResponse?.$id) {
+            console.log('Rolling back: Deleting resident document...');
+            await this.userService.deleteResident(authResponse.$id);
+            console.log('Resident document rollback completed');
+          }
+          
+          // Try to delete user document if it was created
+          if (userDocCreated && authResponse?.$id) {
+            console.log('Rolling back: Deleting user document...');
+            await this.userService.deleteUser(authResponse.$id);
+            console.log('User document rollback completed');
+          }
+          
+          // Attempt to clean up auth session
+          if (authResponse?.$id) {
+            console.log('Rolling back: Cleaning up auth session...');
+            await this.authService.attemptAccountCleanup();
+            console.log('Auth session cleanup completed');
+          }
+          
+        } catch (rollbackError) {
+          console.error('Error during rollback:', rollbackError);
+          // Continue with error handling even if rollback fails
+        }
+        
+        // Re-throw the original database error
+        throw dbError;
+      }
       
     } catch (error: any) {
       console.error('Registration error:', error);
       
-      // Handle specific error types
+      // Handle specific error types with better messaging
       if (error.message && error.message.includes('user with the same email already exists')) {
         this.errorMessage = 'An account with this email already exists. Please use a different email or try logging in.';
       } else if (error.message && error.message.includes('Invalid document structure')) {
         this.errorMessage = 'There was an error with the registration data. Please check all fields and try again.';
+      } else if (error.message && error.message.includes('Network request failed')) {
+        this.errorMessage = 'Network connection error. Please check your internet connection and try again.';
+      } else if (error.message && error.message.includes('Document with the requested ID could not be found')) {
+        this.errorMessage = 'Database error occurred. Please try again. If the problem persists, contact support.';
       } else if (error.message && (
           error.message.includes('required') || 
           error.message.includes('cannot be empty') || 
           error.message.includes('must be selected') ||
           error.message.includes('valid email') ||
           error.message.includes('password') ||
-          error.message.includes('ID Number')
+          error.message.includes('ID Number') ||
+          error.message.includes('must be a positive number') ||
+          error.message.includes('must be selected')
         )) {
         this.errorMessage = error.message;
+      } else if (error.code === 409) {
+        this.errorMessage = 'This email is already registered. Please use a different email address.';
+      } else if (error.code === 400) {
+        this.errorMessage = 'Invalid registration data. Please check all fields and try again.';
+      } else if (error.code === 500) {
+        this.errorMessage = 'Server error. Please try again later.';
       } else if (error.message) {
-        this.errorMessage = error.message;
+        this.errorMessage = `Registration failed: ${error.message}`;
       } else {
-        this.errorMessage = 'An unexpected error occurred during registration. Please try again.';
+        this.errorMessage = 'An unexpected error occurred during registration. Please try again. If the problem persists, contact support.';
       }
     } finally {
       this.isLoading = false;

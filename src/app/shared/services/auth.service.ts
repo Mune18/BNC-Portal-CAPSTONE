@@ -27,6 +27,18 @@ export class AuthService extends BaseAppwriteService {
     }
   }
 
+  async attemptAccountCleanup() {
+    try {
+      // Try to delete current session if exists
+      // This won't delete the account but will clean up the session
+      await this.account.deleteSession('current');
+      console.log('Session cleanup completed');
+    } catch (error) {
+      console.error('Session cleanup error:', error);
+      // Don't throw - this is best effort cleanup
+    }
+  }
+
   setLoading(isLoading: boolean) {
     this.isLoadingSubject.next(isLoading);
   }
