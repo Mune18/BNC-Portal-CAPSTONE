@@ -355,7 +355,7 @@ import { environment } from '../../environment/environment';
                       class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                     >
                     <div *ngIf="hasFieldError('birthDate')" class="text-red-500 text-xs mt-1">
-                      {{ getFieldError('birthDate') }}
+                      {{ getFieldError('birthDate') s
                     </div>
                   </div>
                   <div>
@@ -419,13 +419,22 @@ import { environment } from '../../environment/environment';
                   </div>
                   <div>
                     <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Contact No. *</label>
-                    <input 
-                      type="tel" 
-                      [(ngModel)]="formData.personalInfo.contactNo" 
-                      name="contactNo" 
-                      [class.border-red-500]="hasFieldError('contactNo')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
-                    >
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 text-xs sm:text-sm">+63</span>
+                      </div>
+                      <input 
+                        type="tel" 
+                        [(ngModel)]="formData.personalInfo.contactNo" 
+                        name="contactNo" 
+                        [class.border-red-500]="hasFieldError('contactNo')"
+                        class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 pl-10 sm:pl-12"
+                        placeholder="9XXXXXXXXX"
+                        maxlength="10"
+                        (input)="onPhoneInput($event, 'contactNo')"
+                        (keypress)="onPhoneKeypress($event)"
+                      >
+                    </div>
                     <div *ngIf="hasFieldError('contactNo')" class="text-red-500 text-xs mt-1">
                       {{ getFieldError('contactNo') }}
                     </div>
@@ -679,13 +688,21 @@ import { environment } from '../../environment/environment';
                     </div>
                     <div>
                       <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Contact No. *</label>
-                      <input 
-                        type="tel" 
-                        [(ngModel)]="formData.emergencyContact.contactNo" 
-                        name="emergencyContactNo" 
-                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
-                        placeholder="Enter contact number"
-                      >
+                      <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                          <span class="text-gray-500 text-xs sm:text-sm">+63</span>
+                        </div>
+                        <input 
+                          type="tel" 
+                          [(ngModel)]="formData.emergencyContact.contactNo" 
+                          name="emergencyContactNo" 
+                          [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 pl-10 sm:pl-12 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
+                          placeholder="9XXXXXXXXX"
+                          maxlength="10"
+                          (input)="onPhoneInput($event, 'ecContactNo')"
+                          (keypress)="onPhoneKeypress($event)"
+                        >
+                      </div>
                       <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecContactNo') }}</div>
                     </div>
                     <div>
@@ -1133,6 +1150,39 @@ export class SignUpInformationFormComponent implements OnInit {
     }
   }
 
+  // Phone number input handlers
+  onPhoneKeypress(event: KeyboardEvent) {
+    // Allow only numeric characters, backspace, delete, tab, escape, enter
+    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter'];
+    const isNumeric = /^[0-9]$/.test(event.key);
+    
+    if (!isNumeric && !allowedKeys.includes(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onPhoneInput(event: any, fieldType: string) {
+    let value = event.target.value;
+    
+    // Remove any non-numeric characters
+    value = value.replace(/\D/g, '');
+    
+    // Limit to 10 digits
+    if (value.length > 10) {
+      value = value.substring(0, 10);
+    }
+    
+    // Update the appropriate field
+    if (fieldType === 'contactNo') {
+      this.formData.personalInfo.contactNo = value;
+    } else if (fieldType === 'ecContactNo') {
+      this.formData.emergencyContact.contactNo = value;
+    }
+    
+    // Update the input field value
+    event.target.value = value;
+  }
+
   // Validation methods
   validateStep1(): boolean {
     this.validationErrors = {};
@@ -1233,6 +1283,12 @@ export class SignUpInformationFormComponent implements OnInit {
 
     if (!personalInfo.contactNo || personalInfo.contactNo.trim() === '') {
       this.validationErrors['contactNo'] = 'Contact number is required';
+      isValid = false;
+    } else if (personalInfo.contactNo.length !== 10) {
+      this.validationErrors['contactNo'] = 'Contact number must be exactly 10 digits';
+      isValid = false;
+    } else if (!/^\d{10}$/.test(personalInfo.contactNo)) {
+      this.validationErrors['contactNo'] = 'Contact number must contain only numbers';
       isValid = false;
     }
 
@@ -1340,6 +1396,12 @@ export class SignUpInformationFormComponent implements OnInit {
 
     if (!this.formData.emergencyContact.contactNo || this.formData.emergencyContact.contactNo.trim() === '') {
       this.validationErrors['ecContactNo'] = 'Emergency contact number is required';
+      isValid = false;
+    } else if (this.formData.emergencyContact.contactNo.length !== 10) {
+      this.validationErrors['ecContactNo'] = 'Emergency contact number must be exactly 10 digits';
+      isValid = false;
+    } else if (!/^\d{10}$/.test(this.formData.emergencyContact.contactNo)) {
+      this.validationErrors['ecContactNo'] = 'Emergency contact number must contain only numbers';
       isValid = false;
     }
 
@@ -1600,7 +1662,7 @@ export class SignUpInformationFormComponent implements OnInit {
           nationality: this.formData.personalInfo.nationality,
           religion: this.formData.personalInfo.religion,
           occupation: this.formData.personalInfo.occupation,
-          contactNo: this.formData.personalInfo.contactNo,
+          contactNo: '+63' + this.formData.personalInfo.contactNo,
           pwd: this.formData.personalInfo.pwd,
           pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '',
           monthlyIncome: this.formData.personalInfo.monthlyIncome,
@@ -1616,7 +1678,7 @@ export class SignUpInformationFormComponent implements OnInit {
           street: this.formData.personalInfo.street,
           ecFullName: this.formData.emergencyContact.fullName,
           ecRelation: this.formData.emergencyContact.relationship,
-          ecContactNo: this.formData.emergencyContact.contactNo,
+          ecContactNo: '+63' + this.formData.emergencyContact.contactNo,
           ecAddress: this.formData.emergencyContact.address,
           NationalIdNo: this.formData.otherDetails.nationalIdNo,
           votersIdNo: this.formData.otherDetails.votersIdNo,
