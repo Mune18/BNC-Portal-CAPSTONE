@@ -70,21 +70,6 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
             </div>
           </div>
 
-          <!-- Active Announcements -->
-          <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/announcements']">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-                </svg>
-              </div>
-              <div class="ml-4">
-                <h2 class="text-lg font-semibold text-gray-800">Active Announcements</h2>
-                <p class="text-gray-600 text-2xl font-bold">{{ activeAnnouncements }}</p>
-              </div>
-            </div>
-          </div>
-
           <!-- Pending Update Requests -->
           <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/update-requests']">
             <div class="flex items-center">
@@ -298,7 +283,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   // Statistics
   loading = true;
   totalResidents = 0;
-  activeAnnouncements = 0;
   pendingComplaints = 0;
   pendingUpdateRequests = 0;
   newResidentsLastMonth = 0;
@@ -365,7 +349,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       // Set immediate stats
       this.totalResidents = (residentStats as any).total || 0;
       this.newResidentsLastMonth = (residentStats as any).recent || 0;
-      this.activeAnnouncements = announcements.length;
       this.recentAnnouncements = announcements.slice(0, 3);
     } catch (error) {
       console.error('Error loading critical stats:', error);
@@ -461,7 +444,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private async loadAnnouncements() {
     try {
       const announcements = await this.announcementService.getAllAnnouncements();
-      this.activeAnnouncements = announcements.filter(a => a.status === 'active').length;
       
       // Get recent announcements
       this.recentAnnouncements = [...announcements]

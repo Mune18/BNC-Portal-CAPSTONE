@@ -386,13 +386,34 @@ import { environment } from '../../environment/environment';
                   </div>
                   <div>
                     <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Nationality *</label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="formData.personalInfo.nationality" 
-                      name="nationality" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter nationality"
-                    >
+                    <div class="relative">
+                      <select 
+                        *ngIf="formData.personalInfo.nationalityType !== 'Others'"
+                        [(ngModel)]="formData.personalInfo.nationalityType" 
+                        name="nationalityType" 
+                        (ngModelChange)="onNationalityTypeChange()"
+                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
+                      >
+                        <option value="Filipino">Filipino</option>
+                        <option value="Others">Others</option>
+                      </select>
+                      <div *ngIf="formData.personalInfo.nationalityType === 'Others'" class="flex">
+                        <input 
+                          type="text" 
+                          [(ngModel)]="formData.personalInfo.nationality" 
+                          name="nationality" 
+                          [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 pr-16 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
+                          placeholder="Enter nationality"
+                        >
+                        <button 
+                          type="button"
+                          (click)="resetNationalitySelection()"
+                          class="absolute right-1 top-1/2 transform -translate-y-1/2 px-2 py-1 text-xs text-blue-600 hover:text-blue-800 transition"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    </div>
                     <div *ngIf="hasFieldError('nationality')" class="text-red-500 text-xs mt-1">{{ getFieldError('nationality') }}</div>
                   </div>
                   <div>
@@ -1050,7 +1071,8 @@ export class SignUpInformationFormComponent implements OnInit {
       birthPlace: '',
       age: 0,
       civilStatus: '',
-      nationality: '',
+      nationality: 'Filipino',
+      nationalityType: 'Filipino', // 'Filipino' or 'Others'
       religion: '',
       occupation: '',
       contactNo: '',
@@ -1096,7 +1118,10 @@ export class SignUpInformationFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Any initialization code if needed
+    // Initialize nationality field with default value
+    if (this.formData.personalInfo.nationalityType === 'Filipino') {
+      this.formData.personalInfo.nationality = 'Filipino';
+    }
   }
 
   // Add this method to handle profile image uploads
@@ -1266,8 +1291,17 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     }
 
-    if (!personalInfo.nationality || personalInfo.nationality.trim() === '') {
-      this.validationErrors['nationality'] = 'Nationality is required';
+    // Validate nationality based on selection type
+    if (personalInfo.nationalityType === 'Others') {
+      if (!personalInfo.nationality || personalInfo.nationality.trim() === '') {
+        this.validationErrors['nationality'] = 'Nationality is required when "Others" is selected';
+        isValid = false;
+      }
+    } else if (personalInfo.nationalityType === 'Filipino') {
+      // Ensure nationality is set to Filipino if that's selected
+      personalInfo.nationality = 'Filipino';
+    } else {
+      this.validationErrors['nationality'] = 'Nationality type is required';
       isValid = false;
     }
 
@@ -1477,6 +1511,27 @@ export class SignUpInformationFormComponent implements OnInit {
     }
     if (this.validationErrors['seniorCitizenIdNo']) {
       delete this.validationErrors['seniorCitizenIdNo'];
+    }
+  }
+
+  onNationalityTypeChange() {
+    if (this.formData.personalInfo.nationalityType === 'Filipino') {
+      this.formData.personalInfo.nationality = 'Filipino';
+    } else {
+      this.formData.personalInfo.nationality = '';
+    }
+    // Clear validation error when field changes
+    if (this.validationErrors['nationality']) {
+      delete this.validationErrors['nationality'];
+    }
+  }
+
+  resetNationalitySelection() {
+    this.formData.personalInfo.nationalityType = 'Filipino';
+    this.formData.personalInfo.nationality = 'Filipino';
+    // Clear validation error when field changes
+    if (this.validationErrors['nationality']) {
+      delete this.validationErrors['nationality'];
     }
   }
 
