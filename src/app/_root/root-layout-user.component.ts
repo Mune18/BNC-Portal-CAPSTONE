@@ -10,8 +10,29 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
   imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
   template: `
     <div class="flex">
-      <aside id="separator-sidebar" [class.hidden]="isSidebarHidden" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0" aria-label="Sidebar">
+      <!-- Mobile backdrop -->
+      <div *ngIf="!isSidebarHidden && isMobile" 
+           (click)="toggleSidebar()" 
+           class="fixed inset-0 bg-opacity-50 z-30 lg:hidden"></div>
+      
+      <aside id="separator-sidebar" 
+             [class.hidden]="isSidebarHidden && !isMobile" 
+             [class.translate-x-0]="!isSidebarHidden"
+             [class.-translate-x-full]="isSidebarHidden"
+             [class.w-full]="isMobile && !isSidebarHidden"
+             [class.w-64]="!isMobile"
+             class="fixed top-0 left-0 z-40 h-screen transition-transform duration-300 ease-in-out lg:translate-x-0" 
+             aria-label="Sidebar">
         <div class="h-full border-r-1 border-gray-200 drop-shadow-sm px-3 py-4 overflow-y-auto bg-gray-50">
+          <!-- Mobile close button -->
+          <div *ngIf="isMobile" class="flex justify-end mb-4">
+            <button (click)="toggleSidebar()" class="p-2 text-gray-500 rounded-lg hover:bg-gray-100">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          </div>
+          
           <div class="flex items-center justify-center mb-1">
             <img src="/assets/BNC_Portal_Logo.png" alt="Logo" class="h-28 w-28">
           </div>
@@ -19,7 +40,7 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
           <p class="text-center text-xs text-gray-600">Barangay New Cabalan System</p>
           <ul class="pt-4 mt-4 space-y-3 font-medium">
             <li>
-              <a [routerLink]="['/user/profile']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/user/profile']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/profile-user.png" alt="Profile Icon" class="w-5 h-5">
                 <span class="ms-3">Profile</span>
               </a>
@@ -27,19 +48,19 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
           </ul>
           <ul class="pt-4 mt-4 space-y-3 font-medium border-t border-gray-200 dark:border-gray-300">
             <li>
-              <a [routerLink]="['/user/home']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/user/home']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/home.png" alt="Home Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Home</span>
               </a>
             </li>
             <!-- <li>
-              <a [routerLink]="['/user/request']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/user/request']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/google-docs.png" alt="Document Requests Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Document Requests</span>
               </a>
             </li> -->
             <li>
-              <a [routerLink]="['/user/complaints']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/user/complaints']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/report.png" alt="Complaints Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Complaints & Reports</span>
               </a>
@@ -48,7 +69,9 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
         </div>
       </aside>
 
-      <div [class.ml-64]="!isSidebarHidden" [class.ml-0]="isSidebarHidden" class="flex-1 transition-all duration-300">
+      <div [class.lg:ml-64]="!isSidebarHidden && !isMobile" 
+           [class.ml-0]="isSidebarHidden || isMobile" 
+           class="flex-1 transition-all duration-300">
         <nav class="bg-gray-50 border-b border-gray-200">
           <div class="flex flex-wrap items-center justify-between mx-auto p-3">
             <button (click)="toggleSidebar()" class="inline-flex items-center p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
@@ -98,6 +121,32 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
     .hidden {
       display: none;
     }
+    
+    @media (max-width: 1024px) {
+      .lg\\:ml-64 {
+        margin-left: 0 !important;
+      }
+    }
+    
+    /* Ensure sidebar is properly positioned on mobile */
+    @media (max-width: 768px) {
+      aside {
+        width: 100% !important;
+      }
+    }
+    
+    /* Smooth transitions */
+    aside {
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .-translate-x-full {
+      transform: translateX(-100%);
+    }
+    
+    .translate-x-0 {
+      transform: translateX(0);
+    }
   `]
 })
 export class RootLayoutUserComponent implements OnInit, OnDestroy {
@@ -106,10 +155,18 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
   currentDateTime: Date = new Date();
   private dateTimeInterval: any;
   userProfile: ResidentInfo | null = null;
+  isMobile = false;
 
-  constructor(private router: Router, private authService: AuthService, private userService: UserService) {} // Inject AuthService and UserService
+  constructor(private router: Router, private authService: AuthService, private userService: UserService) {
+    this.checkIfMobile();
+  }
 
   async ngOnInit() {
+    // Set sidebar hidden by default on mobile
+    if (this.isMobile) {
+      this.isSidebarHidden = true;
+    }
+    
     // Update time every second
     this.dateTimeInterval = setInterval(() => {
       this.currentDateTime = new Date();
@@ -147,6 +204,26 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Logout error:', error);
       this.router.navigate(['/sign-in']);
+    }
+  }
+
+  checkIfMobile() {
+    this.isMobile = window.innerWidth <= 768;
+  }
+
+  onNavLinkClick() {
+    // Close sidebar on mobile when navigation link is clicked
+    if (this.isMobile) {
+      this.isSidebarHidden = true;
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.checkIfMobile();
+    // Close sidebar when switching to mobile
+    if (this.isMobile && !this.isSidebarHidden) {
+      this.isSidebarHidden = true;
     }
   }
 

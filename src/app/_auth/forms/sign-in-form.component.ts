@@ -5,6 +5,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { UserService } from '../../shared/services/user.service';
 import { LoginData } from '../../shared/types/auth';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sign-in-form',
@@ -136,6 +137,15 @@ export class SignInFormComponent {
       if (userDoc && userDoc.role === 'admin') {
         this.router.navigate(['/admin/dashboard']);
       } else if (userDoc && userDoc.role === 'resident') {
+        // Check if resident account is active (not deceased/inactive)
+        if (userDoc.otherDetails && userDoc.otherDetails.deceased === 'Deceased') {
+          // Account is inactive - show SweetAlert and logout
+          await this.showInactiveAccountAlert();
+          await this.authService.logout();
+          this.isLoading = false;
+          return;
+        }
+        
         this.router.navigate(['/user/home']);
       } else {
         this.errorMessage = 'Unknown user role or user not found.';
@@ -146,5 +156,50 @@ export class SignInFormComponent {
       console.error('Login failed:', error);
       this.isLoading = false;
     }
+  }
+
+  async showInactiveAccountAlert() {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Account Disabled',
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-4">Your account has been marked as <strong>inactive</strong> and access has been disabled.</p>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <h4 class="font-semibold text-blue-800 mb-2">To reactivate your account:</h4>
+            <ul class="text-blue-700 text-sm space-y-1">
+              <li>• Visit the Barangay New Cabalan office</li>
+              <li>• Bring valid identification documents</li>
+              <li>• Speak with the administrator</li>
+              <li>• Complete the account reactivation process</li>
+            </ul>
+          </div>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <p class="text-gray-600 text-sm">
+              <strong>Office Hours:</strong> Monday to Friday, 8:00 AM - 5:00 PM<br>
+              <strong>Location:</strong> Corner Mabini St., Purok 2, New Cabalan, Olongapo City
+            </p>
+          </div>
+        </div>
+      `,
+      confirmButtonText: 'I Understand',
+      confirmButtonColor: '#DC2626',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      width: '500px',
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold text-red-700 mb-4',
+        htmlContainer: 'text-left',
+        confirmButton: 'font-semibold py-3 px-6 rounded-lg transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105'
+      },
+      backdrop: 'rgba(15, 23, 42, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      }
+    });
   }
 }

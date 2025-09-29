@@ -63,98 +63,159 @@ import Swal from 'sweetalert2';
           </button>
         </div>
 
-        <!-- Update Requests List -->
-        <div *ngIf="!isLoading && !errorMessage" class="space-y-6">
-          <div *ngIf="filteredRequests.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-            <div class="text-gray-400 mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-1">No Update Requests</h3>
-            <p class="text-gray-500">There are no {{ filterStatus === 'all' ? '' : filterStatus }} update requests at this time.</p>
-          </div>
-
-          <div *ngFor="let request of filteredRequests" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <!-- Request Header -->
-            <div class="p-6 border-b border-gray-200">
-              <div class="flex justify-between items-start">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                      Request #{{ request.$id?.slice(-8) }}
-                    </h3>
-                    <span 
-                      class="px-3 py-1 text-sm rounded-full font-medium"
-                      [ngClass]="{
-                        'bg-yellow-100 text-yellow-800': request.status === 'pending',
-                        'bg-green-100 text-green-800': request.status === 'approved',
-                        'bg-red-100 text-red-800': request.status === 'rejected'
-                      }"
-                    >
-                      {{ request.status | titlecase }}
-                    </span>
-                  </div>
-                  <div class="text-sm text-gray-600 space-y-1">
-                    <div class="flex items-center gap-2">
-                      <span><strong>Resident:</strong> {{ getResidentName(request.residentId) }}</span>
-                      <button 
-                        *ngIf="getResidentName(request.residentId) === 'Loading...' || getResidentName(request.residentId) === 'Error Loading Resident'"
-                        (click)="retryLoadResident(request.residentId)"
-                        class="text-xs text-blue-600 hover:text-blue-800 underline"
-                        title="Retry loading resident"
+        <!-- Update Requests Table -->
+        <div *ngIf="!isLoading && !errorMessage && filteredRequests.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Request ID
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Resident
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Submitted
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Changes
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <ng-container *ngFor="let request of filteredRequests; let i = index">
+                  <!-- Main Row -->
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">
+                        #{{ request.$id?.slice(-8) }}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div>
+                          <div class="text-sm font-medium text-gray-900">
+                            {{ getResidentName(request.residentId) }}
+                            <button 
+                              *ngIf="getResidentName(request.residentId) === 'Loading...' || getResidentName(request.residentId) === 'Error Loading Resident'"
+                              (click)="retryLoadResident(request.residentId)"
+                              class="ml-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                              title="Retry loading resident"
+                            >
+                              Retry
+                            </button>
+                          </div>
+                          <div class="text-sm text-gray-500" *ngIf="request.reviewedAt">
+                            Reviewed: {{ formatDate(request.reviewedAt) }}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span 
+                        class="px-2 py-1 text-xs rounded-full font-medium"
+                        [ngClass]="{
+                          'bg-yellow-100 text-yellow-800': request.status === 'pending',
+                          'bg-green-100 text-green-800': request.status === 'approved',
+                          'bg-red-100 text-red-800': request.status === 'rejected'
+                        }"
                       >
-                        Retry
-                      </button>
-                    </div>
-                    <p><strong>Submitted:</strong> {{ formatDate(request.createdAt) }}</p>
-                    <p *ngIf="request.reviewedAt"><strong>Reviewed:</strong> {{ formatDate(request.reviewedAt) }}</p>
-                  </div>
-                </div>
-                <div class="flex gap-2" *ngIf="request.status === 'pending'">
-                  <button
-                    (click)="reviewRequest(request.$id!, 'approve')"
-                    [disabled]="reviewLoading[request.$id!]"
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition disabled:opacity-50"
-                  >
-                    <span *ngIf="reviewLoading[request.$id!]" class="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-1"></span>
-                    Approve
-                  </button>
-                  <button
-                    (click)="showRejectModal(request)"
-                    [disabled]="reviewLoading[request.$id!]"
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium transition disabled:opacity-50"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Changes Preview -->
-            <div class="p-6">
-              <h4 class="text-sm font-semibold text-gray-900 mb-3">Requested Changes:</h4>
-              <div class="bg-gray-50 rounded-lg p-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div *ngFor="let change of parseChanges(request.changesJSON)" class="border-l-4 border-blue-500 pl-3">
-                    <div class="font-medium text-gray-900">{{ change.field }}</div>
-                    <div class="text-gray-600 mt-1">
-                      <span class="block text-xs text-gray-500">New Value:</span>
-                      <span class="text-gray-900">{{ change.newValue || '-' }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Rejection Reason (if rejected) -->
-            <div *ngIf="request.status === 'rejected' && request.reason" class="px-6 pb-6">
-              <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-red-900 mb-2">Rejection Reason:</h4>
-                <p class="text-sm text-red-700">{{ request.reason }}</p>
-              </div>
-            </div>
+                        {{ request.status | titlecase }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ formatDate(request.createdAt) }}
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-900">{{ parseChanges(request.changesJSON).length }} field(s)</span>
+                        <button
+                          (click)="toggleExpandedRow(i)"
+                          class="text-blue-600 hover:text-blue-900 text-sm"
+                        >
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            class="h-4 w-4 transition-transform"
+                            [class.rotate-180]="expandedRows[i]"
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div *ngIf="request.status === 'pending'" class="flex justify-end gap-2">
+                        <button
+                          (click)="reviewRequest(request.$id!, 'approve')"
+                          [disabled]="reviewLoading[request.$id!]"
+                          class="text-green-600 hover:text-green-900 text-sm"
+                        >
+                          <span *ngIf="reviewLoading[request.$id!]" class="h-3 w-3 border border-green-600 border-t-transparent rounded-full animate-spin inline-block mr-1"></span>
+                          Approve
+                        </button>
+                        <button
+                          (click)="showRejectModal(request)"
+                          [disabled]="reviewLoading[request.$id!]"
+                          class="text-red-600 hover:text-red-900 text-sm ml-3"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                      <div *ngIf="request.status !== 'pending'" class="text-gray-400 text-sm">
+                        {{ request.status === 'approved' ? 'Approved' : 'Rejected' }}
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- Expanded Row for Changes Details -->
+                  <tr *ngIf="expandedRows[i]" class="bg-gray-50">
+                    <td colspan="6" class="px-6 py-4">
+                      <div class="space-y-4">
+                        <!-- Requested Changes -->
+                        <div>
+                          <h4 class="text-sm font-semibold text-gray-900 mb-3">Requested Changes:</h4>
+                          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div *ngFor="let change of parseChanges(request.changesJSON)" class="bg-white rounded-lg p-3 border border-gray-200">
+                              <div class="font-medium text-gray-900 text-sm">{{ change.field }}</div>
+                              <div class="text-gray-600 mt-1 text-sm">
+                                <span class="block text-xs text-gray-500">New Value:</span>
+                                <span class="text-gray-900">{{ change.newValue || '-' }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Rejection Reason (if rejected) -->
+                        <div *ngIf="request.status === 'rejected' && request.reason" class="bg-red-50 border border-red-200 rounded-lg p-4">
+                          <h4 class="text-sm font-semibold text-red-900 mb-2">Rejection Reason:</h4>
+                          <p class="text-sm text-red-700">{{ request.reason }}</p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
           </div>
+        </div>
+
+        <!-- No Results State -->
+        <div *ngIf="!isLoading && !errorMessage && filteredRequests.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="text-gray-600 text-lg">No Update Requests</p>
+          <p class="text-gray-500 text-sm mt-1">There are no {{ filterStatus === 'all' ? '' : filterStatus }} update requests at this time.</p>
         </div>
       </div>
     </div>
@@ -196,6 +257,31 @@ import Swal from 'sweetalert2';
     :host {
       display: block;
     }
+    
+    .rotate-180 {
+      transform: rotate(180deg);
+    }
+    
+    svg {
+      transition: transform 0.2s ease-in-out;
+    }
+    
+    /* Ensure table is responsive */
+    @media (max-width: 768px) {
+      .min-w-full {
+        font-size: 0.875rem;
+      }
+      
+      .px-6 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      
+      .py-4 {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+    }
   `]
 })
 export class ResidentUpdateRequestsComponent implements OnInit {
@@ -213,6 +299,9 @@ export class ResidentUpdateRequestsComponent implements OnInit {
   currentRequestToReject: ResidentUpdate | null = null;
   rejectReason = '';
   rejectLoading = false;
+
+  // Expandable rows for table
+  expandedRows: { [key: number]: boolean } = {};
 
   constructor(
     private residentUpdateService: ResidentUpdateService,
@@ -321,6 +410,10 @@ export class ResidentUpdateRequestsComponent implements OnInit {
     } finally {
       this.rejectLoading = false;
     }
+  }
+
+  toggleExpandedRow(index: number) {
+    this.expandedRows[index] = !this.expandedRows[index];
   }
 
   async showCustomAlert(message: string, type: 'success' | 'error' | 'warning' = 'success') {
