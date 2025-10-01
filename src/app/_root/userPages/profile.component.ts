@@ -13,68 +13,72 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen py-8 px-2">
-      <div class="max-w-3xl mx-auto">
+    <div class="min-h-screen py-4 sm:py-8 px-3 sm:px-4 lg:px-6">
+      <div class="max-w-4xl mx-auto">
         <!-- Loading State -->
-        <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8 flex justify-center">
+        <div *ngIf="isLoading" class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-6 sm:mb-8 flex justify-center">
           <div class="flex flex-col items-center">
-            <div class="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-gray-600">Loading profile information...</p>
+            <div class="h-10 w-10 sm:h-12 sm:w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3 sm:mb-4"></div>
+            <p class="text-gray-600 text-sm sm:text-base text-center">Loading profile information...</p>
           </div>
         </div>
 
         <!-- Error State -->
-        <div *ngIf="errorMessage && !isLoading" class="bg-red-50 rounded-2xl shadow-sm border border-red-200 p-6 mb-8">
-          <div class="flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div *ngIf="errorMessage && !isLoading" class="bg-red-50 rounded-xl sm:rounded-2xl shadow-sm border border-red-200 p-4 sm:p-6 mb-6 sm:mb-8">
+          <div class="flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p class="text-red-600">{{ errorMessage }}</p>
+            <div class="flex-1">
+              <p class="text-red-600 text-sm sm:text-base">{{ errorMessage }}</p>
+              <button 
+                (click)="ngOnInit()" 
+                class="mt-3 px-3 sm:px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xs sm:text-sm transition w-full sm:w-auto"
+              >
+                Try Again
+              </button>
+            </div>
           </div>
-          <button 
-            (click)="ngOnInit()" 
-            class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm transition"
-          >
-            Try Again
-          </button>
         </div>
 
         <!-- Profile Content (only show when not loading and no error) -->
         <ng-container *ngIf="!isLoading && !errorMessage">
           <!-- Profile Header -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex items-center gap-4 mb-8">
-            <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300">
-              <img *ngIf="residentInfo && residentInfo.profileImage" [src]="residentInfo.profileImage" alt="Profile Image" class="w-full h-full object-cover">
-              <svg *ngIf="!residentInfo || !residentInfo.profileImage" xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <div class="text-xl font-semibold text-gray-900">
-                {{ residentInfo ? residentInfo.personalInfo.firstName : '-' }} 
-                {{ residentInfo && residentInfo.personalInfo.middleName ? residentInfo.personalInfo.middleName + ' ' : '' }}
-                {{ residentInfo ? residentInfo.personalInfo.lastName : '-' }} 
-                <span *ngIf="residentInfo && residentInfo.personalInfo.suffix">{{ residentInfo.personalInfo.suffix }}</span>
+          <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 flex-shrink-0">
+                <img *ngIf="residentInfo && residentInfo.profileImage" [src]="residentInfo.profileImage" alt="Profile Image" class="w-full h-full object-cover">
+                <svg *ngIf="!residentInfo || !residentInfo.profileImage" xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 sm:h-12 sm:w-12 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                </svg>
               </div>
-              <div class="text-gray-500 text-sm mt-1">{{ residentInfo ? residentInfo.personalInfo.occupation : 'Resident' }}</div>
-              <div class="text-gray-400 text-xs mt-1">
-                {{ residentInfo ? residentInfo.personalInfo.birthPlace : 'Olongapo City' }}
+              <div class="text-center sm:text-left flex-1">
+                <div class="text-lg sm:text-xl font-semibold text-gray-900 leading-tight">
+                  {{ residentInfo ? residentInfo.personalInfo.firstName : '-' }} 
+                  {{ residentInfo && residentInfo.personalInfo.middleName ? residentInfo.personalInfo.middleName + ' ' : '' }}
+                  {{ residentInfo ? residentInfo.personalInfo.lastName : '-' }} 
+                  <span *ngIf="residentInfo && residentInfo.personalInfo.suffix">{{ residentInfo.personalInfo.suffix }}</span>
+                </div>
+                <div class="text-gray-500 text-sm mt-1">{{ residentInfo ? residentInfo.personalInfo.occupation : 'Resident' }}</div>
+                <div class="text-gray-400 text-xs mt-1">
+                  {{ residentInfo ? residentInfo.personalInfo.birthPlace : 'Olongapo City' }}
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Personal Information Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-base font-semibold text-gray-900">Personal Information</h2>
+          <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <h2 class="text-base sm:text-lg font-semibold text-gray-900">Personal Information</h2>
               <button
-                class="px-4 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs font-semibold transition"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs sm:text-sm font-semibold transition w-full sm:w-auto"
                 (click)="showEdit = true"
               >
                 Request Edit
               </button>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-x-3 sm:gap-x-6 lg:gap-x-8 gap-y-4 sm:gap-y-6 text-sm">
               <div>
                 <div class="text-gray-500 text-xs mb-1">First Name</div>
                 <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.personalInfo.firstName : '-' }}</div>
@@ -169,7 +173,7 @@ import { Router } from '@angular/router';
                 <div class="text-gray-500 text-xs mb-1">Registered Voter</div>
                 <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.personalInfo.registeredVoter : '-' }}</div>
               </div>
-              <div class="sm:col-span-2">
+              <div class="col-span-1">
                 <div class="text-gray-500 text-xs mb-1">Address</div>
                 <div class="text-gray-900 font-medium">
                   Purok {{ residentInfo ? residentInfo.personalInfo.purokNo : '-' }},
@@ -188,9 +192,9 @@ import { Router } from '@angular/router';
           </div>
 
           <!-- Emergency Contact Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-            <h2 class="text-base font-semibold text-gray-900 mb-4">Emergency Contact</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 text-sm">
+          <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Emergency Contact</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-6 lg:gap-x-8 gap-y-4 sm:gap-y-6 text-sm">
               <div>
                 <div class="text-gray-500 text-xs mb-1">Full Name</div>
                 <div class="text-gray-900 font-medium">{{ residentInfo ? residentInfo.emergencyContact.fullName : '-' }}</div>
@@ -211,10 +215,24 @@ import { Router } from '@angular/router';
           </div>
 
           <!-- Update Requests Status Card -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8" *ngIf="updateRequests && updateRequests.length > 0">
-            <h2 class="text-base font-semibold text-gray-900 mb-4">Update Request Status</h2>
-            <div class="space-y-3">
-              <div *ngFor="let request of updateRequests" class="border rounded-lg p-4">
+          <div class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8" *ngIf="updateRequests && updateRequests.length > 0">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <h2 class="text-base sm:text-lg font-semibold text-gray-900">Update Request Status</h2>
+              <div class="flex items-center gap-3">
+                <span class="text-xs sm:text-sm text-gray-500">{{ updateRequests.length }} request{{ updateRequests.length !== 1 ? 's' : '' }}</span>
+                <button
+                  (click)="showRequests = !showRequests"
+                  class="px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2 w-full sm:w-auto"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" [class.rotate-180]="showRequests" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {{ showRequests ? 'Hide' : 'Show' }} Requests
+                </button>
+              </div>
+            </div>
+            <div class="space-y-3 sm:space-y-4" *ngIf="showRequests">
+              <div *ngFor="let request of updateRequests" class="border rounded-lg p-3 sm:p-4">
                 <div class="flex justify-between items-start mb-2">
                   <div class="text-sm font-medium text-gray-900">
                     Request #{{ request.$id?.slice(-6) }}
@@ -249,33 +267,40 @@ import { Router } from '@angular/router';
                 </div>
               </div>
             </div>
+            <!-- Empty state when hidden -->
+            <div *ngIf="!showRequests" class="text-center py-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-gray-500 text-sm">Click "Show Requests" to view your update request history</p>
+            </div>
           </div>
         </ng-container>
 
         <!-- Edit Information Modal -->
         <div
           *ngIf="showEdit"
-          class="fixed inset-0 flex items-center justify-center z-50"
+          class="fixed inset-0 flex items-center justify-center z-50 p-2 sm:p-4"
         >
           <!-- Blurred background overlay -->
           <div class="absolute inset-0 backdrop-blur-sm bg-white/30"></div>
-          <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl relative overflow-y-auto max-h-[90vh] z-10">
+          <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 w-full max-w-4xl relative overflow-y-auto max-h-[95vh] sm:max-h-[90vh] z-10">
             <button
-              class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl"
+              class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-lg sm:text-xl w-8 h-8 flex items-center justify-center"
               (click)="showEdit = false"
               [disabled]="saveLoading"
             >✕</button>
-            <h2 class="text-lg font-bold text-gray-800 mb-4">Request Information Update</h2>
+            <h2 class="text-base sm:text-lg font-bold text-gray-800 mb-4 pr-8">Request Information Update</h2>
             
             <!-- Info Message -->
-            <div class="mb-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm">
-              <div class="flex items-start gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 text-blue-700 rounded-lg text-xs sm:text-sm">
+              <div class="flex items-start gap-2 sm:gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
                   <p class="font-medium mb-1">Information Update Process</p>
-                  <p>Your changes will be submitted for approval by the Barangay Admin. You will be notified once your request has been reviewed.</p>
+                  <p class="leading-relaxed">Your changes will be submitted for approval by the Barangay Admin. You will be notified once your request has been reviewed.</p>
                 </div>
               </div>
             </div>
@@ -292,8 +317,8 @@ import { Router } from '@angular/router';
             <form (ngSubmit)="saveEdit()" #editForm="ngForm" class="space-y-6">
               <!-- Personal Information Section -->
               <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Personal Information</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <h3 class="text-base sm:text-lg font-semibold mb-4 text-gray-800">Personal Information</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.lastName" name="lastName" 
@@ -468,8 +493,8 @@ import { Router } from '@angular/router';
 
               <!-- Emergency Contact Section -->
               <div class="mb-6">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Emergency Contact</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <h3 class="text-base sm:text-lg font-semibold mb-4 text-gray-800">Emergency Contact</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
                     <input type="text" [(ngModel)]="editInfo.emergencyContact.fullName" name="emergencyFullName" 
@@ -497,7 +522,7 @@ import { Router } from '@angular/router';
               <div class="flex justify-end mt-6">
                 <button
                   type="submit"
-                  class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition flex items-center gap-2"
+                  class="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs sm:text-sm font-medium transition flex items-center justify-center gap-2 w-full sm:w-auto"
                   [disabled]="saveLoading || saveSuccess"
                 >
                   <span *ngIf="saveLoading" class="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -518,12 +543,26 @@ import { Router } from '@angular/router';
       background: #f3f4f6;
     }
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
       background: #e5e7eb;
     }
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
-      border-radius: 8px;
+      border-radius: 6px;
+    }
+    @media (max-width: 640px) {
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+    }
+    /* Ensure text doesn't overflow on small screens */
+    .text-wrap {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    /* Rotation animation for chevron */
+    .rotate-180 {
+      transform: rotate(180deg);
     }
   `]
 })
@@ -573,6 +612,7 @@ export class ProfileComponent implements OnInit {
   editInfo: ResidentInfo = this.getEmptyResidentInfo();
   updateRequests: ResidentUpdate[] = [];
   showEdit = false;
+  showRequests = false; // New property to control visibility
   isLoading = true;
   errorMessage = '';
   saveLoading = false;

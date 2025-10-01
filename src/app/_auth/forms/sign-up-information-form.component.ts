@@ -55,17 +55,21 @@ import { environment } from '../../environment/environment';
         </div>
       </div>
       
-      <!-- City seal in top right corner - Smaller on mobile -->
-      <div class="absolute top-2 right-2 z-20">
-        <div class="w-16 h-16 sm:w-20 sm:h-20 lg:w-25 lg:h-25">
+      <!-- City seal in top right corner - Hidden on mobile -->
+      <div class="hidden lg:block absolute top-2 right-2 z-20">
+        <div class="w-25 h-25">
           <img src="/assets/Olongapo_City_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
 
       <!-- Mobile logo at top center - Only visible on mobile -->
-      <div class="lg:hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
-        <div class="w-20 h-20 sm:w-24 sm:h-24">
-          <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
+      <div class="lg:hidden absolute top-6 left-1/2 transform -translate-x-1/2 z-20">
+        <div class="flex flex-col items-center">
+          <div class="w-32 h-32 sm:w-36 sm:h-36 mb-2">
+            <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
+          </div>
+          <h1 class="text-center text-xl font-bold text-gray-800">BNC Portal</h1>
+          <p class="text-center text-xs text-gray-600">Barangay New Cabalan System</p>
         </div>
       </div>
 
