@@ -36,83 +36,128 @@ import Swal from 'sweetalert2';
       <!-- Create Announcement Modal -->
       <div
         *ngIf="showCreate"
-        class="fixed inset-0 z-50 flex items-center justify-center"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        <!-- Blurred background overlay -->
+        <!-- Background overlay -->
         <div
-          class="absolute inset-0 backdrop-blur-lg bg-white/40"
+          class="absolute inset-0 bg-black/50"
           (click)="showCreate = false"
         ></div>
-        <div class="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-xl z-10">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Create Announcement</h2>
-          <form (submit)="createAnnouncement($event)" class="space-y-6">
-            <div>
-              <label for="title" class="block text-base font-semibold text-gray-700 mb-1">Title</label>
-              <input
-                id="title"
-                type="text"
-                [(ngModel)]="newAnnouncement.title"
-                name="title"
-                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter announcement title"
-                required
-              />
-            </div>
-            <div>
-              <label for="content" class="block text-base font-semibold text-gray-700 mb-1">Content</label>
-              <textarea
-                id="content"
-                [(ngModel)]="newAnnouncement.content"
-                name="content"
-                rows="4"
-                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter announcement content"
-                required
-              ></textarea>
-            </div>
-            <div>
-              <label for="image" class="block text-base font-semibold text-gray-700 mb-1">Image (Optional)</label>
-              <div class="mt-1 flex items-center">
-                <label class="cursor-pointer bg-gray-100 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200 transition">
-                  <span>{{ imageFileName || 'Choose an image' }}</span>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] overflow-y-auto">
+          <!-- Modal Header -->
+          <div class="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Create Announcement</h2>
+            <button
+              type="button"
+              class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+              (click)="showCreate = false"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal Body -->
+          <form (submit)="createAnnouncement($event)" class="p-6">
+            <div class="space-y-6">
+              <!-- Title Field -->
+              <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                  Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  [(ngModel)]="newAnnouncement.title"
+                  name="title"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
+                  placeholder="Enter the title of your announcement"
+                  required
+                />
+              </div>
+
+              <!-- Content Field -->
+              <div>
+                <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
+                  Content <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="content"
+                  [(ngModel)]="newAnnouncement.content"
+                  name="content"
+                  rows="5"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
+                  placeholder="Describe your announcement in detail..."
+                  required
+                ></textarea>
+                <p class="text-sm text-gray-500 mt-2">Please provide as much detail as possible</p>
+              </div>
+
+              <!-- Image Upload Field -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Attachment (Optional)
+                </label>
+                <div 
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                  (click)="fileInput.click()"
+                >
+                  <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                      <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                      </svg>
+                    </div>
+                    <p class="text-gray-600 font-medium">
+                      {{ imageFileName || 'Tap to choose a file' }}
+                    </p>
+                  </div>
                   <input 
+                    #fileInput
                     type="file" 
                     (change)="onImageChange($event)" 
                     class="hidden" 
                     accept="image/*"
                   >
-                </label>
-                <button 
-                  *ngIf="imageFileName"
-                  type="button"
-                  (click)="removeImage()"
-                  class="ml-2 text-red-600 hover:text-red-800"
-                >
-                  Remove
-                </button>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Supported: Images, PDF, DOC, DOCX (Max 10MB)</p>
+                
+                <!-- Remove file button -->
+                <div *ngIf="imageFileName" class="mt-3">
+                  <button 
+                    type="button"
+                    (click)="removeImage()"
+                    class="text-sm text-red-600 hover:text-red-800 font-medium"
+                  >
+                    Remove file
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="flex justify-end gap-2">
+
+            <!-- Modal Footer -->
+            <div class="flex gap-3 pt-6 border-t border-gray-200 mt-6">
               <button
                 type="button"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                 (click)="showCreate = false"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                class="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition font-semibold"
+                class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 [disabled]="isSubmitting"
               >
-                <span *ngIf="!isSubmitting">Publish</span>
-                <span *ngIf="isSubmitting" class="flex items-center">
-                  <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Publishing...
-                </span>
+                <svg *ngIf="isSubmitting" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <svg *ngIf="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ isSubmitting ? 'Publishing...' : 'Publish Announcement' }}
               </button>
             </div>
           </form>
@@ -212,136 +257,99 @@ import Swal from 'sweetalert2';
         </div>
       </div>
 
-      <!-- Announcements Grid -->
-      <div *ngIf="announcements.length > 0" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Feature Announcement -->
-        <div class="lg:col-span-2 flex flex-col gap-8">
-          <div
-            class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col md:flex-row relative cursor-pointer transition hover:shadow-xl"
-            (click)="openDetail(announcements[0])"
-          >
-            <!-- 3 dots menu -->
-            <div class="absolute top-4 right-4 z-20" (click)="$event.stopPropagation()">
-              <button (click)="toggleMenu(announcements[0].$id || '')" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
-                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                  <circle cx="5" cy="12" r="2" fill="#6B7280"/>
-                  <circle cx="12" cy="12" r="2" fill="#6B7280"/>
-                  <circle cx="19" cy="12" r="2" fill="#6B7280"/>
-                </svg>
-              </button>
-              <div *ngIf="openMenuId === announcements[0].$id" class="absolute right-0 mt-2 w-32 bg-white rounded shadow-lg border z-30">
-                <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="editAnnouncement(announcements[0])">Edit</button>
-                <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="deleteAnnouncementPrompt(announcements[0].$id || '')">Delete</button>
-                <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="archiveAnnouncementPrompt(announcements[0].$id || '')">
-                  {{ announcements[0].status === 'active' ? 'Archive' : 'Activate' }}
-                </button>
-              </div>
-            </div>
-            <div class="flex-1 p-8 flex flex-col justify-center">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-xs text-orange-600 font-semibold uppercase">
+      <!-- Announcements Table -->
+      <div *ngIf="announcements.length > 0" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Announcement
-                </span>
-                <span class="text-xs text-gray-400">| {{ announcements[0].createdAt | date:'mediumDate' }}</span>
-                <span *ngIf="announcements[0].status === 'archived'" class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Archived</span>
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ announcements[0].title }}</h2>
-              <p class="text-gray-700 mb-4">{{ announcements[0].content }}</p>
-              <div class="flex items-center gap-2 text-xs text-gray-500">
-                <span>Published</span>
-                <span>•</span>
-                <span>{{ announcements[0].createdAt | date:'shortTime' }}</span>
-              </div>
-            </div>
-            <div *ngIf="announcements[0].image" class="md:w-72 bg-gray-200 flex items-center justify-center">
-              <img [src]="getImageUrl(announcements[0].image)" class="w-full h-full object-cover" alt="Announcement image">
-            </div>
-            <div *ngIf="!announcements[0].image" class="md:w-72 bg-gray-200 flex items-center justify-center">
-              <svg class="w-32 h-32 text-blue-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"></path>
-              </svg>
-            </div>
-          </div>
-          <!-- Latest Articles Section -->
-          <div *ngIf="announcements.length > 1">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Latest Announcements</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div
-                *ngFor="let announcement of announcements.slice(1, 3)"
-                class="bg-white rounded-xl shadow p-6 flex flex-col justify-between relative cursor-pointer transition hover:shadow-xl"
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Content Preview
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Published
+                </th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr 
+                *ngFor="let announcement of announcements" 
+                class="hover:bg-gray-50 cursor-pointer"
                 (click)="openDetail(announcement)"
               >
-                <!-- 3 dots menu -->
-                <div class="absolute top-4 right-4 z-20" (click)="$event.stopPropagation()">
-                  <button (click)="toggleMenu(announcement.$id || '')" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
-                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                      <circle cx="5" cy="12" r="2" fill="#6B7280"/>
-                      <circle cx="12" cy="12" r="2" fill="#6B7280"/>
-                      <circle cx="19" cy="12" r="2" fill="#6B7280"/>
-                    </svg>
-                  </button>
-                  <div *ngIf="openMenuId === announcement.$id" class="absolute right-0 mt-2 w-32 bg-white rounded shadow-lg border z-30">
-                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="editAnnouncement(announcement)">Edit</button>
-                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="deleteAnnouncementPrompt(announcement.$id || '')">Delete</button>
-                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="archiveAnnouncementPrompt(announcement.$id || '')">
-                      {{ announcement.status === 'active' ? 'Archive' : 'Activate' }}
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12">
+                      <div *ngIf="announcement.image" class="h-12 w-12 rounded-lg overflow-hidden">
+                        <img [src]="getImageUrl(announcement.image)" class="h-12 w-12 object-cover" alt="Announcement">
+                      </div>
+                      <div *ngIf="!announcement.image" class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ announcement.title }}</div>
+                      <div class="text-sm text-gray-500">Announcement ID: #{{ announcement.$id?.slice(-8) }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-900 max-w-xs truncate">{{ announcement.content }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span 
+                    class="px-2 py-1 text-xs rounded-full font-medium"
+                    [ngClass]="{
+                      'bg-green-100 text-green-800': announcement.status === 'active',
+                      'bg-gray-100 text-gray-800': announcement.status === 'archived'
+                    }"
+                  >
+                    {{ announcement.status | titlecase }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ announcement.createdAt | date:'mediumDate' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" (click)="$event.stopPropagation()">
+                  <div class="relative inline-block text-left">
+                    <button 
+                      (click)="toggleMenu(announcement.$id || '')" 
+                      class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Actions
+                      <svg class="-mr-1 ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
                     </button>
+                    <div *ngIf="openMenuId === announcement.$id" class="origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-30">
+                      <div class="py-1">
+                        <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" (click)="editAnnouncement(announcement)">
+                          Edit
+                        </button>
+                        <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" (click)="archiveAnnouncementPrompt(announcement.$id || '')">
+                          {{ announcement.status === 'active' ? 'Archive' : 'Activate' }}
+                        </button>
+                        <button class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100" (click)="deleteAnnouncementPrompt(announcement.$id || '')">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="text-xs text-orange-600 font-semibold uppercase">Announcement</span>
-                    <span class="text-xs text-gray-400">| {{ announcement.createdAt | date:'mediumDate' }}</span>
-                    <span *ngIf="announcement.status === 'archived'" class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Archived</span>
-                  </div>
-                  <h4 class="text-lg font-bold text-gray-900 mb-1">{{ announcement.title }}</h4>
-                  <p class="text-gray-700 text-sm mb-2 truncate">{{ announcement.content }}</p>
-                  <img *ngIf="announcement.image" [src]="getImageUrl(announcement.image)" class="w-full h-32 object-cover rounded my-2" alt="Announcement image">
-                </div>
-                <div class="flex items-center justify-between mt-2">
-                  <span class="text-xs text-gray-500">{{ announcement.createdAt | date:'shortTime' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Side List -->
-        <div class="flex flex-col gap-6">
-          <div class="bg-white rounded-2xl shadow-lg p-6">
-            <h3 class="text-base font-semibold text-gray-900 mb-4">More Announcements</h3>
-            <ul class="divide-y divide-gray-200">
-              <li
-                *ngFor="let announcement of announcements.slice(3)"
-                class="py-4 flex flex-col gap-1 relative cursor-pointer transition hover:bg-gray-100"
-                (click)="openDetail(announcement)"
-              >
-                <!-- 3 dots menu -->
-                <div class="absolute top-2 right-2 z-20" (click)="$event.stopPropagation()">
-                  <button (click)="toggleMenu(announcement.$id || '')" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
-                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                      <circle cx="5" cy="12" r="2" fill="#6B7280"/>
-                      <circle cx="12" cy="12" r="2" fill="#6B7280"/>
-                      <circle cx="19" cy="12" r="2" fill="#6B7280"/>
-                    </svg>
-                  </button>
-                  <div *ngIf="openMenuId === announcement.$id" class="absolute right-0 mt-2 w-32 bg-white rounded shadow-lg border z-30">
-                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="editAnnouncement(announcement)">Edit</button>
-                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="deleteAnnouncementPrompt(announcement.$id || '')">Delete</button>
-                    <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="archiveAnnouncementPrompt(announcement.$id || '')">
-                      {{ announcement.status === 'active' ? 'Archive' : 'Activate' }}
-                    </button>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs text-orange-600 font-semibold uppercase">Announcement</span>
-                  <span class="text-xs text-gray-400">| {{ announcement.createdAt | date:'mediumDate' }}</span>
-                  <span *ngIf="announcement.status === 'archived'" class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Archived</span>
-                </div>
-                <span class="text-sm font-semibold text-gray-800">{{ announcement.title }}</span>
-                <span class="text-xs text-gray-500 truncate">{{ announcement.content }}</span>
-              </li>
-            </ul>
-          </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -363,27 +371,94 @@ import Swal from 'sweetalert2';
       <!-- Announcement Detail Modal -->
       <div
         *ngIf="selectedAnnouncement"
-        class="fixed inset-0 z-50 flex items-center justify-center"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
-        <div class="absolute inset-0 backdrop-blur-md bg-black/30" (click)="closeDetail()"></div>
-        <div class="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg z-10 max-h-[90vh] overflow-y-auto">
-          <button
-            class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl"
-            (click)="closeDetail()"
-          >✕</button>
-          <div class="mb-4">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-xs text-orange-600 font-semibold uppercase">Announcement</span>
-              <span class="text-xs text-gray-400">| {{ selectedAnnouncement.createdAt | date:'mediumDate' }}</span>
-              <span *ngIf="selectedAnnouncement.status === 'archived'" class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Archived</span>
+        <div class="absolute inset-0 backdrop-blur-md bg-black/40" (click)="closeDetail()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl z-10 max-h-[90vh] overflow-y-auto">
+          <!-- Modal Header -->
+          <div class="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 z-10">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <span class="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-semibold rounded-full">
+                  ANNOUNCEMENT
+                </span>
+                <span class="text-sm text-gray-500">{{ selectedAnnouncement.createdAt | date:'mediumDate' }}</span>
+              </div>
+              <button
+                class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 flex-shrink-0"
+                (click)="closeDetail()"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ selectedAnnouncement.title }}</h2>
-            <img *ngIf="selectedAnnouncement.image" [src]="getImageUrl(selectedAnnouncement.image)" class="w-full h-auto rounded my-4" alt="Announcement image">
-            <p class="text-gray-700 mb-4">{{ selectedAnnouncement.content }}</p>
-            <div class="flex items-center gap-2 text-xs text-gray-500">
-              <span>Published</span>
-              <span>•</span>
-              <span>{{ selectedAnnouncement.createdAt | date:'shortTime' }}</span>
+          </div>
+          
+          <!-- Modal Body -->
+          <div class="p-6 space-y-6">
+            <!-- Title -->
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+              {{ selectedAnnouncement.title }}
+            </h2>
+            
+            <!-- Meta Information -->
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Published {{ selectedAnnouncement.createdAt | date:'medium' }}</span>
+              </div>
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <span>Community Announcement</span>
+              </div>
+            </div>
+            
+            <!-- Image Section -->
+            <div *ngIf="selectedAnnouncement.image" class="flex justify-center bg-gray-50 rounded-xl p-4">
+              <img 
+                [src]="getImageUrl(selectedAnnouncement.image)" 
+                class="w-full h-auto object-contain max-h-80 rounded-lg shadow-sm" 
+                alt="Announcement image"
+              >
+            </div>
+            
+            <!-- Content Section -->
+            <div class="bg-gray-50 rounded-xl p-6">
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-2">Announcement Details</h3>
+                  <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ selectedAnnouncement.content }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="pt-4 border-t border-gray-200">
+              <div class="flex flex-col sm:flex-row gap-3 sm:justify-between sm:items-center">
+                <div class="flex items-center text-sm text-gray-500">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <span>Last updated: {{ selectedAnnouncement.createdAt | date:'short' }}</span>
+                </div>
+                <button
+                  (click)="closeDetail()"
+                  class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium text-sm"
+                >
+                  Got it, thanks!
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -600,8 +675,48 @@ export class AnnouncementComponent implements OnInit, OnDestroy {
     if (!announcement) return;
     
     const action = announcement.status === 'active' ? 'archive' : 'activate';
+    const actionTitle = announcement.status === 'active' ? 'Archive Announcement' : 'Activate Announcement';
+    const actionText = announcement.status === 'active' 
+      ? 'This will hide the announcement from users. You can reactivate it later.'
+      : 'This will make the announcement visible to users again.';
     
-    if (confirm(`Are you sure you want to ${action} this announcement?`)) {
+    // Set button colors based on action
+    const confirmButtonClass = announcement.status === 'active' 
+      ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white'
+      : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white';
+    
+    const result = await Swal.fire({
+      title: actionTitle,
+      text: actionText,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${action} it`,
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '400px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+        confirmButton: `font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 ${confirmButtonClass}`,
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true
+    });
+
+    if (result.isConfirmed) {
       if (announcement.status === 'active') {
         await this.archiveAnnouncement(id);
       } else {
@@ -647,9 +762,41 @@ export class AnnouncementComponent implements OnInit, OnDestroy {
   }
 
   async deleteAnnouncementPrompt(id: string) {
-    if (confirm('Are you sure you want to delete this announcement? This action cannot be undone.')) {
+    const result = await Swal.fire({
+      title: 'Delete Announcement',
+      text: 'This action cannot be undone. The announcement will be permanently removed.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '400px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+        confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white',
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true
+    });
+
+    if (result.isConfirmed) {
       await this.deleteAnnouncement(id);
     }
+    
     this.openMenuId = null;
   }
 

@@ -9,7 +9,7 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
   selector: 'app-root-layout-user',
   imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
   template: `
-    <div class="flex">
+    <div class="flex h-screen overflow-hidden">
       <!-- Mobile backdrop -->
       <div *ngIf="!isSidebarHidden && isMobile" 
            (click)="toggleSidebar()" 
@@ -71,8 +71,8 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
 
       <div [class.lg:ml-64]="!isSidebarHidden && !isMobile" 
            [class.ml-0]="isSidebarHidden || isMobile" 
-           class="flex-1 transition-all duration-300">
-        <nav class="bg-gray-50 border-b border-gray-200">
+           class="flex-1 flex flex-col h-full transition-all duration-300">
+        <nav class="bg-gray-50 border-b border-gray-200 sticky top-0 z-30">
           <div class="flex flex-wrap items-center justify-between mx-auto p-3">
             <button (click)="toggleSidebar()" class="inline-flex items-center p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
               <span class="sr-only">Open sidebar</span>
@@ -110,7 +110,7 @@ import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo 
           </div>
         </nav>
 
-        <div class="p-4">
+        <div class="flex-1 overflow-y-auto">
           <!-- Main content goes here -->
           <router-outlet></router-outlet>
         </div>

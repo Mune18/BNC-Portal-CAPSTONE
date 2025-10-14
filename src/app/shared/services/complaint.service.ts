@@ -119,6 +119,7 @@ export class ComplaintService extends BaseAppwriteService {
         status: 'pending' as const, // Type assertion to match enum
         attachments: attachmentId,
         createdAt: now,
+        isAnonymous: complaint.isAnonymous || false
       };
       
       const response = await this.database.createDocument( // Fix: database not databases

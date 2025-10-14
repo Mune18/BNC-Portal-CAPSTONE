@@ -17,25 +17,9 @@ import Swal from 'sweetalert2';
       <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div class="flex justify-between items-center">
-            <div>
-              <h1 class="text-2xl font-bold text-gray-900">Resident Update Requests</h1>
-              <p class="text-gray-600 mt-1">Review and manage resident information update requests</p>
-            </div>
-            <div class="flex gap-3">
-              <button
-                (click)="filterStatus = 'all'; loadUpdateRequests()"
-                [class]="'px-4 py-2 rounded-lg text-sm font-medium transition ' + (filterStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')"
-              >
-                All ({{ getTotalCount() }})
-              </button>
-              <button
-                (click)="filterStatus = 'pending'; loadUpdateRequests()"
-                [class]="'px-4 py-2 rounded-lg text-sm font-medium transition ' + (filterStatus === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')"
-              >
-                Pending ({{ getPendingCount() }})
-              </button>
-            </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Resident Update Requests</h1>
+            <p class="text-gray-600 mt-1">Review and manage resident information update requests</p>
           </div>
         </div>
 
@@ -65,6 +49,24 @@ import Swal from 'sweetalert2';
 
         <!-- Update Requests Table -->
         <div *ngIf="!isLoading && !errorMessage && filteredRequests.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <!-- Tab Filter -->
+          <div class="border-b border-gray-200">
+            <nav class="flex">
+              <button
+                (click)="setFilter('all')"
+                [class]="'px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ' + (filterStatus === 'all' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')"
+              >
+                All Requests ({{ getTotalCount() }})
+              </button>
+              <button
+                (click)="setFilter('pending')"
+                [class]="'px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ' + (filterStatus === 'pending' ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')"
+              >
+                Pending ({{ getPendingCount() }})
+              </button>
+            </nav>
+          </div>
+          
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
@@ -286,6 +288,7 @@ import Swal from 'sweetalert2';
 })
 export class ResidentUpdateRequestsComponent implements OnInit {
   updateRequests: ResidentUpdate[] = [];
+  allRequests: ResidentUpdate[] = []; // Store all requests for accurate counts
   filteredRequests: ResidentUpdate[] = [];
   residentCache: { [key: string]: ResidentInfo } = {};
   
@@ -318,10 +321,14 @@ export class ResidentUpdateRequestsComponent implements OnInit {
     this.errorMessage = '';
     
     try {
+      // Always load all requests to maintain accurate counts
+      this.allRequests = await this.residentUpdateService.getAllUpdateRequests();
+      
+      // Filter based on current filter status
       if (this.filterStatus === 'pending') {
-        this.updateRequests = await this.residentUpdateService.getPendingUpdateRequests();
+        this.updateRequests = this.allRequests.filter(req => req.status === 'pending');
       } else {
-        this.updateRequests = await this.residentUpdateService.getAllUpdateRequests();
+        this.updateRequests = this.allRequests;
       }
       
       this.filteredRequests = this.updateRequests;
@@ -532,11 +539,24 @@ export class ResidentUpdateRequestsComponent implements OnInit {
     });
   }
 
+  setFilter(status: 'all' | 'pending') {
+    this.filterStatus = status;
+    
+    // Filter the requests based on the selected status
+    if (this.filterStatus === 'pending') {
+      this.updateRequests = this.allRequests.filter(req => req.status === 'pending');
+    } else {
+      this.updateRequests = this.allRequests;
+    }
+    
+    this.filteredRequests = this.updateRequests;
+  }
+
   getTotalCount(): number {
-    return this.updateRequests.length;
+    return this.allRequests.length;
   }
 
   getPendingCount(): number {
-    return this.updateRequests.filter(req => req.status === 'pending').length;
+    return this.allRequests.filter(req => req.status === 'pending').length;
   }
 }

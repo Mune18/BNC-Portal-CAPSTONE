@@ -190,7 +190,7 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let resident of filteredResidents" class="hover:bg-gray-50">
+              <tr *ngFor="let resident of filteredResidents" class="hover:bg-gray-50 cursor-pointer transition-colors" (click)="viewResident(resident)">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -222,9 +222,8 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
                   {{ formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button class="text-blue-600 hover:text-blue-900 mr-3" (click)="viewResident(resident)">View</button>
-                  <button class="text-gray-600 hover:text-gray-900 mr-3" (click)="editResident(resident)">Edit</button>
-                  <button class="text-red-600 hover:text-red-900" (click)="deleteResident(resident)">Delete</button>
+                  <button class="text-gray-600 hover:text-gray-900 mr-3" (click)="editResident(resident); $event.stopPropagation()">Edit</button>
+                  <button class="text-red-600 hover:text-red-900" (click)="deleteResident(resident); $event.stopPropagation()">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -477,12 +476,17 @@ export class ResidentsComponent implements OnInit {
 
   editResident(resident: ResidentInfo) {
     this.selectedResident = resident;
+    this.showResidentModal = false; // Close detail modal when opening edit
     this.showEditModal = true;
   }
 
   closeEditModal() {
     this.showEditModal = false;
-    this.selectedResident = null;
+    // Don't clear selectedResident here - keep it for when we return to detail view
+    // Re-open the detail modal if we were viewing a resident before editing
+    if (this.selectedResident) {
+      this.showResidentModal = true;
+    }
   }
 
   onResidentUpdated(updatedResident: ResidentInfo) {
@@ -491,7 +495,19 @@ export class ResidentsComponent implements OnInit {
     if (index !== -1) {
       this.residents[index] = updatedResident;
     }
-    this.closeEditModal();
+    
+    // Also update in allResidents array if it exists
+    const allIndex = this.allResidents.findIndex(r => r.$id === updatedResident.$id);
+    if (allIndex !== -1) {
+      this.allResidents[allIndex] = updatedResident;
+    }
+    
+    // Update the selected resident with the new data
+    this.selectedResident = updatedResident;
+    
+    // Close edit modal and return to detail view
+    this.showEditModal = false;
+    this.showResidentModal = true;
   }
 
   deleteResident(resident: ResidentInfo) {

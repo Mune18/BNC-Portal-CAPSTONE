@@ -6,6 +6,7 @@ import { ComplaintService } from '../../shared/services/complaint.service';
 import { Complaint, ComplaintStatus } from '../../shared/types/complaint';
 import { UserService } from '../../shared/services/user.service';
 import { ResidentInfo } from '../../shared/types/resident';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-reports',
@@ -20,53 +21,106 @@ import { ResidentInfo } from '../../shared/types/resident';
 
       <div *ngIf="!loading" class="mb-8">
         <!-- Header Section -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2 sm:mb-0">Complaints and Reports</h1>
-            <p class="text-gray-500">Manage and respond to complaints submitted by residents</p>
-          </div>
-          <!-- Filter Controls -->
-          <div class="mt-4 sm:mt-0 flex items-center space-x-4">
-            <select 
-              [(ngModel)]="statusFilter" 
-              (change)="applyFilters()"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="in_review">In Review</option>
-              <option value="resolved">Resolved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <select 
-              [(ngModel)]="categoryFilter" 
-              (change)="applyFilters()"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-            >
-              <option value="all">All Categories</option>
-              <option value="complaint">Complaints</option>
-              <option value="report">Reports</option>
-              <option value="other">Other</option>
-            </select>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2 sm:mb-0">Complaints and Reports</h1>
+              <p class="text-gray-500">Manage and respond to complaints submitted by residents</p>
+            </div>
+            <!-- Filter Controls -->
+            <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <div class="flex items-center space-x-2">
+                <label class="text-sm font-medium text-gray-700">Status:</label>
+                <select 
+                  [(ngModel)]="statusFilter" 
+                  (change)="applyFilters()"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[140px]"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="in_review">In Review</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              <div class="flex items-center space-x-2">
+                <label class="text-sm font-medium text-gray-700">Category:</label>
+                <select 
+                  [(ngModel)]="categoryFilter" 
+                  (change)="applyFilters()"
+                  class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-w-[140px]"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="complaint">Complaints</option>
+                  <option value="report">Reports</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Complaints Grid - MODIFIED TO USE FULL WIDTH -->
-        <div>
-          <!-- Main Complaints List -->
-          <div class="flex flex-col gap-8">
-            <div>
-              <h2 class="text-xl font-bold text-gray-900 mb-6">Complaints</h2>
-              <div *ngIf="filteredComplaints.length > 0; else noComplaints">
-                <!-- Modified grid to use 3 columns on large screens -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  <div
+        <!-- Complaints Table -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">Complaints</h2>
+          </div>
+          
+          <div *ngIf="filteredComplaints.length > 0; else noComplaints">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Subject
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Submitted By
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date Submitted
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Attachment
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr 
                     *ngFor="let complaint of filteredComplaints"
-                    class="bg-white rounded-2xl shadow-lg p-5 pb-9 flex flex-col justify-between relative cursor-pointer transition hover:shadow-xl"
+                    class="hover:bg-gray-50 cursor-pointer transition-colors"
                     (click)="selectComplaint(complaint)"
                   >
-                    <!-- Status Badge -->
-                    <div class="absolute bottom-3 right-4 z-10">
+                    <td class="px-6 py-4">
+                      <div class="flex flex-col">
+                        <div class="text-sm font-medium text-gray-900">{{ complaint.subject }}</div>
+                        <div class="text-sm text-gray-500 truncate max-w-xs">{{ complaint.description }}</div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="text-sm text-gray-900">{{ complaint.isAnonymous ? '' : getComplainantName(complaint) }}</div>
+                        <span *ngIf="complaint.isAnonymous" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          Anonymous
+                        </span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900 capitalize">{{ complaint.category }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
                       <span 
                         class="px-2 py-1 text-xs font-medium rounded-full" 
                         [ngClass]="{
@@ -78,38 +132,69 @@ import { ResidentInfo } from '../../shared/types/resident';
                       >
                         {{ complaint.status | statusFormat }}
                       </span>
-                    </div>
-                    
-                    <!-- 3 dots menu -->
-                    <div class="absolute top-4 right-4 z-20" (click)="$event.stopPropagation()">
-                      <button (click)="toggleMenu(complaint.$id || '')" class="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
-                        <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                          <circle cx="5" cy="12" r="2" fill="#6B7280"/>
-                          <circle cx="12" cy="12" r="2" fill="#6B7280"/>
-                          <circle cx="19" cy="12" r="2" fill="#6B7280"/>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ complaint.createdAt | date:'short' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" (click)="$event.stopPropagation()">
+                      <a 
+                        *ngIf="complaint.attachments" 
+                        [href]="getAttachmentUrl(complaint.attachments)" 
+                        target="_blank"
+                        class="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center space-x-1"
+                        title="View attachment"
+                      >
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"/>
                         </svg>
-                      </button>
-                      <div *ngIf="openMenuId === complaint.$id" class="absolute right-0 mt-2 w-32 bg-white rounded shadow-lg border z-30">
-                        <button class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm" (click)="deleteComplaint(complaint.$id)">Delete</button>
+                        <span class="text-xs">View</span>
+                      </a>
+                      <span *ngIf="!complaint.attachments" class="text-gray-400">-</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div class="relative" (click)="$event.stopPropagation()">
+                        <button 
+                          (click)="toggleMenu(complaint.$id || '')" 
+                          class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                        >
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                          </svg>
+                        </button>
+                        <div 
+                          *ngIf="openMenuId === complaint.$id" 
+                          class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border z-30"
+                        >
+                          <button 
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-md"
+                            (click)="selectComplaint(complaint)"
+                          >
+                            View Details
+                          </button>
+                          <button 
+                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-md"
+                            (click)="deleteComplaint(complaint.$id)"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div>
-                      <h3 class="text-lg font-bold text-gray-800 mb-1 mt-2">{{ complaint.subject }}</h3>
-                      <p class="text-gray-600 text-sm mb-2 truncate">{{ complaint.description }}</p>
-                      <p class="text-xs text-gray-500">
-                        Submitted by {{ getResidentName(complaint.userId) }} on {{ complaint.createdAt | date:'medium' }}
-                      </p>
-                      <p *ngIf="complaint.attachments" class="text-xs text-blue-500 mt-1">Has attachment</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <ng-template #noComplaints>
-                <p class="text-gray-600">No complaints available matching the current filters.</p>
-              </ng-template>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
+          
+          <ng-template #noComplaints>
+            <div class="px-6 py-12 text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <h3 class="mt-2 text-sm font-medium text-gray-900">No complaints found</h3>
+              <p class="mt-1 text-sm text-gray-500">No complaints match the current filters.</p>
+            </div>
+          </ng-template>
         </div>
       </div>
 
@@ -144,7 +229,15 @@ import { ResidentInfo } from '../../shared/types/resident';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <p class="text-sm text-gray-500">Submitted by</p>
-                <p class="font-medium">{{ getResidentName(selectedComplaint.userId) }}</p>
+                <div class="flex items-center">
+                  <p class="font-medium">{{ selectedComplaint.isAnonymous ? '' : getComplainantName(selectedComplaint) }}</p>
+                  <span *ngIf="selectedComplaint.isAnonymous" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Anonymous Report
+                  </span>
+                </div>
               </div>
               <div>
                 <p class="text-sm text-gray-500">Date Submitted</p>
@@ -265,76 +358,6 @@ import { ResidentInfo } from '../../shared/types/resident';
           </div>
         </div>
       </div>
-
-      <!-- Custom Notification Modal -->
-      <div 
-        *ngIf="showNotificationModal"
-        class="fixed inset-0 flex items-center justify-center z-50"
-      >
-        <div 
-          class="absolute inset-0 backdrop-blur-md bg-black/30"
-          (click)="closeNotification()"
-        ></div>
-        <div class="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md z-10">
-          <div class="text-center">
-            <!-- Success icon without the green background strip -->
-            <div class="mx-auto flex items-center justify-center mb-4">
-              <svg *ngIf="notificationType === 'success'" class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <svg *ngIf="notificationType === 'error'" class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">
-              {{ notificationType === 'success' ? 'Success!' : 'Error' }}
-            </h3>
-            <p class="text-gray-600 mb-6">{{ notificationMessage }}</p>
-            <button
-              (click)="closeNotification()"
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- New Delete Confirmation Modal -->
-      <div 
-        *ngIf="showDeleteConfirmation"
-        class="fixed inset-0 flex items-center justify-center z-50"
-      >
-        <div 
-          class="absolute inset-0 backdrop-blur-md bg-black/30"
-          (click)="cancelDelete()"
-        ></div>
-        <div class="bg-white rounded-lg shadow-lg p-6 relative w-full max-w-md z-10">
-          <div class="text-center">
-            <div class="mx-auto flex items-center justify-center mb-4">
-              <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Confirm Deletion</h3>
-            <p class="text-gray-600 mb-6">Are you sure you want to delete this complaint?</p>
-            <div class="flex justify-center space-x-4">
-              <button
-                (click)="cancelDelete()"
-                class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-              >
-                Cancel
-              </button>
-              <button
-                (click)="confirmDelete()"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   `,
   styles: [`
@@ -355,7 +378,37 @@ import { ResidentInfo } from '../../shared/types/resident';
       background-repeat: no-repeat;
       background-position: right 0.75rem center;
       background-size: 1rem;
-      padding-right: 2.5rem; /* Ensure space for the arrow */
+      padding-right: 2.5rem;
+      appearance: none;
+    }
+    
+    /* Table hover effects */
+    tbody tr:hover {
+      background-color: #f9fafb;
+    }
+    
+    /* Ensure dropdown menus appear above other content */
+    .relative {
+      position: relative;
+    }
+    
+    /* Custom scrollbar for table */
+    .overflow-x-auto::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    .overflow-x-auto::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   `]
 })
@@ -381,15 +434,6 @@ export class ReportsComponent implements OnInit {
     { value: 'resolved', label: 'Resolved' },
     { value: 'rejected', label: 'Rejected' }
   ];
-
-  // Notification system properties
-  showNotificationModal = false;
-  notificationMessage = '';
-  notificationType: 'success' | 'error' = 'success';
-  
-  // New delete confirmation properties
-  showDeleteConfirmation = false;
-  complaintToDeleteId: string | null = null;
   
   constructor(
     private complaintService: ComplaintService,
@@ -463,40 +507,55 @@ export class ReportsComponent implements OnInit {
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
-  // UPDATED: Start deletion process with confirmation
-  deleteComplaint(id: string) {
-    this.complaintToDeleteId = id;
-    this.showDeleteConfirmation = true;
-  }
-  
-  // NEW: Cancel deletion
-  cancelDelete() {
-    this.showDeleteConfirmation = false;
-    this.complaintToDeleteId = null;
-  }
-  
-  // NEW: Confirm and execute deletion
-  async confirmDelete() {
-    if (!this.complaintToDeleteId) return;
-    
-    const id = this.complaintToDeleteId;
-    this.showDeleteConfirmation = false;
-    this.complaintToDeleteId = null;
-    
-    try {
-      const success = await this.complaintService.deleteComplaint(id);
-      if (success) {
-        this.complaints = this.complaints.filter(c => c.$id !== id);
-        this.applyFilters();
-        if (this.openMenuId === id) this.openMenuId = null;
-        if (this.selectedComplaint && this.selectedComplaint.$id === id) this.selectedComplaint = null;
-        this.showSuccessNotification('Complaint deleted successfully.');
-      } else {
-        this.showErrorNotification('Failed to delete complaint.');
+  // UPDATED: Start deletion process with SweetAlert2 confirmation
+  async deleteComplaint(id: string) {
+    const result = await Swal.fire({
+      title: 'Delete Complaint',
+      text: 'Are you sure you want to delete this complaint? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '400px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+        confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white',
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const success = await this.complaintService.deleteComplaint(id);
+        if (success) {
+          this.complaints = this.complaints.filter(c => c.$id !== id);
+          this.applyFilters();
+          if (this.openMenuId === id) this.openMenuId = null;
+          if (this.selectedComplaint && this.selectedComplaint.$id === id) this.selectedComplaint = null;
+          await this.showCustomAlert('Complaint deleted successfully', 'success');
+        } else {
+          await this.showCustomAlert('Failed to delete complaint', 'error');
+        }
+      } catch (error) {
+        console.error('Error deleting complaint:', error);
+        await this.showCustomAlert('An error occurred while deleting the complaint', 'error');
       }
-    } catch (error) {
-      console.error('Error deleting complaint:', error);
-      this.showErrorNotification('An error occurred while deleting the complaint.');
     }
   }
 
@@ -504,7 +563,7 @@ export class ReportsComponent implements OnInit {
     event.preventDefault();
     
     if (!this.selectedComplaint || !this.statusToUpdate) {
-      alert('Please select a status.');
+      await this.showCustomAlert('Please select a status', 'warning');
       return;
     }
     
@@ -533,35 +592,81 @@ export class ReportsComponent implements OnInit {
           this.applyFilters();
         }
         
-        this.showSuccessNotification('Complaint updated successfully.');
+        await this.showCustomAlert('Complaint updated and reply sent successfully', 'success');
         this.selectedComplaint = null;
       } else {
-        this.showErrorNotification('Failed to update complaint.');
+        await this.showCustomAlert('Failed to update complaint', 'error');
       }
     } catch (error) {
       console.error('Error updating complaint:', error);
-      this.showErrorNotification('An error occurred while updating the complaint.');
+      await this.showCustomAlert('An error occurred while updating the complaint', 'error');
     } finally {
       this.isSubmitting = false;
     }
   }
 
-  showSuccessNotification(message: string) {
-    this.notificationType = 'success';
-    this.notificationMessage = message;
-    this.showNotificationModal = true;
+  async showCustomAlert(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    const config: any = {
+      text: message,
+      confirmButtonText: 'OK',
+      background: '#ffffff',
+      color: '#374151',
+      timer: 3000,
+      timerProgressBar: true,
+      width: '350px',
+      padding: '1.5rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0 backdrop-blur-sm',
+        title: 'text-lg font-bold mb-2 leading-tight',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-4',
+        confirmButton: 'font-semibold py-2 px-5 rounded-lg transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm',
+        timerProgressBar: 'rounded-full h-1'
+      },
+      backdrop: 'rgba(15, 23, 42, 0.3)',
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      buttonsStyling: false
+    };
+
+    if (type === 'success') {
+      config.icon = 'success';
+      config.title = 'Success!';
+      config.iconColor = '#10B981';
+      config.customClass.title += ' text-emerald-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-emerald-400 to-emerald-500';
+    } else if (type === 'error') {
+      config.icon = 'error';
+      config.title = 'Error';
+      config.iconColor = '#EF4444';
+      config.customClass.title += ' text-red-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-red-400 to-red-500';
+    } else if (type === 'warning') {
+      config.icon = 'warning';
+      config.title = 'Warning';
+      config.iconColor = '#F59E0B';
+      config.customClass.title += ' text-amber-700';
+      config.customClass.confirmButton += ' bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white';
+      config.customClass.timerProgressBar += ' bg-gradient-to-r from-amber-400 to-amber-500';
+    }
+
+    await Swal.fire(config);
   }
   
-  showErrorNotification(message: string) {
-    this.notificationType = 'error';
-    this.notificationMessage = message;
-    this.showNotificationModal = true;
+  getComplainantName(complaint: Complaint): string {
+    if (complaint.isAnonymous) {
+      return 'Anonymous';
+    }
+    return this.residentMap[complaint.userId] || 'Unknown Resident';
   }
-  
-  closeNotification() {
-    this.showNotificationModal = false;
-  }
-  
+
   getResidentName(userId: string): string {
     return this.residentMap[userId] || 'Unknown Resident';
   }

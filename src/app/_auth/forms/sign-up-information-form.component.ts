@@ -359,7 +359,7 @@ import { environment } from '../../environment/environment';
                       class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                     >
                     <div *ngIf="hasFieldError('birthDate')" class="text-red-500 text-xs mt-1">
-                      {{ getFieldError('birthDate') s
+                      {{ getFieldError('birthDate') }}
                     </div>
                   </div>
                   <div>

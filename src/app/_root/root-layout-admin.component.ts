@@ -7,7 +7,7 @@ import { AuthService } from '../shared/services/auth.service';
   selector: 'app-root-layout-admin',
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <div class="flex">
+    <div class="flex h-screen overflow-hidden">
       <aside id="separator-sidebar" [class.hidden]="isSidebarHidden" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0" aria-label="Sidebar">
         <div class="h-full border-r-1 border-gray-200 drop-shadow-sm px-3 py-4 overflow-y-auto bg-gray-50">
           <div class="flex items-center justify-center mb-1">
@@ -56,8 +56,8 @@ import { AuthService } from '../shared/services/auth.service';
         </div>
       </aside>
 
-      <div [class.ml-64]="!isSidebarHidden" [class.ml-0]="isSidebarHidden" class="flex-1 transition-all duration-300">
-        <nav class="bg-gray-50 border-b border-gray-200">
+      <div [class.ml-64]="!isSidebarHidden" [class.ml-0]="isSidebarHidden" class="flex-1 flex flex-col h-full transition-all duration-300">
+        <nav class="bg-gray-50 border-b border-gray-200 sticky top-0 z-30">
           <div class="flex flex-wrap items-center justify-between mx-auto p-3">
             <button (click)="toggleSidebar()" class="inline-flex items-center p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
               <span class="sr-only">Open sidebar</span>
@@ -89,7 +89,7 @@ import { AuthService } from '../shared/services/auth.service';
           </div>
         </nav>
 
-        <div class="p-4">
+        <div class="flex-1 overflow-y-auto p-4">
           <!-- Main content goes here -->
           <router-outlet/>
         </div>
