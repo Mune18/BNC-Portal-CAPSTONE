@@ -30,15 +30,15 @@ export class ResidentGuardService {
       const userDoc = await this.userService.getUserInformation(account.$id);
       
       if (userDoc && userDoc.role === 'resident') {
-        // Additional check: ensure resident account is active
-        if (userDoc.otherDetails && userDoc.otherDetails.deceased === 'Deceased') {
-          console.log('ResidentGuard: Resident account is inactive, logging out and redirecting to sign-in');
+        // Additional check: block only deceased and archived accounts
+        if (userDoc.otherDetails && (userDoc.otherDetails.status === 'Deceased' || userDoc.otherDetails.status === 'Archived')) {
+          console.log('ResidentGuard: Resident account is deceased or archived, logging out and redirecting to sign-in');
           await this.authService.logout();
           this.router.navigate(['/sign-in']);
           return false;
         }
         
-        console.log('ResidentGuard: User is an active resident, allowing access');
+        console.log('ResidentGuard: User is a resident (Active or Inactive), allowing access');
         return true;
       } else {
         console.log('ResidentGuard: User is not a resident');

@@ -754,7 +754,7 @@ export class ProfileComponent implements OnInit {
     otherDetails: {
       nationalIdNo: '',
       votersIdNo: '',
-      deceased: '',
+      status: '',
       dateOfRegistration: ''
     }
   };
@@ -906,7 +906,7 @@ export class ProfileComponent implements OnInit {
       otherDetails: {
         nationalIdNo: '',
         votersIdNo: '',
-        deceased: '',
+        status: '',
         dateOfRegistration: ''
       }
     };

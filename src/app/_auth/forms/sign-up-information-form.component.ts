@@ -74,697 +74,1183 @@ import { environment } from '../../environment/environment';
       </div>
 
       <!-- Form content (blurred only when modal is open) -->
-      <div [class.blur-md]="showPreviewModal || showTermsModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-3 sm:px-6 lg:ml-auto lg:mr-8 lg:px-0 transition-all duration-300 w-full lg:w-3/5 py-4 pt-20 lg:pt-4">
+      <div [class.blur-md]="showPreviewModal || showTermsModal" class="flex flex-col items-center justify-center min-h-screen relative z-40 px-2 sm:px-4 lg:ml-auto lg:mr-8 lg:px-0 transition-all duration-300 w-full lg:w-3/5 pt-16 pb-8 lg:py-4">
         <form
           [ngClass]="{
-            'w-full max-w-sm sm:max-w-md': currentStep === 1,
-            'w-full max-w-full sm:max-w-5xl lg:max-w-6xl': currentStep === 2,
-            'w-full max-w-lg sm:max-w-2xl lg:max-w-3xl': currentStep === 3
+            'w-full max-w-md': currentStep === 1,
+            'w-full max-w-7xl': currentStep === 2,
+            'w-full max-w-2xl': currentStep === 3
           }"
-          class="bg-white/90 backdrop-blur-lg p-4 sm:p-6 lg:p-8 rounded-2xl shadow-2xl transition-all duration-300 overflow-y-auto"
+          class="bg-white/95 backdrop-blur-lg p-3 sm:p-6 lg:p-8 rounded-2xl shadow-2xl transition-all duration-300 overflow-y-auto"
           [ngClass]="{
-            'h-auto max-h-[85vh]': currentStep === 1,
-            'min-h-[85vh] max-h-[90vh]': currentStep === 2,
-            'h-auto max-h-[80vh]': currentStep === 3
+            'h-auto max-h-[90vh]': currentStep === 1,
+            'min-h-[85vh] max-h-[95vh]': currentStep === 2,
+            'h-auto max-h-[85vh]': currentStep === 3
           }"
           (ngSubmit)="onNextOrShowPreview()"
         >
-          <!-- Stepper Navigation -->
-          <div class="flex justify-center mb-3 sm:mb-4 lg:mb-6">
-            <div class="flex items-center gap-2 sm:gap-3">
-              <!-- Step 1 -->
-              <div [ngClass]="{
-                'bg-green-500': currentStep > 1,
-                'bg-blue-800': currentStep === 1,
-                'bg-gray-300': currentStep < 1
-              }" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm">
-                <!-- Show checkmark if step is completed -->
-                <svg *ngIf="currentStep > 1" class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <!-- Show number if step is current or not completed -->
-                <span *ngIf="currentStep <= 1">1</span>
+          <!-- Enhanced Stepper Navigation -->
+          <div class="flex justify-center mb-4 sm:mb-6">
+            <div class="flex items-center space-x-2 sm:space-x-4 bg-gray-100 rounded-full px-4 py-2">
+              <!-- Step 1 - Account -->
+              <div class="flex items-center">
+                <div [ngClass]="{
+                  'bg-green-500 shadow-green-200': currentStep > 1,
+                  'bg-blue-600 shadow-blue-200': currentStep === 1,
+                  'bg-gray-400': currentStep < 1
+                }" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 shadow-lg">
+                  <svg *ngIf="currentStep > 1" class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span *ngIf="currentStep <= 1" class="text-sm sm:text-base">1</span>
+                </div>
+                <span class="hidden sm:block ml-2 text-xs font-medium text-gray-600">Account</span>
               </div>
+              
               <!-- Connector line -->
               <div [ngClass]="{
                 'bg-green-500': currentStep > 1,
                 'bg-gray-300': currentStep <= 1
-              }" class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 transition-colors duration-300"></div>
-              <!-- Step 2 -->
-              <div [ngClass]="{
-                'bg-green-500': currentStep > 2,
-                'bg-blue-800': currentStep === 2,
-                'bg-gray-300': currentStep < 2
-              }" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm">
-                <!-- Show checkmark if step is completed -->
-                <svg *ngIf="currentStep > 2" class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <!-- Show number if step is current or not completed -->
-                <span *ngIf="currentStep <= 2">2</span>
+              }" class="w-6 sm:w-8 h-1 rounded-full transition-colors duration-300"></div>
+              
+              <!-- Step 2 - Personal -->
+              <div class="flex items-center">
+                <div [ngClass]="{
+                  'bg-green-500 shadow-green-200': currentStep > 2,
+                  'bg-blue-600 shadow-blue-200': currentStep === 2,
+                  'bg-gray-400': currentStep < 2
+                }" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 shadow-lg">
+                  <svg *ngIf="currentStep > 2" class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span *ngIf="currentStep <= 2" class="text-sm sm:text-base">2</span>
+                </div>
+                <span class="hidden sm:block ml-2 text-xs font-medium text-gray-600">Personal</span>
               </div>
+              
               <!-- Connector line -->
               <div [ngClass]="{
                 'bg-green-500': currentStep > 2,
                 'bg-gray-300': currentStep <= 2
-              }" class="w-2 sm:w-3 lg:w-4 h-0.5 sm:h-1 transition-colors duration-300"></div>
-              <!-- Step 3 -->
-              <div [ngClass]="{
-                'bg-green-500': currentStep > 3,
-                'bg-blue-800': currentStep === 3,
-                'bg-gray-300': currentStep < 3
-              }" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 text-xs sm:text-sm">
-                <!-- Show checkmark if step is completed (when form is submitted successfully) -->
-                <svg *ngIf="currentStep > 3" class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <!-- Show number if step is current or not completed -->
-                <span *ngIf="currentStep <= 3">3</span>
+              }" class="w-6 sm:w-8 h-1 rounded-full transition-colors duration-300"></div>
+              
+              <!-- Step 3 - Emergency -->
+              <div class="flex items-center">
+                <div [ngClass]="{
+                  'bg-green-500 shadow-green-200': currentStep > 3,
+                  'bg-blue-600 shadow-blue-200': currentStep === 3,
+                  'bg-gray-400': currentStep < 3
+                }" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 shadow-lg">
+                  <svg *ngIf="currentStep > 3" class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span *ngIf="currentStep <= 3" class="text-sm sm:text-base">3</span>
+                </div>
+                <span class="hidden sm:block ml-2 text-xs font-medium text-gray-600">Emergency</span>
               </div>
             </div>
           </div>
 
           <!-- Section 1: Account Info -->
           <div *ngIf="currentStep === 1" class="flex flex-col justify-center">
-            <h2 class="text-center text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mb-6">Register Account</h2>
+            <div class="text-center mb-6">
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Account Setup</h2>
+              <p class="text-sm text-gray-600">Create your account credentials to access the BNC Portal</p>
+            </div>
             
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-3 sm:mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              <span class="text-sm sm:text-base">{{ errorMessage }}</span>
-            </div>
-            
-            <div class="mb-2 sm:mb-3 lg:mb-4">
-              <label class="block text-gray-700 text-sm font-semibold mb-1 sm:mb-2" for="email">Email *</label>
-              <input 
-                type="email" 
-                id="email" 
-                [(ngModel)]="formData.account.email" 
-                name="email" 
-                placeholder="Enter your email address"
-                [class.border-red-500]="hasFieldError('email')"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 sm:py-2.5 lg:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-                required
-              />
-              <div *ngIf="hasFieldError('email')" class="text-red-500 text-xs mt-1">
-                {{ getFieldError('email') }}
+            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                {{ errorMessage }}
               </div>
             </div>
             
-            <div class="mb-2 sm:mb-3 lg:mb-4">
-              <label class="block text-gray-700 text-sm font-semibold mb-1 sm:mb-2" for="password">Password *</label>
-              <input 
-                type="password" 
-                id="password" 
-                [(ngModel)]="formData.account.password" 
-                name="password" 
-                placeholder="Create a strong password"
-                [class.border-red-500]="hasFieldError('password')"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 sm:py-2.5 lg:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-                required
-              />
-              <div *ngIf="hasFieldError('password')" class="text-red-500 text-xs mt-1">
-                {{ getFieldError('password') }}
-              </div>
-              <div class="text-gray-500 text-xs mt-1">
-                Password must be at least 8 characters long
-              </div>
-            </div>
-            
-            <div class="mb-2 sm:mb-3 lg:mb-4">
-              <label class="block text-gray-700 text-sm font-semibold mb-1 sm:mb-2" for="confirmPassword">Confirm Password *</label>
-              <input 
-                type="password" 
-                id="confirmPassword" 
-                [(ngModel)]="formData.account.confirmPassword" 
-                name="confirmPassword" 
-                placeholder="Re-enter your password"
-                [class.border-red-500]="hasFieldError('confirmPassword')"
-                class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2 sm:py-2.5 lg:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-                required
-              />
-              <div *ngIf="hasFieldError('confirmPassword')" class="text-red-500 text-xs mt-1">
-                {{ getFieldError('confirmPassword') }}
-              </div>
-            </div>
-
-            <!-- Terms and Conditions -->
-            <div class="mb-3 sm:mb-4 lg:mb-6">
-              <div class="flex items-start">
-                <input 
-                  type="checkbox" 
-                  id="acceptTerms" 
-                  [(ngModel)]="acceptedTerms"
-                  name="acceptTerms"
-                  [class.border-red-500]="hasFieldError('acceptedTerms')"
-                  class="mt-1 mr-2 sm:mr-3 h-3 w-3 sm:h-4 sm:w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label for="acceptTerms" class="text-xs sm:text-sm text-gray-700 leading-tight">
-                  I agree to the 
-                  <button 
-                    type="button"
-                    (click)="showTermsModal = true"
-                    class="text-blue-600 hover:text-blue-800 underline font-medium"
-                  >
-                    Terms and Conditions
-                  </button>
-                  and 
-                  <button 
-                    type="button"
-                    (click)="showTermsModal = true"
-                    class="text-blue-600 hover:text-blue-800 underline font-medium"
-                  >
-                    Privacy Policy
-                  </button>
-                  *
+            <div class="space-y-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">
+                  Email Address <span class="text-red-500">*</span>
                 </label>
+                <div class="relative">
+                  <input 
+                    type="email" 
+                    id="email" 
+                    [(ngModel)]="formData.account.email" 
+                    name="email" 
+                    placeholder="Enter your email address"
+                    [class.border-red-300]="hasFieldError('email')"
+                    [class.border-green-300]="!hasFieldError('email') && formData.account.email && isValidEmail(formData.account.email)"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    required
+                    autocomplete="email"
+                  />
+                  <div class="absolute right-3 top-3">
+                    <svg *ngIf="!hasFieldError('email') && formData.account.email && isValidEmail(formData.account.email)" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg *ngIf="hasFieldError('email')" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div *ngIf="hasFieldError('email')" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  {{ getFieldError('email') }}
+                </div>
+                <div *ngIf="!hasFieldError('email') && formData.account.email && isValidEmail(formData.account.email)" class="text-green-600 text-xs mt-1">
+                  ✓ Valid email address
+                </div>
               </div>
-              <div *ngIf="hasFieldError('acceptedTerms')" class="text-red-500 text-xs mt-1 ml-5 sm:ml-7">
-                {{ getFieldError('acceptedTerms') }}
+              
+              <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-2" for="password">
+                  Password <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input 
+                    [type]="showPassword ? 'text' : 'password'"
+                    id="password" 
+                    [(ngModel)]="formData.account.password" 
+                    name="password" 
+                    placeholder="Create a strong password"
+                    [class.border-red-300]="hasFieldError('password')"
+                    [class.border-green-300]="!hasFieldError('password') && getPasswordStrength() >= 4"
+                    class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    required
+                    minlength="8"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    (click)="togglePasswordVisibility()"
+                  >
+                    <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    <svg *ngIf="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                    </svg>
+                  </button>
+                </div>
+                
+                <!-- Password Strength Indicator -->
+                <div *ngIf="formData.account.password" class="mt-2">
+                  <div class="flex space-x-1">
+                    <div *ngFor="let level of [1,2,3,4,5]" 
+                         class="h-1 flex-1 rounded-full transition-all duration-300"
+                         [class.bg-red-500]="level <= getPasswordStrength() && getPasswordStrength() < 3"
+                         [class.bg-yellow-500]="level <= getPasswordStrength() && getPasswordStrength() === 3"
+                         [class.bg-green-500]="level <= getPasswordStrength() && getPasswordStrength() >= 4"
+                         [class.bg-gray-200]="level > getPasswordStrength()">
+                    </div>
+                  </div>
+                  <p class="text-xs mt-1 transition-colors duration-300"
+                     [class.text-red-600]="getPasswordStrength() < 3"
+                     [class.text-yellow-600]="getPasswordStrength() === 3"
+                     [class.text-green-600]="getPasswordStrength() >= 4">
+                    {{ getPasswordStrengthText() }}
+                  </p>
+                </div>
+                
+                <div *ngIf="hasFieldError('password')" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  {{ getFieldError('password') }}
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-gray-700 text-sm font-semibold mb-2" for="confirmPassword">
+                  Confirm Password <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    [(ngModel)]="formData.account.confirmPassword" 
+                    name="confirmPassword" 
+                    placeholder="Re-enter your password"
+                    [class.border-red-300]="hasFieldError('confirmPassword') || passwordMismatch()"
+                    [class.border-green-300]="!hasFieldError('confirmPassword') && !passwordMismatch() && formData.account.confirmPassword"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    required
+                    autocomplete="new-password"
+                  />
+                  <div class="absolute right-3 top-3">
+                    <svg *ngIf="!passwordMismatch() && formData.account.confirmPassword && !hasFieldError('confirmPassword')" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div *ngIf="passwordMismatch()" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  Passwords do not match
+                </div>
+                <div *ngIf="!passwordMismatch() && formData.account.confirmPassword && !hasFieldError('confirmPassword')" class="text-green-600 text-xs mt-1">
+                  ✓ Passwords match
+                </div>
+                <div *ngIf="hasFieldError('confirmPassword')" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  {{ getFieldError('confirmPassword') }}
+                </div>
+              </div>
+
+              <!-- Terms and Conditions -->
+              <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                <div class="flex items-start">
+                  <input 
+                    type="checkbox" 
+                    id="acceptTerms" 
+                    [(ngModel)]="acceptedTerms"
+                    name="acceptTerms"
+                    [class.border-red-300]="hasFieldError('acceptedTerms')"
+                    class="mt-1 mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <label for="acceptTerms" class="text-sm text-gray-700 leading-relaxed flex-1">
+                    I agree to the 
+                    <button 
+                      type="button"
+                      (click)="showTermsModal = true"
+                      class="text-blue-600 hover:text-blue-800 underline font-semibold"
+                    >
+                      Terms and Conditions
+                    </button>
+                    and 
+                    <button 
+                      type="button"
+                      (click)="showTermsModal = true"
+                      class="text-blue-600 hover:text-blue-800 underline font-semibold"
+                    >
+                      Privacy Policy
+                    </button>
+                    <span class="text-red-500 ml-1">*</span>
+                  </label>
+                </div>
+                <div *ngIf="hasFieldError('acceptedTerms')" class="text-red-500 text-xs mt-2 ml-7 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  {{ getFieldError('acceptedTerms') }}
+                </div>
               </div>
             </div>
             
-            <div class="flex justify-end pt-2">
+            <div class="flex justify-center pt-6">
               <button 
                 type="button" 
                 (click)="nextStep()"
-                [disabled]="isLoading || !acceptedTerms"
-                class="w-full sm:w-auto bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 lg:py-3 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2 text-sm sm:text-base"
+                [disabled]="isLoading || !canProceedToStep2()"
+                class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
               >
-                <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {{ isLoading ? 'Processing...' : 'Next' }}
+                <span *ngIf="!isLoading" class="flex items-center">
+                  Continue to Personal Information
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </span>
+                <span *ngIf="isLoading" class="flex items-center">
+                  <svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </span>
               </button>
             </div>
           </div>
 
           <!-- Section 2: Personal Info (personal details only) -->
           <div *ngIf="currentStep === 2" class="flex-1 overflow-y-auto">
-            <h2 class="text-center text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mb-6">Personal Information</h2>
-            
-            <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-3 sm:mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              <span class="text-sm">{{ errorMessage }}</span>
+            <div class="text-center mb-4 sm:mb-6">
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Personal Information</h2>
+              <p class="text-sm text-gray-600">Please provide your complete personal details</p>
             </div>
             
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 items-start">
-              <!-- Left column: Profile image at top, then fields below (Full width on mobile) -->
-              <div class="flex flex-col items-center lg:items-stretch lg:col-span-1">
-                <!-- Profile image at the very top -->
-                <div class="flex flex-col items-center mb-3 sm:mb-4">
-                  <div class="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center mb-2 border-4 border-blue-300">
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                {{ errorMessage }}
+              </div>
+            </div>
+            
+            <!-- Mobile-First Layout -->
+            <div class="space-y-6">
+              
+              <!-- Profile Image Section -->
+              <div class="flex flex-col items-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Profile Photo</h3>
+                <div class="relative group">
+                  <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden flex items-center justify-center border-4 border-white shadow-lg transition-transform group-hover:scale-105">
                     <img *ngIf="formData.profileImage" [src]="formData.profileImage" alt="Profile Image" class="object-cover w-full h-full" />
-                    <span *ngIf="!formData.profileImage" class="text-gray-400 text-2xl sm:text-3xl lg:text-4xl">+</span>
+                    <svg *ngIf="!formData.profileImage" class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
                   </div>
-                  <label class="cursor-pointer bg-blue-600 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition mb-3 sm:mb-4 text-xs sm:text-sm">
-                    Upload Profile Image
+                  <label class="absolute -bottom-2 -right-2 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
                     <input type="file" accept="image/*" (change)="onProfileImageChange($event)" hidden>
                   </label>
                 </div>
-                <!-- Fields below the image - Mobile: 2 columns, Desktop: 1 column -->
-                <div class="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3 lg:gap-4 w-full">
+                <p class="text-xs text-gray-500 mt-2 text-center">Click the + button to upload your photo</p>
+              </div>
+
+              <!-- Basic Information -->
+              <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                  </svg>
+                  Basic Information
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Last Name *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Last Name <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.lastName" 
                       name="lastName" 
-                      [class.border-red-500]="hasFieldError('lastName')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2" 
+                      placeholder="Enter last name"
+                      [class.border-red-300]="hasFieldError('lastName')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                       required
+                      autocomplete="family-name"
                     >
-                    <div *ngIf="hasFieldError('lastName')" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="hasFieldError('lastName')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
                       {{ getFieldError('lastName') }}
                     </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">First Name *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      First Name <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.firstName" 
                       name="firstName" 
-                      [class.border-red-500]="hasFieldError('firstName')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2" 
+                      placeholder="Enter first name"
+                      [class.border-red-300]="hasFieldError('firstName')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                       required
+                      autocomplete="given-name"
                     >
-                    <div *ngIf="hasFieldError('firstName')" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="hasFieldError('firstName')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
                       {{ getFieldError('firstName') }}
                     </div>
                   </div>
-                  <div class="col-span-2 lg:col-span-1">
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Middle Name *</label>
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Middle Name <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.middleName" 
                       name="middleName" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('middleName') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter middle name"
+                      [class.border-red-300]="hasFieldError('middleName')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      autocomplete="additional-name"
                     >
-                    <div *ngIf="hasFieldError('middleName')" class="text-red-500 text-xs mt-1">{{ getFieldError('middleName') }}</div>
+                    <div *ngIf="hasFieldError('middleName')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('middleName') }}
+                    </div>
                   </div>
-                  <div class="col-span-2 lg:col-span-1">
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Suffix</label>
-                    <input type="text" [(ngModel)]="formData.personalInfo.suffix" name="suffix" class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2">
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Suffix</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="formData.personalInfo.suffix" 
+                      name="suffix" 
+                      placeholder="Jr., Sr., III (optional)"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    >
                   </div>
                 </div>
               </div>
-              <!-- Right column: The rest of the fields -->
-              <div class="lg:col-span-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4 mb-3 sm:mb-4">
-                  <!-- Remove the fields already placed on the left column above -->
+
+              <!-- Personal Details -->
+              <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  Personal Details
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Gender *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Gender <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.gender" 
                       name="gender" 
-                      [class.border-red-500]="hasFieldError('gender')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
+                      [class.border-red-300]="hasFieldError('gender')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Gender</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                     </select>
-                    <div *ngIf="hasFieldError('gender')" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="hasFieldError('gender')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
                       {{ getFieldError('gender') }}
                     </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Birth Date *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Birth Date <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="date" 
                       [(ngModel)]="formData.personalInfo.birthDate" 
                       name="birthDate" 
-                      [class.border-red-500]="hasFieldError('birthDate')"
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
+                      [class.border-red-300]="hasFieldError('birthDate')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      [max]="maxDate"
                     >
-                    <div *ngIf="hasFieldError('birthDate')" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="hasFieldError('birthDate')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
                       {{ getFieldError('birthDate') }}
                     </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Birth Place *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Birth Place <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.birthPlace" 
                       name="birthPlace" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('birthPlace') ? 'border-red-500' : 'border-gray-300')"
                       placeholder="Enter birth place"
+                      [class.border-red-300]="hasFieldError('birthPlace')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                    <div *ngIf="hasFieldError('birthPlace')" class="text-red-500 text-xs mt-1">{{ getFieldError('birthPlace') }}</div>
+                    <div *ngIf="hasFieldError('birthPlace')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('birthPlace') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Civil Status *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Civil Status <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.civilStatus" 
                       name="civilStatus" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('civilStatus') ? 'border-red-500' : 'border-gray-300')"
+                      [class.border-red-300]="hasFieldError('civilStatus')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Status</option>
                       <option value="Single">Single</option>
                       <option value="Married">Married</option>
                       <option value="Widowed">Widowed</option>
                       <option value="Divorced">Divorced</option>
                     </select>
-                    <div *ngIf="hasFieldError('civilStatus')" class="text-red-500 text-xs mt-1">{{ getFieldError('civilStatus') }}</div>
+                    <div *ngIf="hasFieldError('civilStatus')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('civilStatus') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Nationality *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Nationality <span class="text-red-500">*</span>
+                    </label>
                     <div class="relative">
                       <select 
                         *ngIf="formData.personalInfo.nationalityType !== 'Others'"
                         [(ngModel)]="formData.personalInfo.nationalityType" 
                         name="nationalityType" 
                         (ngModelChange)="onNationalityTypeChange()"
-                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
+                        [class.border-red-300]="hasFieldError('nationality')"
+                        class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                       >
                         <option value="Filipino">Filipino</option>
                         <option value="Others">Others</option>
                       </select>
-                      <div *ngIf="formData.personalInfo.nationalityType === 'Others'" class="flex">
+                      <div *ngIf="formData.personalInfo.nationalityType === 'Others'" class="relative">
                         <input 
                           type="text" 
                           [(ngModel)]="formData.personalInfo.nationality" 
                           name="nationality" 
-                          [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 pr-16 ' + (hasFieldError('nationality') ? 'border-red-500' : 'border-gray-300')"
                           placeholder="Enter nationality"
+                          [class.border-red-300]="hasFieldError('nationality')"
+                          class="w-full px-3 py-3 pr-16 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                         >
                         <button 
                           type="button"
                           (click)="resetNationalitySelection()"
-                          class="absolute right-1 top-1/2 transform -translate-y-1/2 px-2 py-1 text-xs text-blue-600 hover:text-blue-800 transition"
+                          class="absolute right-2 top-1/2 transform -translate-y-1/2 px-2 py-1 text-xs text-blue-600 hover:text-blue-800 transition-colors bg-white rounded border"
                         >
                           Change
                         </button>
                       </div>
                     </div>
-                    <div *ngIf="hasFieldError('nationality')" class="text-red-500 text-xs mt-1">{{ getFieldError('nationality') }}</div>
+                    <div *ngIf="hasFieldError('nationality')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('nationality') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Religion *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Religion <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.religion" 
                       name="religion" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('religion') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter religion"
+                      placeholder="Enter your religion"
+                      [class.border-red-300]="hasFieldError('religion')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                    <div *ngIf="hasFieldError('religion')" class="text-red-500 text-xs mt-1">{{ getFieldError('religion') }}</div>
+                    <div *ngIf="hasFieldError('religion')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('religion') }}
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              <!-- Contact & Work Information -->
+              <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                  Contact & Work
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Occupation *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Occupation <span class="text-red-500">*</span>
+                    </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.occupation" 
                       name="occupation" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('occupation') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter occupation"
+                      placeholder="Enter your occupation"
+                      [class.border-red-300]="hasFieldError('occupation')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      autocomplete="organization-title"
                     >
-                    <div *ngIf="hasFieldError('occupation')" class="text-red-500 text-xs mt-1">{{ getFieldError('occupation') }}</div>
+                    <div *ngIf="hasFieldError('occupation')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('occupation') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Contact No. *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Monthly Income <span class="text-red-500">*</span>
+                    </label>
                     <div class="relative">
-                      <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-500 text-xs sm:text-sm">+63</span>
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 text-sm">₱</span>
+                      </div>
+                      <input 
+                        type="number" 
+                        [(ngModel)]="formData.personalInfo.monthlyIncome" 
+                        name="monthlyIncome" 
+                        placeholder="0.00"
+                        min="0"
+                        step="0.01"
+                        [class.border-red-300]="hasFieldError('monthlyIncome')"
+                        class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      >
+                    </div>
+                    <div *ngIf="hasFieldError('monthlyIncome')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('monthlyIncome') }}
+                    </div>
+                  </div>
+                  
+                  <div class="sm:col-span-2">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Contact Number <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 text-sm">+63</span>
                       </div>
                       <input 
                         type="tel" 
                         [(ngModel)]="formData.personalInfo.contactNo" 
                         name="contactNo" 
-                        [class.border-red-500]="hasFieldError('contactNo')"
-                        class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 pl-10 sm:pl-12"
                         placeholder="9XXXXXXXXX"
                         maxlength="10"
+                        [class.border-red-300]="hasFieldError('contactNo')"
+                        class="w-full pl-12 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                         (input)="onPhoneInput($event, 'contactNo')"
                         (keypress)="onPhoneKeypress($event)"
+                        autocomplete="tel"
                       >
                     </div>
-                    <div *ngIf="hasFieldError('contactNo')" class="text-red-500 text-xs mt-1">
+                    <div *ngIf="hasFieldError('contactNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
                       {{ getFieldError('contactNo') }}
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">Enter 10-digit mobile number without +63</p>
                   </div>
+                </div>
+              </div>
+
+              <!-- Address Information -->
+              <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  Address Information
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">PWD? *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Purok Number <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="formData.personalInfo.purokNo" 
+                      name="purokNo" 
+                      placeholder="Enter purok number"
+                      [class.border-red-300]="hasFieldError('purokNo')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    >
+                    <div *ngIf="hasFieldError('purokNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('purokNo') }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      House Number <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="formData.personalInfo.houseNo" 
+                      name="houseNo" 
+                      placeholder="Enter house number"
+                      [class.border-red-300]="hasFieldError('houseNo')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    >
+                    <div *ngIf="hasFieldError('houseNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('houseNo') }}
+                    </div>
+                  </div>
+                  
+                  <div class="sm:col-span-2 lg:col-span-1">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Street <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="formData.personalInfo.street" 
+                      name="street" 
+                      placeholder="Enter street name"
+                      [class.border-red-300]="hasFieldError('street')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    >
+                    <div *ngIf="hasFieldError('street')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('street') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Special Categories -->
+              <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm4-3a1 1 0 00-1 1v1h2V4a1 1 0 00-1-1zM4 9h12v5H4V9z" clip-rule="evenodd"></path>
+                  </svg>
+                  Special Categories & Benefits
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      PWD Status <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.pwd" 
                       name="pwd" 
                       (ngModelChange)="onPwdChange()"
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('pwd') ? 'border-red-500' : 'border-gray-300')"
+                      [class.border-red-300]="hasFieldError('pwd')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('pwd')" class="text-red-500 text-xs mt-1">{{ getFieldError('pwd') }}</div>
+                    <div *ngIf="hasFieldError('pwd')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('pwd') }}
+                    </div>
                   </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
-                      PWD ID No. <span *ngIf="formData.personalInfo.pwd === 'Yes'" class="text-red-500">*</span>
+                  
+                  <div *ngIf="formData.personalInfo.pwd === 'Yes'">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      PWD ID Number <span class="text-red-500">*</span>
                     </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.pwdIdNo" 
                       name="pwdIdNo" 
-                      [disabled]="formData.personalInfo.pwd !== 'Yes'"
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('pwdIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.pwd !== 'Yes' ? ' bg-gray-100' : '')"
                       placeholder="Enter PWD ID Number"
+                      [class.border-red-300]="hasFieldError('pwdIdNo')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                    <div *ngIf="hasFieldError('pwdIdNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('pwdIdNo') }}</div>
+                    <div *ngIf="hasFieldError('pwdIdNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('pwdIdNo') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Family Monthly Income *</label>
-                    <input 
-                      type="number" 
-                      [(ngModel)]="formData.personalInfo.monthlyIncome" 
-                      name="monthlyIncome" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('monthlyIncome') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter monthly income"
-                    >
-                    <div *ngIf="hasFieldError('monthlyIncome')" class="text-red-500 text-xs mt-1">{{ getFieldError('monthlyIncome') }}</div>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Indigent? *</label>
-                    <select 
-                      [(ngModel)]="formData.personalInfo.indigent" 
-                      name="indigent" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('indigent') ? 'border-red-500' : 'border-gray-300')"
-                    >
-                      <option value="">Select</option>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                    <div *ngIf="hasFieldError('indigent')" class="text-red-500 text-xs mt-1">{{ getFieldError('indigent') }}</div>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Solo Parent? *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Solo Parent Status <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.soloParent" 
                       name="soloParent" 
                       (ngModelChange)="onSoloParentChange()"
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('soloParent') ? 'border-red-500' : 'border-gray-300')"
+                      [class.border-red-300]="hasFieldError('soloParent')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('soloParent')" class="text-red-500 text-xs mt-1">{{ getFieldError('soloParent') }}</div>
+                    <div *ngIf="hasFieldError('soloParent')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('soloParent') }}
+                    </div>
                   </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
-                      Solo Parent ID No. <span *ngIf="formData.personalInfo.soloParent === 'Yes'" class="text-red-500">*</span>
+                  
+                  <div *ngIf="formData.personalInfo.soloParent === 'Yes'">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Solo Parent ID Number <span class="text-red-500">*</span>
                     </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.soloParentIdNo" 
                       name="soloParentIdNo" 
-                      [disabled]="formData.personalInfo.soloParent !== 'Yes'"
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('soloParentIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.soloParent !== 'Yes' ? ' bg-gray-100' : '')"
                       placeholder="Enter Solo Parent ID Number"
+                      [class.border-red-300]="hasFieldError('soloParentIdNo')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                    <div *ngIf="hasFieldError('soloParentIdNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('soloParentIdNo') }}</div>
+                    <div *ngIf="hasFieldError('soloParentIdNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('soloParentIdNo') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Senior Citizen? *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Senior Citizen Status <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.seniorCitizen" 
                       name="seniorCitizen" 
                       (ngModelChange)="onSeniorCitizenChange()"
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('seniorCitizen') ? 'border-red-500' : 'border-gray-300')"
+                      [class.border-red-300]="hasFieldError('seniorCitizen')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('seniorCitizen')" class="text-red-500 text-xs mt-1">{{ getFieldError('seniorCitizen') }}</div>
+                    <div *ngIf="hasFieldError('seniorCitizen')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('seniorCitizen') }}
+                    </div>
                   </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">
-                      Senior Citizen ID No. <span *ngIf="formData.personalInfo.seniorCitizen === 'Yes'" class="text-red-500">*</span>
+                  
+                  <div *ngIf="formData.personalInfo.seniorCitizen === 'Yes'">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Senior Citizen ID Number <span class="text-red-500">*</span>
                     </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.seniorCitizenIdNo" 
                       name="seniorCitizenIdNo" 
-                      [disabled]="formData.personalInfo.seniorCitizen !== 'Yes'"
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('seniorCitizenIdNo') ? 'border-red-500' : 'border-gray-300') + (formData.personalInfo.seniorCitizen !== 'Yes' ? ' bg-gray-100' : '')"
                       placeholder="Enter Senior Citizen ID Number"
+                      [class.border-red-300]="hasFieldError('seniorCitizenIdNo')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                    <div *ngIf="hasFieldError('seniorCitizenIdNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('seniorCitizenIdNo') }}</div>
+                    <div *ngIf="hasFieldError('seniorCitizenIdNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('seniorCitizenIdNo') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">4Ps Member? *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Indigent Status <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                      [(ngModel)]="formData.personalInfo.indigent" 
+                      name="indigent" 
+                      [class.border-red-300]="hasFieldError('indigent')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                    <div *ngIf="hasFieldError('indigent')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('indigent') }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      4Ps Member <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.fourPsMember" 
                       name="fourPsMember" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('fourPsMember') ? 'border-red-500' : 'border-gray-300')"
+                      [class.border-red-300]="hasFieldError('fourPsMember')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('fourPsMember')" class="text-red-500 text-xs mt-1">{{ getFieldError('fourPsMember') }}</div>
+                    <div *ngIf="hasFieldError('fourPsMember')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('fourPsMember') }}
+                    </div>
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Registered Voter? *</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Registered Voter <span class="text-red-500">*</span>
+                    </label>
                     <select 
                       [(ngModel)]="formData.personalInfo.registeredVoter" 
                       name="registeredVoter" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('registeredVoter') ? 'border-red-500' : 'border-gray-300')"
+                      [class.border-red-300]="hasFieldError('registeredVoter')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     >
-                      <option value="">Select</option>
+                      <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
                       <option value="No">No</option>
                     </select>
-                    <div *ngIf="hasFieldError('registeredVoter')" class="text-red-500 text-xs mt-1">{{ getFieldError('registeredVoter') }}</div>
+                    <div *ngIf="hasFieldError('registeredVoter')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('registeredVoter') }}
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              <!-- Optional Government IDs -->
+              <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-4 sm:p-6 border border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  </svg>
+                  Optional Government IDs
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">These fields are optional but recommended for faster document processing</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Purok No. *</label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="formData.personalInfo.purokNo" 
-                      name="purokNo" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('purokNo') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter purok number"
-                    >
-                    <div *ngIf="hasFieldError('purokNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('purokNo') }}</div>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">House No. *</label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="formData.personalInfo.houseNo" 
-                      name="houseNo" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('houseNo') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter house number"
-                    >
-                    <div *ngIf="hasFieldError('houseNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('houseNo') }}</div>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Street *</label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="formData.personalInfo.street" 
-                      name="street" 
-                      [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2 ' + (hasFieldError('street') ? 'border-red-500' : 'border-gray-300')"
-                      placeholder="Enter street name"
-                    >
-                    <div *ngIf="hasFieldError('street')" class="text-red-500 text-xs mt-1">{{ getFieldError('street') }}</div>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">National ID No.</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">National ID Number</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.otherDetails.nationalIdNo" 
                       name="nationalIdNo" 
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                       placeholder="Enter National ID Number (optional)"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
                   </div>
+                  
                   <div>
-                    <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Voter's ID No.</label>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">Voter's ID Number</label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.otherDetails.votersIdNo" 
                       name="votersIdNo" 
-                      class="w-full border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm p-1.5 sm:p-2"
                       placeholder="Enter Voter's ID Number (optional)"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     >
                   </div>
                 </div>
               </div>
             </div>
             
-            <div class="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
+            <!-- Navigation Buttons -->
+            <div class="flex flex-col sm:flex-row justify-between gap-3 mt-6">
               <button 
                 type="button" 
                 (click)="prevStep()"
                 [disabled]="isLoading"
-                class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base order-2 sm:order-1"
+                class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-8 rounded-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-gray-400 order-2 sm:order-1 flex items-center justify-center"
               >
-                Back
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Account
               </button>
+              
               <button 
                 type="button"
                 (click)="nextStep()"
                 [disabled]="isLoading"
-                class="w-full sm:w-auto bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base order-1 sm:order-2"
+                class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 order-1 sm:order-2 flex items-center justify-center"
               >
-                Next
+                Continue to Emergency Contact
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
               </button>
             </div>
           </div>
 
           <!-- Section 3: Emergency Contact -->
           <div *ngIf="currentStep === 3" class="flex-1 flex flex-col">
-            <h2 class="text-center text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mb-6">Emergency Contact</h2>
+            <div class="text-center mb-6">
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Emergency Contact</h2>
+              <p class="text-sm text-gray-600">Provide details of someone we can contact in case of emergency</p>
+            </div>
             
             <!-- Error Message -->
-            <div *ngIf="errorMessage" class="mb-3 sm:mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              <span class="text-sm">{{ errorMessage }}</span>
+            <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                {{ errorMessage }}
+              </div>
             </div>
             
             <div class="flex-1 flex flex-col justify-center">
-              <div class="max-w-4xl mx-auto w-full">
-                <div class="mb-4">
-                  <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Emergency Contact Information</h3>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div class="max-w-2xl mx-auto w-full">
+                
+                <!-- Emergency Contact Card -->
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Emergency Contact Information
+                  </h3>
+                  
+                  <div class="space-y-4">
                     <div>
-                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Full Name *</label>
+                      <label class="block text-gray-700 text-sm font-semibold mb-2">
+                        Full Name <span class="text-red-500">*</span>
+                      </label>
                       <input 
                         type="text" 
                         [(ngModel)]="formData.emergencyContact.fullName" 
-                        name="emergencyFullName" 
-                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecFullName') ? 'border-red-500' : 'border-gray-300')"
-                        placeholder="Enter emergency contact full name"
+                        name="emergencyFullName"
+                        placeholder="Enter full name of emergency contact"
+                        [class.border-red-300]="hasFieldError('ecFullName')"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        required
                       >
-                      <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecFullName') }}</div>
+                      <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-xs mt-1 flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ getFieldError('ecFullName') }}
+                      </div>
                     </div>
+                    
                     <div>
-                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Relationship *</label>
-                      <input 
-                        type="text" 
+                      <label class="block text-gray-700 text-sm font-semibold mb-2">
+                        Relationship <span class="text-red-500">*</span>
+                      </label>
+                      <select 
                         [(ngModel)]="formData.emergencyContact.relationship" 
-                        name="emergencyRelationship" 
-                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecRelationship') ? 'border-red-500' : 'border-gray-300')"
-                        placeholder="Enter relationship (e.g., Mother, Father, Spouse)"
+                        name="emergencyRelationship"
+                        [class.border-red-300]="hasFieldError('ecRelationship')"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        required
                       >
-                      <div *ngIf="hasFieldError('ecRelationship')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecRelationship') }}</div>
+                        <option value="">Select relationship</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Child">Child</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Relative">Other Relative</option>
+                        <option value="Friend">Friend</option>
+                        <option value="Neighbor">Neighbor</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <div *ngIf="hasFieldError('ecRelationship')" class="text-red-500 text-xs mt-1 flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ getFieldError('ecRelationship') }}
+                      </div>
                     </div>
+                    
                     <div>
-                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Contact No. *</label>
+                      <label class="block text-gray-700 text-sm font-semibold mb-2">
+                        Contact Number <span class="text-red-500">*</span>
+                      </label>
                       <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
-                          <span class="text-gray-500 text-xs sm:text-sm">+63</span>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span class="text-gray-500 text-sm">+63</span>
                         </div>
                         <input 
                           type="tel" 
                           [(ngModel)]="formData.emergencyContact.contactNo" 
-                          name="emergencyContactNo" 
-                          [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 pl-10 sm:pl-12 ' + (hasFieldError('ecContactNo') ? 'border-red-500' : 'border-gray-300')"
+                          name="emergencyContactNo"
                           placeholder="9XXXXXXXXX"
                           maxlength="10"
+                          [class.border-red-300]="hasFieldError('ecContactNo')"
+                          class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                           (input)="onPhoneInput($event, 'ecContactNo')"
                           (keypress)="onPhoneKeypress($event)"
+                          autocomplete="tel"
                         >
                       </div>
-                      <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecContactNo') }}</div>
+                      <div *ngIf="hasFieldError('ecContactNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ getFieldError('ecContactNo') }}
+                      </div>
+                      <p class="text-xs text-gray-500 mt-1">Enter 10-digit mobile number without +63</p>
                     </div>
+                    
                     <div>
-                      <label class="block text-gray-700 text-xs sm:text-sm font-bold mb-1 sm:mb-2">Address *</label>
-                      <input 
-                        type="text" 
+                      <label class="block text-gray-700 text-sm font-semibold mb-2">
+                        Address <span class="text-red-500">*</span>
+                      </label>
+                      <textarea 
                         [(ngModel)]="formData.emergencyContact.address" 
-                        name="emergencyAddress" 
-                        [class]="'w-full border rounded-lg shadow-sm text-xs sm:text-sm py-2 sm:py-2.5 lg:py-3 px-2 sm:px-3 ' + (hasFieldError('ecAddress') ? 'border-red-500' : 'border-gray-300')"
-                        placeholder="Enter emergency contact address"
-                      >
-                      <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-xs mt-1">{{ getFieldError('ecAddress') }}</div>
+                        name="emergencyAddress"
+                        placeholder="Enter complete address of emergency contact"
+                        rows="3"
+                        [class.border-red-300]="hasFieldError('ecAddress')"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all resize-none"
+                      ></textarea>
+                      <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-xs mt-1 flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ getFieldError('ecAddress') }}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div class="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
+            <!-- Navigation Buttons -->
+            <div class="flex flex-col sm:flex-row justify-between gap-3 mt-8">
               <button 
                 type="button" 
                 (click)="prevStep()"
                 [disabled]="isLoading"
-                class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base order-2 sm:order-1"
+                class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-8 rounded-xl shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-gray-400 order-2 sm:order-1 flex items-center justify-center"
               >
-                Back
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Personal Info
               </button>
+              
               <button 
                 type="submit"
                 [disabled]="isLoading"
-                class="w-full sm:w-auto bg-blue-800 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2 sm:py-2.5 px-6 sm:px-8 rounded-lg shadow transition focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2 text-sm sm:text-base order-1 sm:order-2"
+                class="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-green-500 order-1 sm:order-2 flex items-center justify-center"
               >
-                <svg *ngIf="isLoading" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {{ isLoading ? 'Processing...' : 'Review & Submit' }}
+                <span *ngIf="!isLoading" class="flex items-center">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Review & Submit Registration
+                </span>
+                <span *ngIf="isLoading" class="flex items-center">
+                  <svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing Registration...
+                </span>
               </button>
             </div>
           </div>
@@ -780,7 +1266,7 @@ import { environment } from '../../environment/environment';
       ></app-resident-info-preview-modal>
 
       <!-- Loading Modal -->
-      <div *ngIf="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div *ngIf="isLoading" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20">
         <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-xs w-full">
           <svg class="animate-spin h-12 w-12 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -1057,6 +1543,8 @@ export class SignUpInformationFormComponent implements OnInit {
   errorMessage = '';
   validationErrors: { [key: string]: string } = {};
   acceptedTerms = false;
+  maxDate = '';
+  currentYear = new Date().getFullYear();
 
   formData = {
     account: {
@@ -1103,7 +1591,7 @@ export class SignUpInformationFormComponent implements OnInit {
     otherDetails: {
       nationalIdNo: '',
       votersIdNo: '',
-      deceased: 'Alive',
+      status: 'Active',
       dateOfRegistration: ''
     }
   };
@@ -1122,9 +1610,22 @@ export class SignUpInformationFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Set max date to today to prevent future dates
+    const today = new Date();
+    this.maxDate = today.toISOString().split('T')[0];
+    
     // Initialize nationality field with default value
     if (this.formData.personalInfo.nationalityType === 'Filipino') {
       this.formData.personalInfo.nationality = 'Filipino';
+    }
+    
+    // Check if there's step 1 data from previous navigation
+    const step1Data = sessionStorage.getItem('signupStep1Data');
+    if (step1Data) {
+      const parsedData = JSON.parse(step1Data);
+      this.formData.account.email = parsedData.email;
+      this.formData.account.password = parsedData.password;
+      this.formData.account.confirmPassword = parsedData.confirmPassword;
     }
   }
 
@@ -1454,8 +1955,8 @@ export class SignUpInformationFormComponent implements OnInit {
   validateOtherDetails(): boolean {
     const otherDetails = this.formData.otherDetails;
 
-    // Automatically set deceased to "Alive" 
-    otherDetails.deceased = 'Alive';
+    // Automatically set status to "Active" for new registrations
+    otherDetails.status = 'Active';
 
     // Set default date of registration to current date and time
     if (!otherDetails.dateOfRegistration) {
@@ -1741,7 +2242,7 @@ export class SignUpInformationFormComponent implements OnInit {
           ecAddress: this.formData.emergencyContact.address,
           NationalIdNo: this.formData.otherDetails.nationalIdNo,
           votersIdNo: this.formData.otherDetails.votersIdNo,
-          deceased: 'Alive',
+          status: 'Active',
           dateOfRegistration: new Date().toISOString()
         };
         
@@ -1845,5 +2346,64 @@ export class SignUpInformationFormComponent implements OnInit {
     if (this.validationErrors['acceptedTerms']) {
       delete this.validationErrors['acceptedTerms'];
     }
+  }
+
+  // Enhanced helper methods for better UX
+  showPassword = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  getPasswordStrength(): number {
+    const password = this.formData.account.password;
+    if (!password) return 0;
+    
+    let strength = 0;
+    
+    // Length check
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    
+    // Character variety checks
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    return Math.min(strength, 5);
+  }
+
+  getPasswordStrengthText(): string {
+    const strength = this.getPasswordStrength();
+    switch (strength) {
+      case 0:
+      case 1:
+        return 'Very weak';
+      case 2:
+        return 'Weak';
+      case 3:
+        return 'Fair';
+      case 4:
+        return 'Strong';
+      case 5:
+        return 'Very strong';
+      default:
+        return '';
+    }
+  }
+
+  passwordMismatch(): boolean {
+    return this.formData.account.password !== this.formData.account.confirmPassword && this.formData.account.confirmPassword !== '';
+  }
+
+  canProceedToStep2(): boolean {
+    return !!(this.formData.account.email &&
+              this.formData.account.password &&
+              this.formData.account.confirmPassword &&
+              this.acceptedTerms &&
+              !this.passwordMismatch() &&
+              this.isValidEmail(this.formData.account.email) &&
+              this.formData.account.password.length >= 8);
   }
 }

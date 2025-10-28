@@ -46,7 +46,7 @@ export interface ResidentInfo {
   otherDetails: {
     nationalIdNo: string;
     votersIdNo: string;
-    deceased: string;
+    status: string;
     dateOfRegistration: string;
   };
 }

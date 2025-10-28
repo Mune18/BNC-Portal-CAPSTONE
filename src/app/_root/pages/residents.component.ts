@@ -5,6 +5,7 @@ import { AdminService } from '../../shared/services/admin.service';
 import { ResidentInfo } from '../../shared/types/resident';
 import { ResidentDetailModalComponent } from './resident-detail-modal.component';
 import { ResidentEditModalComponent } from './resident-edit-modal.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-residents',
@@ -42,6 +43,8 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
             <option value="all">All Status</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
+            <option value="Deceased">Deceased</option>
+            <option value="Archived">Archived</option>
           </select>
         </div>
 
@@ -214,16 +217,67 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
                   <div class="text-sm text-gray-500">{{ resident.personalInfo.contactNo }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span [class]="getStatusClass(resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active')">
-                    {{ resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active' }}
+                  <span [class]="getStatusClass(resident.otherDetails.status)">
+                    {{ resident.otherDetails.status }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button class="text-gray-600 hover:text-gray-900 mr-3" (click)="editResident(resident); $event.stopPropagation()">Edit</button>
-                  <button class="text-red-600 hover:text-red-900" (click)="deleteResident(resident); $event.stopPropagation()">Delete</button>
+                  <div class="flex items-center justify-end space-x-2">
+                    <button 
+                      class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors"
+                      [class]="archivingResidentId === resident.$id ? 
+                        'text-gray-400 bg-gray-100 cursor-not-allowed' : 
+                        'text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700'"
+                      (click)="editResident(resident); $event.stopPropagation()"
+                      title="Edit resident information"
+                      [disabled]="archivingResidentId === resident.$id"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit
+                    </button>
+                    <!-- Archive/Unarchive Button -->
+                    <button 
+                      *ngIf="resident.otherDetails.status !== 'Archived'"
+                      class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors"
+                      [class]="archivingResidentId === resident.$id ? 
+                        'text-gray-400 bg-gray-100 cursor-not-allowed' : 
+                        'text-orange-600 bg-orange-50 hover:bg-orange-100 hover:text-orange-700'"
+                      (click)="archiveResident(resident); $event.stopPropagation()"
+                      title="Archive resident"
+                      [disabled]="archivingResidentId === resident.$id"
+                    >
+                      <div *ngIf="archivingResidentId === resident.$id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-gray-400 mr-1"></div>
+                      <svg *ngIf="archivingResidentId !== resident.$id" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l4-4h6l4 4" />
+                      </svg>
+                      {{ archivingResidentId === resident.$id ? 'Archiving...' : 'Archive' }}
+                    </button>
+                    
+                    <!-- Unarchive Button (only for archived residents) -->
+                    <button 
+                      *ngIf="resident.otherDetails.status === 'Archived'"
+                      class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors"
+                      [class]="archivingResidentId === resident.$id ? 
+                        'text-gray-400 bg-gray-100 cursor-not-allowed' : 
+                        'text-green-600 bg-green-50 hover:bg-green-100 hover:text-green-700'"
+                      (click)="unarchiveResident(resident); $event.stopPropagation()"
+                      title="Unarchive resident"
+                      [disabled]="archivingResidentId === resident.$id"
+                    >
+                      <div *ngIf="archivingResidentId === resident.$id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-gray-400 mr-1"></div>
+                      <svg *ngIf="archivingResidentId !== resident.$id" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+                      </svg>
+                      {{ archivingResidentId === resident.$id ? 'Unarchiving...' : 'Unarchive' }}
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -300,6 +354,8 @@ import { ResidentEditModalComponent } from './resident-edit-modal.component';
         (close)="closeEditModal()"
         (save)="onResidentUpdated($event)"
       ></app-resident-edit-modal>
+
+
     </div>
   `,
   styles: [`
@@ -320,6 +376,7 @@ export class ResidentsComponent implements OnInit {
   residents: ResidentInfo[] = [];
   allResidents: ResidentInfo[] = []; // Keep full list for search/filter
   Math = Math; // Make Math available in the template
+  archivingResidentId: string | null = null; // Track which resident is being archived
 
   // Pagination properties
   currentPage: number = 1;
@@ -415,11 +472,17 @@ export class ResidentsComponent implements OnInit {
         address.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         resident.personalInfo.contactNo.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      // Filter by status (active/inactive based on deceased status)
-      const status = resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
-      const matchesStatus = this.statusFilter === 'all' || 
-                            (this.statusFilter === 'Active' && status === 'Active') ||
-                            (this.statusFilter === 'Inactive' && status === 'Inactive');
+      // Filter by status
+      const status = resident.otherDetails.status;
+      let matchesStatus = false;
+      
+      if (this.statusFilter === 'all') {
+        // For "all" status, exclude archived residents (they have their own filter)
+        matchesStatus = status !== 'Archived';
+      } else {
+        // For specific status filters, match exactly
+        matchesStatus = this.statusFilter === status;
+      }
       
       return matchesSearch && matchesStatus;
     });
@@ -442,6 +505,8 @@ export class ResidentsComponent implements OnInit {
         return baseClasses + 'bg-red-100 text-red-800';
       case 'Deceased':
         return baseClasses + 'bg-gray-100 text-gray-800';
+      case 'Archived':
+        return baseClasses + 'bg-purple-100 text-purple-800';
       case 'Pending':
         return baseClasses + 'bg-yellow-100 text-yellow-800';
       default:
@@ -510,10 +575,243 @@ export class ResidentsComponent implements OnInit {
     this.showResidentModal = true;
   }
 
-  deleteResident(resident: ResidentInfo) {
-    if (confirm(`Are you sure you want to delete ${resident.personalInfo.firstName} ${resident.personalInfo.lastName}?`)) {
-      console.log('Delete resident:', resident);
-      // Implement delete functionality
+  async archiveResident(resident: ResidentInfo) {
+    const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '. ' : ''}${resident.personalInfo.lastName}`;
+    
+    // Show SweetAlert2 confirmation for archiving
+    const result = await Swal.fire({
+      title: 'Archive Resident',
+      html: `Are you sure you want to archive <strong>${fullName}</strong>?<br><br>
+             <div class="text-left bg-orange-50 p-3 rounded-lg mt-3 border border-orange-200">
+               <p class="font-semibold text-orange-800 mb-2">Archive Action:</p>
+               <ul class="text-xs text-orange-700 space-y-1">
+                 <li>• Resident will be moved to "Archived" status</li>
+                 <li>• Will be hidden from active resident lists</li>
+                 <li>• Can be viewed by selecting "Archived" filter</li>
+                 <li>• Data will be preserved and can be restored later</li>
+               </ul>
+             </div>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Archive',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '500px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+        confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white',
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Ensure we have a valid resident ID
+        if (!resident.$id) {
+          throw new Error('Invalid resident ID');
+        }
+
+        // Set archiving state
+        this.archivingResidentId = resident.$id;
+
+        // Update resident status to "Archived"
+        const updatedResident = { ...resident };
+        updatedResident.otherDetails.status = 'Archived';
+
+        // Update in database
+        await this.adminService.updateResident(resident.$id, updatedResident);
+
+        // Update local arrays
+        const residentIndex = this.residents.findIndex(r => r.$id === resident.$id);
+        if (residentIndex !== -1) {
+          this.residents[residentIndex] = updatedResident;
+        }
+
+        const allResidentIndex = this.allResidents.findIndex(r => r.$id === resident.$id);
+        if (allResidentIndex !== -1) {
+          this.allResidents[allResidentIndex] = updatedResident;
+        }
+
+        // Update selected resident if it's the one being archived
+        if (this.selectedResident && this.selectedResident.$id === resident.$id) {
+          this.selectedResident = updatedResident;
+        }
+
+        // Show success message
+        await Swal.fire({
+          icon: 'success',
+          title: 'Resident Archived',
+          text: `${fullName} has been successfully archived.`,
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-0',
+            title: 'text-xl font-bold text-green-700',
+          },
+          backdrop: 'rgba(15, 23, 42, 0.3)',
+          showClass: {
+            popup: 'animate__animated animate__zoomIn animate__faster'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__zoomOut animate__faster'
+          }
+        });
+
+      } catch (error) {
+        console.error('Error archiving resident:', error);
+        
+        // Show error message
+        await Swal.fire({
+          icon: 'error',
+          title: 'Archive Failed',
+          text: 'Failed to archive resident. Please try again.',
+          confirmButtonText: 'OK',
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-0',
+            title: 'text-xl font-bold text-red-700',
+            confirmButton: 'font-semibold py-3 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white'
+          },
+          backdrop: 'rgba(15, 23, 42, 0.4)'
+        });
+      } finally {
+        // Clear archiving state
+        this.archivingResidentId = null;
+      }
+    }
+  }
+
+  async unarchiveResident(resident: ResidentInfo) {
+    const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '. ' : ''}${resident.personalInfo.lastName}`;
+    
+    // Show SweetAlert2 confirmation for unarchiving
+    const result = await Swal.fire({
+      title: 'Unarchive Resident',
+      html: `Are you sure you want to unarchive <strong>${fullName}</strong>?<br><br>
+             <div class="text-left bg-green-50 p-3 rounded-lg mt-3 border border-green-200">
+               <p class="font-semibold text-green-800 mb-2">Unarchive Action:</p>
+               <ul class="text-xs text-green-700 space-y-1">
+                 <li>• Resident will be moved to "Active" status</li>
+                 <li>• Will appear in the main resident list</li>
+                 <li>• Will be visible in "All Status" filter</li>
+                 <li>• All data and information will be preserved</li>
+               </ul>
+             </div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Unarchive',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '500px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+        confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white',
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Ensure we have a valid resident ID
+        if (!resident.$id) {
+          throw new Error('Invalid resident ID');
+        }
+
+        // Set archiving state (reusing the same state for unarchiving)
+        this.archivingResidentId = resident.$id;
+
+        // Update resident status to "Active"
+        const updatedResident = { ...resident };
+        updatedResident.otherDetails.status = 'Active';
+
+        // Update in database
+        await this.adminService.updateResident(resident.$id, updatedResident);
+
+        // Update local arrays
+        const residentIndex = this.residents.findIndex(r => r.$id === resident.$id);
+        if (residentIndex !== -1) {
+          this.residents[residentIndex] = updatedResident;
+        }
+
+        const allResidentIndex = this.allResidents.findIndex(r => r.$id === resident.$id);
+        if (allResidentIndex !== -1) {
+          this.allResidents[allResidentIndex] = updatedResident;
+        }
+
+        // Update selected resident if it's the one being unarchived
+        if (this.selectedResident && this.selectedResident.$id === resident.$id) {
+          this.selectedResident = updatedResident;
+        }
+
+        // Show success message
+        await Swal.fire({
+          icon: 'success',
+          title: 'Resident Unarchived',
+          text: `${fullName} has been successfully unarchived and is now active.`,
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-0',
+            title: 'text-xl font-bold text-green-700',
+          },
+          backdrop: 'rgba(15, 23, 42, 0.3)',
+          showClass: {
+            popup: 'animate__animated animate__zoomIn animate__faster'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__zoomOut animate__faster'
+          }
+        });
+
+      } catch (error) {
+        console.error('Error unarchiving resident:', error);
+        
+        // Show error message
+        await Swal.fire({
+          icon: 'error',
+          title: 'Unarchive Failed',
+          text: 'Failed to unarchive resident. Please try again.',
+          confirmButtonText: 'OK',
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-0',
+            title: 'text-xl font-bold text-red-700',
+            confirmButton: 'font-semibold py-3 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white'
+          },
+          backdrop: 'rgba(15, 23, 42, 0.4)'
+        });
+      } finally {
+        // Clear archiving state
+        this.archivingResidentId = null;
+      }
     }
   }
 
@@ -585,7 +883,7 @@ export class ResidentsComponent implements OnInit {
       const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
       const address = this.getFullAddress(resident);
       const age = this.calculateAge(resident.personalInfo.birthDate);
-      const status = resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
+      const status = resident.otherDetails.status;
       
       return [
         fullName,
@@ -690,7 +988,7 @@ export class ResidentsComponent implements OnInit {
               const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
               const address = this.getFullAddress(resident);
               const age = this.calculateAge(resident.personalInfo.birthDate);
-              const status = resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
+              const status = resident.otherDetails.status;
               
               return `
                 <tr>

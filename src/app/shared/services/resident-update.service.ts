@@ -158,7 +158,7 @@ export class ResidentUpdateService extends BaseAppwriteService {
         otherDetails: {
           nationalIdNo: response['nationalIdNo'] || '',
           votersIdNo: response['votersIdNo'] || '',
-          deceased: response['deceased'] || '',
+          status: response['status'] || '',
           dateOfRegistration: response['dateOfRegistration'] || ''
         }
       };
@@ -298,7 +298,7 @@ export class ResidentUpdateService extends BaseAppwriteService {
       otherDetails: {
         nationalIdNo: 'National ID Number',
         votersIdNo: 'Voter\'s ID Number',
-        deceased: 'Deceased',
+        status: 'Status',
         dateOfRegistration: 'Date of Registration'
       }
     };

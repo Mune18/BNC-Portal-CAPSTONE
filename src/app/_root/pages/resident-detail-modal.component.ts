@@ -358,12 +358,18 @@ export class ResidentDetailModalComponent {
 
   getStatus(): string {
     if (!this.resident?.otherDetails) return 'Active';
-    return this.resident.otherDetails.deceased === 'Deceased' ? 'Inactive' : 'Active';
+    return this.resident.otherDetails.status || 'Active';
   }
 
   getStatusColor(): string {
     const status = this.getStatus();
-    return status === 'Active' ? 'bg-green-500' : 'bg-red-500';
+    switch(status) {
+      case 'Active': return 'bg-green-500';
+      case 'Inactive': return 'bg-red-500';
+      case 'Deceased': return 'bg-gray-500';
+      case 'Archived': return 'bg-purple-500';
+      default: return 'bg-gray-500';
+    }
   }
 
   getRegistrationDate(): string {

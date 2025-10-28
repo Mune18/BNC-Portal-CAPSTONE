@@ -461,12 +461,13 @@ import Swal from 'sweetalert2';
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                   <select 
-                    [(ngModel)]="editedResident.otherDetails.deceased" 
-                    name="deceased" 
+                    [(ngModel)]="editedResident.otherDetails.status" 
+                    name="status" 
                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white"
                   >
                     <option value="">Select Status</option>
-                    <option value="Alive">Alive</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
                     <option value="Deceased">Deceased</option>
                   </select>
                 </div>
@@ -573,7 +574,7 @@ export class ResidentEditModalComponent implements OnInit, OnChanges {
       otherDetails: {
         nationalIdNo: '',
         votersIdNo: '',
-        deceased: 'No',
+        status: 'Active',
         dateOfRegistration: new Date().toISOString()
       }
     };

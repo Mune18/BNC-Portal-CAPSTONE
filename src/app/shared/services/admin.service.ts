@@ -32,13 +32,14 @@ export class AdminService extends BaseAppwriteService {
         [Query.select(['$id'])]
       );
 
-      // Get active residents (non-deceased)
+      // Get active residents (exclude deceased and archived)
       const activeResponse = await this.database.listDocuments(
         environment.appwriteDatabaseId,
         environment.residentCollectionId,
         [
           Query.select(['$id']),
-          Query.notEqual('deceased', 'Deceased')
+          Query.notEqual('status', 'Deceased'),
+          Query.notEqual('status', 'Archived')
         ]
       );
 
@@ -142,7 +143,7 @@ export class AdminService extends BaseAppwriteService {
       otherDetails: {
         nationalIdNo: '',
         votersIdNo: '',
-        deceased: '',
+        status: '',
         dateOfRegistration: doc.dateOfRegistration || ''
       }
     };
@@ -292,7 +293,7 @@ export class AdminService extends BaseAppwriteService {
       otherDetails: {
         nationalIdNo: doc.NationalIdNo || '',
         votersIdNo: doc.votersIdNo || '',
-        deceased: doc.deceased || '',
+        status: doc.status || '',
         dateOfRegistration: doc.dateOfRegistration || ''
       }
     };
@@ -381,7 +382,7 @@ export class AdminService extends BaseAppwriteService {
         ecAddress: residentData.emergencyContact.address,
         NationalIdNo: residentData.otherDetails.nationalIdNo,
         votersIdNo: residentData.otherDetails.votersIdNo,
-        deceased: residentData.otherDetails.deceased,
+        status: residentData.otherDetails.status,
         dateOfRegistration: residentData.otherDetails.dateOfRegistration
       };
 
@@ -427,4 +428,5 @@ export class AdminService extends BaseAppwriteService {
       throw error;
     }
   }
+
 }

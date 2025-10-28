@@ -103,7 +103,7 @@ export class UserService extends BaseAppwriteService {
         otherDetails: {
           nationalIdNo: residentDoc['NationalIdNo'] || '',
           votersIdNo: residentDoc['votersIdNo'] || '',
-          deceased: residentDoc['deceased'] || '',
+          status: residentDoc['status'] || '',
           dateOfRegistration: residentDoc['dateOfRegistration'] || ''
         }
       };
@@ -158,7 +158,7 @@ export class UserService extends BaseAppwriteService {
       otherDetails: {
         nationalIdNo: '',
         votersIdNo: '',
-        deceased: '',
+        status: '',
         dateOfRegistration: ''
       }
     };
@@ -194,7 +194,7 @@ export class UserService extends BaseAppwriteService {
     }
   }
 
-  async updateUser(documentId: string, userData: ResidentInfo): Promise<any> {
+  async updateUser(documentId: string, userData: any) {
     try {
       const response = await this.database.updateDocument(
         environment.appwriteDatabaseId,
@@ -205,6 +205,36 @@ export class UserService extends BaseAppwriteService {
       return response;
     } catch (error) {
       console.error('Error updating user document:', error);
+      throw error;
+    }
+  }
+
+  async updateUserStatus(accountId: string, newStatus: string): Promise<void> {
+    try {
+      // Find the resident document by userId (accountId)
+      const residentResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [Query.equal('userId', accountId)]
+      );
+
+      if (residentResponse.documents.length > 0) {
+        const residentDoc = residentResponse.documents[0];
+        
+        // Update the status field in the resident document
+        await this.database.updateDocument(
+          environment.appwriteDatabaseId,
+          environment.residentCollectionId,
+          residentDoc.$id,
+          { status: newStatus }
+        );
+        
+        console.log(`User status updated to ${newStatus} for account ID:`, accountId);
+      } else {
+        console.log('No resident document found to update status for userId:', accountId);
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
       throw error;
     }
   }
