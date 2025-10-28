@@ -137,7 +137,6 @@ export class SignInFormComponent {
       if (userDoc && userDoc.role === 'admin') {
         this.router.navigate(['/admin/dashboard']);
       } else if (userDoc && userDoc.role === 'resident') {
-          await this.showInactiveAccountAlert();
         // Check if resident account has restricted access
         if (userDoc.otherDetails && (userDoc.otherDetails.status === 'Deceased' || userDoc.otherDetails.status === 'Archived')) {
           // Show specific alerts for deceased or archived accounts
