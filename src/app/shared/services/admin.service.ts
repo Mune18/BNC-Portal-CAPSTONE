@@ -25,25 +25,29 @@ export class AdminService extends BaseAppwriteService {
     if (cached) return cached;
 
     try {
-      // Get total count
+      // Get total count (exclude pending residents for accurate resident count)
       const totalResponse = await this.database.listDocuments(
         environment.appwriteDatabaseId,
         environment.residentCollectionId,
-        [Query.select(['$id'])]
+        [
+          Query.select(['$id']),
+          Query.notEqual('approvalStatus', 'Pending')
+        ]
       );
 
-      // Get active residents (exclude deceased and archived)
+      // Get active residents (exclude deceased, archived, and pending)
       const activeResponse = await this.database.listDocuments(
         environment.appwriteDatabaseId,
         environment.residentCollectionId,
         [
           Query.select(['$id']),
           Query.notEqual('status', 'Deceased'),
-          Query.notEqual('status', 'Archived')
+          Query.notEqual('status', 'Archived'),
+          Query.notEqual('approvalStatus', 'Pending')
         ]
       );
 
-      // Get recent registrations (last 30 days)
+      // Get recent registrations (last 30 days, exclude pending)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
@@ -52,7 +56,8 @@ export class AdminService extends BaseAppwriteService {
         environment.residentCollectionId,
         [
           Query.select(['$id']),
-          Query.greaterThan('$createdAt', thirtyDaysAgo.toISOString())
+          Query.greaterThan('$createdAt', thirtyDaysAgo.toISOString()),
+          Query.notEqual('approvalStatus', 'Pending')
         ]
       );
 
@@ -83,7 +88,9 @@ export class AdminService extends BaseAppwriteService {
         [
           Query.select(['$id', '$createdAt', 'firstName', 'lastName', 'contactNo', 'profileImage', 'dateOfRegistration']),
           Query.orderDesc('$createdAt'),
-          Query.limit(limit)
+          Query.limit(limit),
+          // Exclude pending residents - only show approved residents
+          Query.notEqual('approvalStatus', 'Pending')
         ]
       );
 
@@ -119,6 +126,7 @@ export class AdminService extends BaseAppwriteService {
         nationality: '',
         religion: '',
         occupation: '',
+        email: doc.email || '',
         contactNo: doc.contactNo || '',
         pwd: '',
         pwdIdNo: '',
@@ -164,7 +172,9 @@ export class AdminService extends BaseAppwriteService {
         [
           Query.limit(limit),
           Query.offset(offset),
-          Query.orderDesc('$createdAt')
+          Query.orderDesc('$createdAt'),
+          // Exclude pending residents - only show approved residents
+          Query.notEqual('approvalStatus', 'Pending')
         ]
       );
 
@@ -212,12 +222,13 @@ export class AdminService extends BaseAppwriteService {
 
     try {
       // Fetch all resident documents from the residents collection
+      // Exclude pending residents - only show approved residents
       const response = await this.database.listDocuments(
         environment.appwriteDatabaseId,
         environment.residentCollectionId,
         [
-          // Add any filters if needed
-          // Query.limit(100) // Consider adding pagination
+          Query.notEqual('approvalStatus', 'Pending'),
+          Query.orderDesc('$createdAt')
         ]
       );
 
@@ -269,6 +280,7 @@ export class AdminService extends BaseAppwriteService {
         nationality: doc.nationality || '',
         religion: doc.religion || '',
         occupation: doc.occupation || '',
+        email: doc.email || '',
         contactNo: doc.contactNo || '',
         pwd: doc.pwd || '',
         pwdIdNo: doc.pwdIdNo || '',
@@ -425,6 +437,108 @@ export class AdminService extends BaseAppwriteService {
       return response;
     } catch (error) {
       console.error('Error deleting user document:', error);
+      throw error;
+    }
+  }
+
+  // Pending approval methods
+  async getPendingResidents(): Promise<ResidentInfo[]> {
+    try {
+      const response = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [
+          Query.equal('approvalStatus', 'Pending'),
+          Query.orderDesc('$createdAt'),
+          Query.limit(100) // Limit to reasonable number of pending requests
+        ]
+      );
+
+      // Get user documents for each resident to include role information
+      const residents: ResidentInfo[] = [];
+      for (const doc of response.documents) {
+        if (doc['userId']) {
+          // Get user document to fetch role
+          const userResponse = await this.database.listDocuments(
+            environment.appwriteDatabaseId,
+            environment.userCollectionId,
+            [Query.equal('uid', doc['userId'])]
+          );
+
+          const userRole = userResponse.documents.length > 0 ? userResponse.documents[0]['role'] : 'resident';
+          residents.push(this.mapToResidentInfo(doc, userRole));
+        }
+      }
+
+      return residents;
+    } catch (error) {
+      console.error('Error fetching pending residents:', error);
+      throw error;
+    }
+  }
+
+  async approveResident(residentId: string, userId: string): Promise<void> {
+    try {
+      // Update resident document
+      await this.database.updateDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId,
+        {
+          approvalStatus: 'Approved',
+          approvedAt: new Date().toISOString()
+        }
+      );
+
+      // Update user document to set is_active to true
+      const userResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.userCollectionId,
+        [Query.equal('uid', userId)]
+      );
+
+      if (userResponse.documents.length > 0) {
+        await this.database.updateDocument(
+          environment.appwriteDatabaseId,
+          environment.userCollectionId,
+          userResponse.documents[0].$id,
+          {
+            is_active: true
+          }
+        );
+      }
+
+      // Invalidate caches
+      this.invalidateResidentCaches();
+    } catch (error) {
+      console.error('Error approving resident:', error);
+      throw error;
+    }
+  }
+
+  async rejectResident(residentId: string, reason?: string): Promise<void> {
+    try {
+      const updateData: any = {
+        approvalStatus: 'Rejected',
+        rejectedAt: new Date().toISOString()
+      };
+
+      if (reason) {
+        updateData.rejectionReason = reason;
+      }
+
+      // Update resident document
+      await this.database.updateDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId,
+        updateData
+      );
+
+      // Invalidate caches
+      this.invalidateResidentCaches();
+    } catch (error) {
+      console.error('Error rejecting resident:', error);
       throw error;
     }
   }

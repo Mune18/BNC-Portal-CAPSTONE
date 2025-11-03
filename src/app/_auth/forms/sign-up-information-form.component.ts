@@ -170,39 +170,41 @@ import { environment } from '../../environment/environment';
             
             <div class="space-y-4">
               <div>
-                <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">
-                  Email Address <span class="text-red-500">*</span>
+                <label class="block text-gray-700 text-sm font-semibold mb-2" for="username">
+                  Username <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
                   <input 
-                    type="email" 
-                    id="email" 
-                    [(ngModel)]="formData.account.email" 
-                    name="email" 
-                    placeholder="Enter your email address"
-                    [class.border-red-300]="hasFieldError('email')"
-                    [class.border-green-300]="!hasFieldError('email') && formData.account.email && isValidEmail(formData.account.email)"
+                    type="text" 
+                    id="username" 
+                    [(ngModel)]="formData.account.username" 
+                    name="username" 
+                    placeholder="Choose a unique username"
+                    [class.border-red-300]="hasFieldError('username')"
+                    [class.border-green-300]="!hasFieldError('username') && formData.account.username && isValidUsername(formData.account.username)"
                     class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                     required
-                    autocomplete="email"
+                    minlength="4"
+                    maxlength="20"
+                    autocomplete="username"
                   />
                   <div class="absolute right-3 top-3">
-                    <svg *ngIf="!hasFieldError('email') && formData.account.email && isValidEmail(formData.account.email)" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg *ngIf="!hasFieldError('username') && formData.account.username && isValidUsername(formData.account.username)" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                     </svg>
-                    <svg *ngIf="hasFieldError('email')" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <svg *ngIf="hasFieldError('username')" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                     </svg>
                   </div>
                 </div>
-                <div *ngIf="hasFieldError('email')" class="text-red-500 text-xs mt-1 flex items-center">
+                <div *ngIf="hasFieldError('username')" class="text-red-500 text-xs mt-1 flex items-center">
                   <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                   </svg>
-                  {{ getFieldError('email') }}
+                  {{ getFieldError('username') }}
                 </div>
-                <div *ngIf="!hasFieldError('email') && formData.account.email && isValidEmail(formData.account.email)" class="text-green-600 text-xs mt-1">
-                  ✓ Valid email address
+                <div *ngIf="!hasFieldError('username') && formData.account.username && isValidUsername(formData.account.username)" class="text-green-600 text-xs mt-1">
+                  ✓ Valid username (4-20 characters, letters, numbers, and underscores only)
                 </div>
               </div>
               
@@ -710,6 +712,42 @@ import { environment } from '../../environment/environment';
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                       </svg>
                       {{ getFieldError('monthlyIncome') }}
+                    </div>
+                  </div>
+                  
+                  <div class="sm:col-span-2">
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Email Address <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <input 
+                        type="email" 
+                        [(ngModel)]="formData.personalInfo.email" 
+                        name="email" 
+                        placeholder="Enter your email address"
+                        [class.border-red-300]="hasFieldError('email')"
+                        [class.border-green-300]="!hasFieldError('email') && formData.personalInfo.email && isValidEmail(formData.personalInfo.email)"
+                        class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        required
+                        autocomplete="email"
+                      />
+                      <div class="absolute right-3 top-3">
+                        <svg *ngIf="!hasFieldError('email') && formData.personalInfo.email && isValidEmail(formData.personalInfo.email)" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg *ngIf="hasFieldError('email')" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div *ngIf="hasFieldError('email')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('email') }}
+                    </div>
+                    <div *ngIf="!hasFieldError('email') && formData.personalInfo.email && isValidEmail(formData.personalInfo.email)" class="text-green-600 text-xs mt-1">
+                      ✓ Valid email address
                     </div>
                   </div>
                   
@@ -1296,13 +1334,32 @@ import { environment } from '../../environment/environment';
 
       <!-- Registration Success Modal -->
       <div *ngIf="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg bg-white/30">
-        <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-xs w-full">
-          <svg class="w-16 h-16 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-md w-full mx-4">
+          <svg class="w-20 h-20 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 class="text-2xl font-bold mb-2 text-center">Registration Success</h2>
-          <p class="mb-6 text-center text-gray-600">Your registration was successful!</p>
-          <button (click)="onSuccessOk()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">OK</button>
+          <h2 class="text-2xl font-bold mb-3 text-center text-gray-800">Registration Submitted!</h2>
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-yellow-700 font-semibold">Pending Admin Approval</p>
+              </div>
+            </div>
+          </div>
+          <p class="mb-4 text-center text-gray-600 text-sm leading-relaxed">
+            Your registration has been submitted successfully! Please wait for the Barangay Admin to review and approve your account before you can log in.
+          </p>
+          <p class="mb-6 text-center text-gray-500 text-xs">
+            You will be notified once your account has been approved.
+          </p>
+          <button (click)="onSuccessOk()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-medium w-full">
+            Understood
+          </button>
         </div>
       </div>
 
@@ -1548,7 +1605,7 @@ export class SignUpInformationFormComponent implements OnInit {
 
   formData = {
     account: {
-      email: '',
+      username: '',
       password: '',
       confirmPassword: ''
     },
@@ -1558,6 +1615,7 @@ export class SignUpInformationFormComponent implements OnInit {
       firstName: '',
       middleName: '',
       suffix: '',
+      email: '',
       gender: '',
       birthDate: '',
       birthPlace: '',
@@ -1623,7 +1681,7 @@ export class SignUpInformationFormComponent implements OnInit {
     const step1Data = sessionStorage.getItem('signupStep1Data');
     if (step1Data) {
       const parsedData = JSON.parse(step1Data);
-      this.formData.account.email = parsedData.email;
+      this.formData.account.username = parsedData.username;
       this.formData.account.password = parsedData.password;
       this.formData.account.confirmPassword = parsedData.confirmPassword;
     }
@@ -1718,12 +1776,12 @@ export class SignUpInformationFormComponent implements OnInit {
     this.validationErrors = {};
     let isValid = true;
 
-    // Email validation
-    if (!this.formData.account.email) {
-      this.validationErrors['email'] = 'Email is required';
+    // Username validation
+    if (!this.formData.account.username) {
+      this.validationErrors['username'] = 'Username is required';
       isValid = false;
-    } else if (!this.isValidEmail(this.formData.account.email)) {
-      this.validationErrors['email'] = 'Please enter a valid email address';
+    } else if (!this.isValidUsername(this.formData.account.username)) {
+      this.validationErrors['username'] = 'Username must be 4-20 characters and contain only letters, numbers, and underscores';
       isValid = false;
     }
 
@@ -1817,6 +1875,15 @@ export class SignUpInformationFormComponent implements OnInit {
 
     if (!personalInfo.occupation || personalInfo.occupation.trim() === '') {
       this.validationErrors['occupation'] = 'Occupation is required';
+      isValid = false;
+    }
+
+    // Email validation in personal info
+    if (!personalInfo.email || personalInfo.email.trim() === '') {
+      this.validationErrors['email'] = 'Email address is required';
+      isValid = false;
+    } else if (!this.isValidEmail(personalInfo.email)) {
+      this.validationErrors['email'] = 'Please enter a valid email address';
       isValid = false;
     }
 
@@ -2163,8 +2230,13 @@ export class SignUpInformationFormComponent implements OnInit {
       }
 
       // Validate email format one more time
-      if (!this.isValidEmail(this.formData.account.email)) {
+      if (!this.isValidEmail(this.formData.personalInfo.email)) {
         throw new Error('Please enter a valid email address.');
+      }
+
+      // Validate username format one more time
+      if (!this.isValidUsername(this.formData.account.username)) {
+        throw new Error('Please enter a valid username (4-20 characters, letters, numbers, and underscores only).');
       }
 
       // Validate password requirements
@@ -2187,7 +2259,7 @@ export class SignUpInformationFormComponent implements OnInit {
         // STEP 1: Create user in Appwrite Auth
         console.log('Step 1: Creating user account...');
         authResponse = await this.authService.register({
-          email: this.formData.account.email,
+          username: this.formData.account.username,
           password: this.formData.account.password,
           confirmPassword: this.formData.account.confirmPassword
         });
@@ -2197,10 +2269,11 @@ export class SignUpInformationFormComponent implements OnInit {
         console.log('Step 2: Creating user document...');
         const userDoc = {
           uid: authResponse.$id,
-          email: authResponse.email,
+          username: this.formData.account.username,
+          email: this.formData.personalInfo.email,
           role: 'resident',
           created_at: new Date().toISOString(),
-          is_active: true
+          is_active: false // User needs admin approval before login
         };
         await this.userService.createUser(userDoc);
         userDocCreated = true;
@@ -2211,6 +2284,7 @@ export class SignUpInformationFormComponent implements OnInit {
         const residentDoc = {
           profileImage: this.formData.profileImage || '', 
           userId: authResponse.$id,
+          email: this.formData.personalInfo.email,
           lastName: this.formData.personalInfo.lastName,
           firstName: this.formData.personalInfo.firstName,
           middleName: this.formData.personalInfo.middleName,
@@ -2243,7 +2317,9 @@ export class SignUpInformationFormComponent implements OnInit {
           NationalIdNo: this.formData.otherDetails.nationalIdNo,
           votersIdNo: this.formData.otherDetails.votersIdNo,
           status: 'Active',
-          dateOfRegistration: new Date().toISOString()
+          dateOfRegistration: new Date().toISOString(),
+          approvalStatus: 'Pending', // Pending admin approval
+          approvedAt: null
         };
         
         console.log('Creating resident document with profile image:', residentDoc.profileImage);
@@ -2397,13 +2473,19 @@ export class SignUpInformationFormComponent implements OnInit {
     return this.formData.account.password !== this.formData.account.confirmPassword && this.formData.account.confirmPassword !== '';
   }
 
+  isValidUsername(username: string): boolean {
+    // Username must be 4-20 characters, containing only letters, numbers, and underscores
+    const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
+    return usernameRegex.test(username);
+  }
+
   canProceedToStep2(): boolean {
-    return !!(this.formData.account.email &&
+    return !!(this.formData.account.username &&
               this.formData.account.password &&
               this.formData.account.confirmPassword &&
               this.acceptedTerms &&
               !this.passwordMismatch() &&
-              this.isValidEmail(this.formData.account.email) &&
+              this.isValidUsername(this.formData.account.username) &&
               this.formData.account.password.length >= 8);
   }
 }

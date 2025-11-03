@@ -19,7 +19,45 @@ import Swal from 'sweetalert2';
         <p class="text-gray-600">Manage and view all registered residents in Barangay New Cabalan</p>
       </div>
 
-      <!-- Actions and Search Bar -->
+      <!-- Tab Navigation -->
+      <div class="mb-6">
+        <div class="border-b border-gray-200">
+          <nav class="-mb-px flex space-x-8">
+            <button 
+              (click)="setActiveTab('residents')"
+              [class]="activeTab === 'residents' 
+                ? 'border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'"
+            >
+              All Residents
+              <span class="ml-2 bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                {{ totalResidents }}
+              </span>
+            </button>
+            <button 
+              (click)="setActiveTab('pending')"
+              [class]="activeTab === 'pending' 
+                ? 'border-yellow-500 text-yellow-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'"
+            >
+              Pending Approvals
+              <span class="ml-2 bg-yellow-100 text-yellow-800 py-0.5 px-2.5 rounded-full text-xs font-medium" *ngIf="pendingResidents.length > 0">
+                {{ pendingResidents.length }}
+              </span>
+              <span class="ml-2 bg-gray-100 text-gray-500 py-0.5 px-2.5 rounded-full text-xs font-medium" *ngIf="pendingResidents.length === 0">
+                0
+              </span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div [ngSwitch]="activeTab">
+
+        <!-- All Residents Tab -->
+        <div *ngSwitchCase="'residents'">
+          <!-- Actions and Search Bar -->
       <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <!-- Search and Filter -->
         <div class="flex items-center gap-4 flex-1">
@@ -215,6 +253,7 @@ import Swal from 'sweetalert2';
                     {{ getFullAddress(resident) }}
                   </div>
                   <div class="text-sm text-gray-500">{{ resident.personalInfo.contactNo }}</div>
+                  <div class="text-sm text-gray-500">{{ resident.personalInfo.email || 'No email' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span [class]="getStatusClass(resident.otherDetails.status)">
@@ -338,6 +377,175 @@ import Swal from 'sweetalert2';
         <p class="text-gray-600 text-lg">No residents found</p>
         <p class="text-gray-500 text-sm mt-1">Try adjusting your search or filter criteria</p>
       </div>
+        </div> <!-- End All Residents Tab -->
+
+        <!-- Pending Approvals Tab -->
+        <div *ngSwitchCase="'pending'">
+          <!-- Pending Header -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-gray-800">Pending Resident Approvals</h2>
+                <p class="text-sm text-gray-600 mt-1">Review and approve new resident registrations</p>
+              </div>
+              <button 
+                (click)="loadPendingResidents()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                [disabled]="isLoadingPending"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {{ isLoadingPending ? 'Loading...' : 'Refresh' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State for Pending -->
+          <div *ngIf="isLoadingPending" class="bg-white rounded-xl shadow-sm p-8 flex justify-center">
+            <div class="flex flex-col items-center">
+              <div class="h-12 w-12 border-4 border-yellow-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p class="text-gray-600">Loading pending approvals...</p>
+            </div>
+          </div>
+
+          <!-- Error State for Pending -->
+          <div *ngIf="pendingErrorMessage && !isLoadingPending" class="bg-red-50 rounded-xl shadow-sm border border-red-200 p-6 mb-6">
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-red-600">{{ pendingErrorMessage }}</p>
+            </div>
+            <button 
+              (click)="loadPendingResidents()" 
+              class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm transition"
+            >
+              Try Again
+            </button>
+          </div>
+
+          <!-- Pending Residents Table -->
+          <div *ngIf="!isLoadingPending && !pendingErrorMessage && pendingResidents.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-yellow-50">
+                  <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Applicant Information
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact Details
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Registration Date
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr *ngFor="let resident of pendingResidents" class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-yellow-200 flex items-center justify-center overflow-hidden">
+                          <img *ngIf="resident.profileImage" [src]="resident.profileImage" alt="Profile" class="w-full h-full object-cover">
+                          <span *ngIf="!resident.profileImage" class="text-yellow-700 font-medium">{{ resident.personalInfo.firstName.charAt(0) }}</span>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">
+                            {{ resident.personalInfo.firstName }} {{ resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '.' : '' }} {{ resident.personalInfo.lastName }}
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            {{ calculateAge(resident.personalInfo.birthDate) }} years old • {{ resident.personalInfo.gender }}
+                          </div>
+                          <div class="text-xs text-yellow-600 font-medium mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Pending Approval
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">
+                        {{ getFullAddress(resident) }}
+                      </div>
+                      <div class="text-sm text-gray-500">{{ resident.personalInfo.contactNo }}</div>
+                      <div class="text-sm text-gray-500">{{ resident.personalInfo.email || 'No email' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ formatDate(resident.$createdAt) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                      <div class="flex items-center justify-center space-x-2">
+                        <!-- View Details Button -->
+                        <button 
+                          class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 rounded-md"
+                          (click)="viewResident(resident)"
+                          title="View applicant details"
+                          [disabled]="approvingResidentId === resident.$id"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          View
+                        </button>
+                        
+                        <!-- Approve Button -->
+                        <button 
+                          class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors rounded-md"
+                          [class]="approvingResidentId === resident.$id ? 
+                            'text-gray-400 bg-gray-100 cursor-not-allowed' : 
+                            'text-green-600 bg-green-50 hover:bg-green-100 hover:text-green-700'"
+                          (click)="approveResident(resident)"
+                          title="Approve registration"
+                          [disabled]="approvingResidentId === resident.$id"
+                        >
+                          <div *ngIf="approvingResidentId === resident.$id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-gray-400 mr-1"></div>
+                          <svg *ngIf="approvingResidentId !== resident.$id" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          {{ approvingResidentId === resident.$id ? 'Processing...' : 'Approve' }}
+                        </button>
+
+                        <!-- Reject Button -->
+                        <button 
+                          class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors rounded-md"
+                          [class]="approvingResidentId === resident.$id ? 
+                            'text-gray-400 bg-gray-100 cursor-not-allowed' : 
+                            'text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700'"
+                          (click)="rejectResident(resident)"
+                          title="Reject registration"
+                          [disabled]="approvingResidentId === resident.$id"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- No Pending Approvals State -->
+          <div *ngIf="!isLoadingPending && !pendingErrorMessage && pendingResidents.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-gray-600 text-lg">No pending approvals</p>
+            <p class="text-gray-500 text-sm mt-1">All registration requests have been processed</p>
+          </div>
+        </div> <!-- End Pending Approvals Tab -->
+
+      </div> <!-- End Tab Content -->
 
       <!-- Resident Detail Modal (hidden by default) -->
       <app-resident-detail-modal
@@ -378,6 +586,15 @@ export class ResidentsComponent implements OnInit {
   Math = Math; // Make Math available in the template
   archivingResidentId: string | null = null; // Track which resident is being archived
 
+  // Tab management
+  activeTab: 'residents' | 'pending' = 'residents';
+  
+  // Pending residents properties
+  pendingResidents: ResidentInfo[] = [];
+  isLoadingPending: boolean = false;
+  pendingErrorMessage: string = '';
+  approvingResidentId: string | null = null; // Track which resident is being approved/rejected
+
   // Pagination properties
   currentPage: number = 1;
   pageSize: number = 20;
@@ -397,6 +614,32 @@ export class ResidentsComponent implements OnInit {
 
   ngOnInit() {
     this.loadResidentsOptimized();
+    this.loadPendingResidents();
+  }
+
+  // Tab management
+  setActiveTab(tab: 'residents' | 'pending') {
+    this.activeTab = tab;
+    if (tab === 'pending' && this.pendingResidents.length === 0) {
+      this.loadPendingResidents();
+    } else if (tab === 'residents') {
+      // Refresh residents data when switching back to ensure newly approved residents appear
+      this.loadResidentsOptimized();
+    }
+  }
+
+  // Load pending residents
+  async loadPendingResidents() {
+    this.isLoadingPending = true;
+    this.pendingErrorMessage = '';
+    try {
+      this.pendingResidents = await this.adminService.getPendingResidents();
+    } catch (error) {
+      console.error('Failed to load pending residents:', error);
+      this.pendingErrorMessage = 'Failed to load pending residents. Please try again.';
+    } finally {
+      this.isLoadingPending = false;
+    }
   }
 
   async loadResidentsOptimized() {
@@ -1026,6 +1269,239 @@ export class ResidentsComponent implements OnInit {
     if (printWindow) {
       printWindow.document.write(htmlContent);
       printWindow.document.close();
+    }
+  }
+
+  // Approval action methods
+  async approveResident(resident: ResidentInfo) {
+    const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '. ' : ''}${resident.personalInfo.lastName}`;
+    
+    // Show SweetAlert2 confirmation for approval
+    const result = await Swal.fire({
+      title: 'Approve Registration',
+      html: `Are you sure you want to approve <strong>${fullName}</strong>'s registration?<br><br>
+             <div class="text-left bg-green-50 p-3 rounded-lg mt-3 border border-green-200">
+               <p class="font-semibold text-green-800 mb-2">Approval Action:</p>
+               <ul class="text-xs text-green-700 space-y-1">
+                 <li>• User account will be activated</li>
+                 <li>• User will be able to log in immediately</li>
+                 <li>• Approval status will be set to "Approved"</li>
+                 <li>• Approval timestamp will be recorded</li>
+               </ul>
+             </div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Approve',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '500px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+        confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white',
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true
+    });
+
+    if (result.isConfirmed && resident.$id && resident.uid) {
+      this.approvingResidentId = resident.$id;
+      try {
+        await this.adminService.approveResident(resident.$id, resident.uid);
+        
+        // Remove from pending list
+        this.pendingResidents = this.pendingResidents.filter(r => r.$id !== resident.$id);
+        
+        // Refresh the All Residents data to include the newly approved resident
+        // Use setTimeout to ensure the approval process is fully complete
+        setTimeout(() => {
+          this.loadResidentsOptimized();
+        }, 500);
+        
+        // Show success message
+        await Swal.fire({
+          title: 'Registration Approved!',
+          html: `<strong>${fullName}</strong>'s registration has been approved successfully.<br><br>
+                 <div class="text-left bg-green-50 p-3 rounded-lg border border-green-200">
+                   <p class="text-green-700 text-sm">
+                     <strong>What's next:</strong><br>
+                     • User can now log in to their account<br>
+                     • Account is fully activated<br>
+                     • User will appear in the residents list
+                   </p>
+                 </div>`,
+          icon: 'success',
+          confirmButtonText: 'Great!',
+          background: '#ffffff',
+          color: '#374151',
+          width: '500px',
+          padding: '2rem',
+          showClass: {
+            popup: 'animate__animated animate__zoomIn animate__faster'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__zoomOut animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-0',
+            title: 'text-xl font-bold mb-3 text-green-700',
+            htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+            confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
+          },
+          buttonsStyling: false,
+          backdrop: 'rgba(15, 23, 42, 0.4)',
+          timer: 5000,
+          timerProgressBar: true
+        });
+        
+      } catch (error) {
+        console.error('Error approving resident:', error);
+        await Swal.fire({
+          title: 'Approval Failed',
+          text: 'Failed to approve the registration. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#EF4444',
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl',
+            confirmButton: 'font-semibold py-3 px-6 rounded-xl'
+          },
+          buttonsStyling: false
+        });
+      } finally {
+        this.approvingResidentId = null;
+      }
+    }
+  }
+
+  async rejectResident(resident: ResidentInfo) {
+    const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '. ' : ''}${resident.personalInfo.lastName}`;
+    
+    // Show SweetAlert2 input prompt for rejection reason
+    const { value: reason, isConfirmed } = await Swal.fire({
+      title: 'Reject Registration',
+      html: `Are you sure you want to reject <strong>${fullName}</strong>'s registration?<br><br>
+             <div class="text-left bg-red-50 p-3 rounded-lg mt-3 border border-red-200">
+               <p class="font-semibold text-red-800 mb-2">Rejection Action:</p>
+               <ul class="text-xs text-red-700 space-y-1">
+                 <li>• User account will remain inactive</li>
+                 <li>• User will not be able to log in</li>
+                 <li>• Registration status will be set to "Rejected"</li>
+                 <li>• Rejection reason will be recorded</li>
+               </ul>
+             </div>`,
+      input: 'textarea',
+      inputLabel: 'Reason for rejection (optional)',
+      inputPlaceholder: 'Please provide a reason for rejecting this registration...',
+      inputAttributes: {
+        'aria-label': 'Rejection reason',
+        'class': 'mt-3'
+      },
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Reject',
+      cancelButtonText: 'Cancel',
+      background: '#ffffff',
+      color: '#374151',
+      width: '500px',
+      padding: '2rem',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      },
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold mb-3 text-gray-900',
+        htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-4',
+        confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm mr-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white',
+        cancelButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white',
+        actions: 'gap-3'
+      },
+      buttonsStyling: false,
+      backdrop: 'rgba(15, 23, 42, 0.4)',
+      allowOutsideClick: true,
+      allowEscapeKey: true,
+      preConfirm: (inputValue) => {
+        return inputValue || 'No reason provided';
+      }
+    });
+
+    if (isConfirmed && resident.$id) {
+      this.approvingResidentId = resident.$id;
+      try {
+        await this.adminService.rejectResident(resident.$id, reason);
+        
+        // Remove from pending list
+        this.pendingResidents = this.pendingResidents.filter(r => r.$id !== resident.$id);
+        
+        // Show success message
+        await Swal.fire({
+          title: 'Registration Rejected',
+          html: `<strong>${fullName}</strong>'s registration has been rejected.<br><br>
+                 <div class="text-left bg-red-50 p-3 rounded-lg border border-red-200">
+                   <p class="text-red-700 text-sm">
+                     <strong>Rejection processed:</strong><br>
+                     • User account remains inactive<br>
+                     • User cannot log in<br>
+                     • Rejection reason has been recorded
+                   </p>
+                 </div>`,
+          icon: 'info',
+          confirmButtonText: 'OK',
+          background: '#ffffff',
+          color: '#374151',
+          width: '500px',
+          padding: '2rem',
+          showClass: {
+            popup: 'animate__animated animate__zoomIn animate__faster'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__zoomOut animate__faster'
+          },
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl border-0',
+            title: 'text-xl font-bold mb-3 text-gray-700',
+            htmlContainer: 'text-gray-600 text-sm leading-relaxed mb-6',
+            confirmButton: 'font-semibold py-3 px-6 rounded-xl transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
+          },
+          buttonsStyling: false,
+          backdrop: 'rgba(15, 23, 42, 0.4)',
+          timer: 5000,
+          timerProgressBar: true
+        });
+        
+      } catch (error) {
+        console.error('Error rejecting resident:', error);
+        await Swal.fire({
+          title: 'Rejection Failed',
+          text: 'Failed to reject the registration. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#EF4444',
+          customClass: {
+            popup: 'rounded-2xl shadow-2xl',
+            confirmButton: 'font-semibold py-3 px-6 rounded-xl'
+          },
+          buttonsStyling: false
+        });
+      } finally {
+        this.approvingResidentId = null;
+      }
     }
   }
 }

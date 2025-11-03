@@ -16,6 +16,29 @@ export class UserService extends BaseAppwriteService {
     super(router);
   }
 
+  // Get user document from users collection to check is_active status
+  async getUserFromUsersCollection(accountId: string): Promise<any | null> {
+    try {
+      const userResponse = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.userCollectionId,
+        [
+          Query.equal('uid', accountId)
+        ]
+      );
+      
+      if (userResponse.documents.length === 0) {
+        console.log('No user document found for account ID:', accountId);
+        return null;
+      }
+      
+      return userResponse.documents[0];
+    } catch (error) {
+      console.error('Error fetching user document:', error);
+      return null;
+    }
+  }
+
   async getUserInformation(accountId: string): Promise<ResidentInfo | null> {
     try {
       // First get the user document that contains role and uid
@@ -79,6 +102,7 @@ export class UserService extends BaseAppwriteService {
           nationality: residentDoc['nationality'] || '',
           religion: residentDoc['religion'] || '',
           occupation: residentDoc['occupation'] || '',
+          email: residentDoc['email'] || '',
           contactNo: residentDoc['contactNo'] || '',
           pwd: residentDoc['pwd'] || '',
           pwdIdNo: residentDoc['pwdIdNo'] || '',
@@ -134,6 +158,7 @@ export class UserService extends BaseAppwriteService {
         nationality: '',
         religion: '',
         occupation: '',
+        email: '',
         contactNo: '',
         pwd: '',
         pwdIdNo: '',

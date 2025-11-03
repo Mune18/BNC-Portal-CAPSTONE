@@ -22,6 +22,7 @@ export interface ResidentInfo {
     nationality: string;
     religion: string;
     occupation: string;
+    email: string;
     contactNo: string;
     pwd: string;
     pwdIdNo: string;
@@ -48,5 +49,7 @@ export interface ResidentInfo {
     votersIdNo: string;
     status: string;
     dateOfRegistration: string;
+    approvalStatus?: string;
+    approvedAt?: string;
   };
 }

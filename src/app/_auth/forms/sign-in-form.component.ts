@@ -32,17 +32,17 @@ import Swal from 'sweetalert2';
             </div>
           </div>
 
-          <!-- Email Field -->
+          <!-- Username Field -->
           <div class="mb-4 sm:mb-6">
-            <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">
-              Email Address *
+            <label class="block text-gray-700 text-sm font-semibold mb-2" for="username">
+              Username *
             </label>
             <input
-              type="email"
-              id="email"
-              [(ngModel)]="loginData.email"
-              name="email"
-              placeholder="Enter your email"
+              type="text"
+              id="username"
+              [(ngModel)]="loginData.username"
+              name="username"
+              placeholder="Enter your username"
               class="border border-gray-200 rounded-lg bg-blue-50 w-full py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
               required
               [disabled]="isLoading"
@@ -98,7 +98,7 @@ import Swal from 'sweetalert2';
   `]
 })
 export class SignInFormComponent {
-  loginData: LoginData = { email: '', password: '' };
+  loginData: LoginData = { username: '', password: '' };
   errorMessage = '';
   isLoading = false;
 
@@ -131,8 +131,18 @@ export class SignInFormComponent {
       // 2. Get current user info from Appwrite
       const account = await this.authService.getAccount();
 
-      // 3. Fetch user document from your database to check role
+      // 3. Fetch user document from your database to check role and status
       const userDoc = await this.userService.getUserInformation(account.$id);
+      
+      // 4. Check if user account is active (approved by admin)
+      const usersCollection = await this.userService.getUserFromUsersCollection(account.$id);
+      if (usersCollection && !usersCollection['is_active']) {
+        // Account is not yet approved by admin
+        await this.showPendingApprovalAlert();
+        await this.authService.logout();
+        this.isLoading = false;
+        return;
+      }
 
       if (userDoc && userDoc.role === 'admin') {
         this.router.navigate(['/admin/dashboard']);
@@ -173,7 +183,7 @@ export class SignInFormComponent {
         this.isLoading = false;
       }
     } catch (error: any) {
-      this.errorMessage = 'Invalid email or password.';
+      this.errorMessage = 'Invalid username or password.';
       console.error('Login failed:', error);
       this.isLoading = false;
     }
@@ -258,6 +268,53 @@ export class SignInFormComponent {
       customClass: {
         popup: 'rounded-2xl shadow-2xl border-0',
         title: 'text-xl font-bold text-orange-700 mb-4',
+        htmlContainer: 'text-left',
+        confirmButton: 'font-semibold py-3 px-6 rounded-lg transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105'
+      },
+      backdrop: 'rgba(15, 23, 42, 0.7)',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn animate__faster'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut animate__faster'
+      }
+    });
+  }
+
+  async showPendingApprovalAlert() {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Account Pending Approval',
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-4">Your account is currently <strong>awaiting approval</strong> from the Barangay Administrator.</p>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <h4 class="font-semibold text-yellow-800 mb-2">What happens next:</h4>
+            <ul class="text-yellow-700 text-sm space-y-1">
+              <li>• The administrator will review your registration information</li>
+              <li>• Your account will be verified against barangay records</li>
+              <li>• Once approved, you will be able to log in</li>
+              <li>• This process typically takes 1-3 business days</li>
+            </ul>
+          </div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p class="text-gray-600 text-sm">
+              <strong>Need assistance?</strong><br>
+              <strong>Office Hours:</strong> Monday to Friday, 8:00 AM - 5:00 PM<br>
+              <strong>Location:</strong> Corner Mabini St., Purok 2, New Cabalan, Olongapo City<br>
+              <strong>Contact:</strong> (047) 224-2176
+            </p>
+          </div>
+        </div>
+      `,
+      confirmButtonText: 'I Understand',
+      confirmButtonColor: '#CA8A04',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      width: '500px',
+      customClass: {
+        popup: 'rounded-2xl shadow-2xl border-0',
+        title: 'text-xl font-bold text-yellow-700 mb-4',
         htmlContainer: 'text-left',
         confirmButton: 'font-semibold py-3 px-6 rounded-lg transition-all duration-200 border-0 shadow-lg hover:shadow-xl transform hover:scale-105'
       },

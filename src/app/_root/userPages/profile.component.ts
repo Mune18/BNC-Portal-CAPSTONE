@@ -168,6 +168,10 @@ import { Router } from '@angular/router';
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Email Address</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base break-all">{{ residentInfo ? residentInfo.personalInfo.email : '-' }}</div>
+                  </div>
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Contact Number</div>
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.contactNo : '-' }}</div>
                   </div>
@@ -534,6 +538,11 @@ import { Router } from '@angular/router';
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
                   </div>
                   <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
+                    <input type="email" [(ngModel)]="editInfo.personalInfo.email" name="email" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                  </div>
+                  <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Contact No.</label>
                     <input type="tel" [(ngModel)]="editInfo.personalInfo.contactNo" name="contactNo" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
@@ -730,6 +739,7 @@ export class ProfileComponent implements OnInit {
       nationality: '',
       religion: '',
       occupation: '',
+      email: '',
       contactNo: '',
       pwd: '',
       pwdIdNo: '',
@@ -882,6 +892,7 @@ export class ProfileComponent implements OnInit {
         nationality: '',
         religion: '',
         occupation: '',
+        email: '',
         contactNo: '',
         pwd: '',
         pwdIdNo: '',

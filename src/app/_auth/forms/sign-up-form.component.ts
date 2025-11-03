@@ -64,41 +64,45 @@ import { FormsModule } from '@angular/forms';
           </div>
         </div>
         
-        <!-- Email Field -->
+        <!-- Username Field -->
         <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-semibold mb-2" for="email">
-            Email Address <span class="text-red-500">*</span>
+          <label class="block text-gray-700 text-sm font-semibold mb-2" for="username">
+            Username <span class="text-red-500">*</span>
           </label>
           <div class="relative">
             <input
-              type="email"
-              id="email"
-              name="email"
-              [(ngModel)]="formData.email"
-              #emailInput="ngModel"
-              placeholder="Enter your email address"
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="formData.username"
+              #usernameInput="ngModel"
+              placeholder="Choose a unique username"
               class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-200"
-              [class.border-red-500]="emailInput.invalid && emailInput.touched"
-              [class.border-green-500]="emailInput.valid && emailInput.touched"
+              [class.border-red-500]="usernameInput.invalid && usernameInput.touched"
+              [class.border-green-500]="usernameInput.valid && usernameInput.touched"
               required
-              email
-              autocomplete="email"
+              minlength="4"
+              maxlength="20"
+              pattern="^[a-zA-Z0-9_]+$"
+              autocomplete="username"
             />
             <div class="absolute right-3 top-3">
-              <svg *ngIf="emailInput.valid && emailInput.touched" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg *ngIf="usernameInput.valid && usernameInput.touched" class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
               </svg>
-              <svg *ngIf="emailInput.invalid && emailInput.touched" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg *ngIf="usernameInput.invalid && usernameInput.touched" class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
               </svg>
             </div>
           </div>
-          <div *ngIf="emailInput.invalid && emailInput.touched" class="mt-1 text-sm text-red-600">
-            <span *ngIf="emailInput.errors?.['required']">Email is required</span>
-            <span *ngIf="emailInput.errors?.['email']">Please enter a valid email address</span>
+          <div *ngIf="usernameInput.invalid && usernameInput.touched" class="mt-1 text-sm text-red-600">
+            <span *ngIf="usernameInput.errors?.['required']">Username is required</span>
+            <span *ngIf="usernameInput.errors?.['minlength']">Username must be at least 4 characters</span>
+            <span *ngIf="usernameInput.errors?.['maxlength']">Username cannot exceed 20 characters</span>
+            <span *ngIf="usernameInput.errors?.['pattern']">Username can only contain letters, numbers, and underscores</span>
           </div>
-          <div *ngIf="emailInput.valid && emailInput.touched" class="mt-1 text-sm text-green-600">
-            ✓ Valid email address
+          <div *ngIf="usernameInput.valid && usernameInput.touched" class="mt-1 text-sm text-green-600">
+            ✓ Valid username
           </div>
         </div>
         
@@ -260,7 +264,7 @@ import { FormsModule } from '@angular/forms';
 export class SignUpFormComponent {
   formData = {
     name: '',
-    email: '',
+    username: '',
     password: '',
     confirmPassword: ''
   };

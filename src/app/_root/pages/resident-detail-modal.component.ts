@@ -145,6 +145,14 @@ import { ResidentInfo } from '../../shared/types/resident';
                     <p class="text-gray-900">{{ resident?.personalInfo?.occupation || '-' }}</p>
                   </div>
                   <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Email Address</p>
+                    <p class="text-gray-900 break-all">{{ resident?.personalInfo?.email || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Contact Number</p>
+                    <p class="text-gray-900">{{ resident?.personalInfo?.contactNo || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
                     <p class="text-sm font-medium text-gray-500 mb-1">Monthly Income</p>
                     <p class="text-gray-900">₱{{ resident?.personalInfo?.monthlyIncome || 0 | number }}</p>
                   </div>

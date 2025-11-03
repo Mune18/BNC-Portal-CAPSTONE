@@ -182,6 +182,17 @@ import Swal from 'sweetalert2';
                   <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Contact & Address Information</h3>
                   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                     <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Email Address <span class="text-red-500">*</span></label>
+                      <input 
+                        type="email" 
+                        [(ngModel)]="editedResident.personalInfo.email" 
+                        name="email" 
+                        required
+                        placeholder="Enter email address"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      >
+                    </div>
+                    <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Contact Number <span class="text-red-500">*</span></label>
                       <input 
                         type="tel" 
@@ -550,6 +561,7 @@ export class ResidentEditModalComponent implements OnInit, OnChanges {
         nationality: '',
         religion: '',
         contactNo: '',
+        email: '',
         houseNo: '',
         street: '',
         purokNo: '',

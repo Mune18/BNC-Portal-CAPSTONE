@@ -19,7 +19,9 @@ export class AuthService extends BaseAppwriteService {
 
   async register(registerData: RegisterData) {
     try {
-      const response = await this.account.create('unique()', registerData.email, registerData.password);
+      // Convert username to email format for Appwrite (username@bnc.portal)
+      const appwriteEmail = `${registerData.username}@bnc.portal`;
+      const response = await this.account.create('unique()', appwriteEmail, registerData.password);
       return response;
     } catch (error) {
       console.error('Registration error:', error);
@@ -46,7 +48,9 @@ export class AuthService extends BaseAppwriteService {
   async login(loginData: LoginData) {
     this.setLoading(true);
     try {
-      const response = await this.account.createEmailPasswordSession(loginData.email, loginData.password);
+      // Convert username to email format for Appwrite (username@bnc.portal)
+      const appwriteEmail = `${loginData.username}@bnc.portal`;
+      const response = await this.account.createEmailPasswordSession(appwriteEmail, loginData.password);
       this.setLoading(false);
       return response;
     } catch (error) {
