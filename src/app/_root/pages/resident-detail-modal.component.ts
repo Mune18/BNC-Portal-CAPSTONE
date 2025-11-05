@@ -14,7 +14,17 @@ import { ResidentInfo } from '../../shared/types/resident';
       <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden z-10 flex flex-col">
         <!-- Modal Header -->
         <div class="flex-shrink-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 class="text-xl font-semibold text-gray-800">Resident Details</h2>
+          <div class="flex items-center gap-3">
+            <h2 class="text-xl font-semibold text-gray-800">
+              {{ showApprovalActions ? 'Registration Review' : 'Resident Details' }}
+            </h2>
+            <div *ngIf="showApprovalActions" class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Pending Approval
+            </div>
+          </div>
           <button 
             (click)="close.emit()" 
             class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
@@ -32,6 +42,17 @@ import { ResidentInfo } from '../../shared/types/resident';
             <!-- Background decorations -->
             <div class="absolute -top-4 -right-4 w-24 h-24 bg-white/10 rounded-full"></div>
             <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full"></div>
+            
+            <!-- Approval Notice (shown when in approval mode) -->
+            <div *ngIf="showApprovalActions" class="mb-4 bg-yellow-100 border border-yellow-300 rounded-lg p-3 text-yellow-800 text-sm">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="font-medium">Registration Review Mode</span>
+              </div>
+              <p class="mt-1 text-xs">Please review the applicant's information carefully before approving or rejecting their registration.</p>
+            </div>
             
             <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <!-- Profile Image -->
@@ -312,7 +333,32 @@ import { ResidentInfo } from '../../shared/types/resident';
 
         <!-- Modal Footer - Sticky at bottom -->
         <div class="sticky bottom-0 flex-shrink-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-2xl shadow-lg">
-          <div class="flex flex-col sm:flex-row gap-3 justify-end">
+          <!-- Approval Actions (shown when showApprovalActions is true) -->
+          <div *ngIf="showApprovalActions" class="flex flex-col sm:flex-row gap-3 justify-end">
+            <button 
+              type="button"
+              class="px-6 py-3 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-all font-medium flex items-center justify-center gap-2 sm:w-auto"
+              (click)="onReject()"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              Reject Application
+            </button>
+            <button 
+              type="button"
+              class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-medium flex items-center justify-center gap-2 sm:w-auto"
+              (click)="onApprove()"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              Approve Application
+            </button>
+          </div>
+
+          <!-- Regular Actions (shown when showApprovalActions is false) -->
+          <div *ngIf="!showApprovalActions" class="flex flex-col sm:flex-row gap-3 justify-end">
             <button 
               type="button"
               class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all font-medium sm:w-auto"
@@ -340,8 +386,11 @@ import { ResidentInfo } from '../../shared/types/resident';
 export class ResidentDetailModalComponent {
   @Input() show: boolean = false;
   @Input() resident: ResidentInfo | null = null;
+  @Input() showApprovalActions: boolean = false; // New input to control button display
   @Output() close = new EventEmitter<void>();
   @Output() edit = new EventEmitter<ResidentInfo>();
+  @Output() approve = new EventEmitter<ResidentInfo>(); // New output for approval
+  @Output() reject = new EventEmitter<ResidentInfo>(); // New output for rejection
   
   activeTab: string = 'personal';
   
@@ -417,6 +466,18 @@ export class ResidentDetailModalComponent {
   onEdit() {
     if (this.resident) {
       this.edit.emit(this.resident);
+    }
+  }
+
+  onApprove() {
+    if (this.resident) {
+      this.approve.emit(this.resident);
+    }
+  }
+
+  onReject() {
+    if (this.resident) {
+      this.reject.emit(this.resident);
     }
   }
 

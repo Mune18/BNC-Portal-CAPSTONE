@@ -551,8 +551,11 @@ import Swal from 'sweetalert2';
       <app-resident-detail-modal
         [show]="showResidentModal"
         [resident]="selectedResident"
+        [showApprovalActions]="activeTab === 'pending'"
         (close)="closeResidentModal()"
         (edit)="editResident($event)"
+        (approve)="approveResident($event)"
+        (reject)="rejectResident($event)"
       ></app-resident-detail-modal>
 
       <!-- Resident Edit Modal (hidden by default) -->
@@ -1337,17 +1340,21 @@ export class ResidentsComponent implements OnInit {
           html: `<strong>${fullName}</strong>'s registration has been approved successfully.<br><br>
                  <div class="text-left bg-green-50 p-3 rounded-lg border border-green-200">
                    <p class="text-green-700 text-sm">
+                     <strong>Actions completed:</strong><br>
+                     ✅ Account activated and user can now log in<br>
+                     ✅ User added to residents list<br>
+                     📧 Email notification sent to ${resident.personalInfo.email}<br><br>
                      <strong>What's next:</strong><br>
-                     • User can now log in to their account<br>
-                     • Account is fully activated<br>
-                     • User will appear in the residents list
+                     • User will receive approval email notification<br>
+                     • User can access all barangay services<br>
+                     • User profile appears in residents management
                    </p>
                  </div>`,
           icon: 'success',
           confirmButtonText: 'Great!',
           background: '#ffffff',
           color: '#374151',
-          width: '500px',
+          width: '550px',
           padding: '2rem',
           showClass: {
             popup: 'animate__animated animate__zoomIn animate__faster'
@@ -1363,7 +1370,7 @@ export class ResidentsComponent implements OnInit {
           },
           buttonsStyling: false,
           backdrop: 'rgba(15, 23, 42, 0.4)',
-          timer: 5000,
+          timer: 6000,
           timerProgressBar: true
         });
         
@@ -1452,20 +1459,26 @@ export class ResidentsComponent implements OnInit {
         // Show success message
         await Swal.fire({
           title: 'Registration Rejected',
-          html: `<strong>${fullName}</strong>'s registration has been rejected.<br><br>
+          html: `<strong>${fullName}</strong>'s registration has been rejected and completely removed from the system.<br><br>
                  <div class="text-left bg-red-50 p-3 rounded-lg border border-red-200">
                    <p class="text-red-700 text-sm">
-                     <strong>Rejection processed:</strong><br>
-                     • User account remains inactive<br>
-                     • User cannot log in<br>
-                     • Rejection reason has been recorded
+                     <strong>Actions completed:</strong><br>
+                     ❌ Registration completely rejected<br>
+                     �️ User account deleted from system<br>
+                     🗑️ Resident record deleted from database<br>
+                     📧 Email notification sent to ${resident.personalInfo.email}<br>
+                     📝 Rejection reason: ${reason || 'No reason provided'}<br><br>
+                     <strong>Status:</strong><br>
+                     • User has been notified via email<br>
+                     • All user data removed from system<br>
+                     • No records kept (complete cleanup)
                    </p>
                  </div>`,
           icon: 'info',
           confirmButtonText: 'OK',
           background: '#ffffff',
           color: '#374151',
-          width: '500px',
+          width: '550px',
           padding: '2rem',
           showClass: {
             popup: 'animate__animated animate__zoomIn animate__faster'
@@ -1481,7 +1494,7 @@ export class ResidentsComponent implements OnInit {
           },
           buttonsStyling: false,
           backdrop: 'rgba(15, 23, 42, 0.4)',
-          timer: 5000,
+          timer: 6000,
           timerProgressBar: true
         });
         

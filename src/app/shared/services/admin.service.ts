@@ -5,6 +5,7 @@ import { environment } from '../../environment/environment';
 import { Query } from 'appwrite';
 import { ResidentInfo } from '../types/resident';
 import { CacheService } from './cache.service';
+import { EmailService, EmailNotificationData } from './email.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class AdminService extends BaseAppwriteService {
 
   constructor(
     router: Router,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private emailService: EmailService
   ) {
     super(router);
   }
@@ -479,6 +481,13 @@ export class AdminService extends BaseAppwriteService {
 
   async approveResident(residentId: string, userId: string): Promise<void> {
     try {
+      // First, get resident info for email notification
+      const residentDoc = await this.database.getDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId
+      );
+
       // Update resident document
       await this.database.updateDocument(
         environment.appwriteDatabaseId,
@@ -508,8 +517,23 @@ export class AdminService extends BaseAppwriteService {
         );
       }
 
+      // Send approval email notification
+      const emailData: EmailNotificationData = {
+        userEmail: residentDoc['email'],
+        userName: `${residentDoc['firstName']} ${residentDoc['lastName']}`,
+        isApproved: true
+      };
+
+      // Send email in background (don't block the approval process)
+      this.emailService.sendRegistrationStatusEmail(emailData).catch(error => {
+        console.error('Failed to send approval email:', error);
+        // Log but don't throw - email failure shouldn't affect approval
+      });
+
       // Invalidate caches
       this.invalidateResidentCaches();
+      
+      console.log(`Resident ${residentDoc['firstName']} ${residentDoc['lastName']} approved successfully. Email notification sent to ${residentDoc['email']}`);
     } catch (error) {
       console.error('Error approving resident:', error);
       throw error;
@@ -518,25 +542,65 @@ export class AdminService extends BaseAppwriteService {
 
   async rejectResident(residentId: string, reason?: string): Promise<void> {
     try {
-      const updateData: any = {
-        approvalStatus: 'Rejected',
-        rejectedAt: new Date().toISOString()
-      };
-
-      if (reason) {
-        updateData.rejectionReason = reason;
-      }
-
-      // Update resident document
-      await this.database.updateDocument(
+      // First, get resident info for email notification BEFORE deletion
+      const residentDoc = await this.database.getDocument(
         environment.appwriteDatabaseId,
         environment.residentCollectionId,
-        residentId,
-        updateData
+        residentId
       );
+
+      // Get the userId to delete from users collection as well
+      const userId = residentDoc['userId'];
+
+      // Send rejection email notification BEFORE deletion
+      const emailData: EmailNotificationData = {
+        userEmail: residentDoc['email'],
+        userName: `${residentDoc['firstName']} ${residentDoc['lastName']}`,
+        isApproved: false,
+        reason: reason
+      };
+
+      // Send email first (don't wait for it to complete)
+      this.emailService.sendRegistrationStatusEmail(emailData).catch(error => {
+        console.error('Failed to send rejection email:', error);
+        // Log but don't throw - email failure shouldn't affect rejection
+      });
+
+      // Delete from residents collection
+      await this.database.deleteDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId
+      );
+
+      // Delete from users collection if userId exists
+      if (userId) {
+        try {
+          // Find the user document by uid
+          const userResponse = await this.database.listDocuments(
+            environment.appwriteDatabaseId,
+            environment.userCollectionId,
+            [Query.equal('uid', userId)]
+          );
+
+          // Delete the user document if found
+          if (userResponse.documents.length > 0) {
+            await this.database.deleteDocument(
+              environment.appwriteDatabaseId,
+              environment.userCollectionId,
+              userResponse.documents[0].$id
+            );
+          }
+        } catch (userDeleteError) {
+          console.error('Error deleting user document:', userDeleteError);
+          // Continue - resident is already deleted
+        }
+      }
 
       // Invalidate caches
       this.invalidateResidentCaches();
+      
+      console.log(`Resident ${residentDoc['firstName']} ${residentDoc['lastName']} rejected and completely removed from system. Email notification sent to ${residentDoc['email']}`);
     } catch (error) {
       console.error('Error rejecting resident:', error);
       throw error;

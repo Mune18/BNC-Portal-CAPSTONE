@@ -18,6 +18,7 @@ import { ComplaintsComponent } from './_root/userPages/complaints.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AdminGuard } from './shared/guards/admin.guard';
 import { ResidentGuard } from './shared/guards/resident.guard';
+import { EmailConfigComponent } from './_root/pages/email-config.component';
 
 export const routes: Routes = [
     {
@@ -45,6 +46,7 @@ export const routes: Routes = [
             // {path: 'documents', component: DocuComponent},
             {path: 'announcements', component: AnnouncementComponent},
             {path: 'reports', component: ReportsComponent},
+            {path: 'email-config', component: EmailConfigComponent}
         ]
     },
     {

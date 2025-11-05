@@ -1334,12 +1334,14 @@ import { environment } from '../../environment/environment';
 
       <!-- Registration Success Modal -->
       <div *ngIf="showSuccessModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg bg-white/30">
-        <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-md w-full mx-4">
+        <div class="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center max-w-lg w-full mx-4">
           <svg class="w-20 h-20 text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <h2 class="text-2xl font-bold mb-3 text-center text-gray-800">Registration Submitted!</h2>
-          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded">
+          
+          <!-- Pending Approval Notice -->
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 rounded w-full">
             <div class="flex">
               <div class="flex-shrink-0">
                 <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -1351,12 +1353,54 @@ import { environment } from '../../environment/environment';
               </div>
             </div>
           </div>
+          
+          <!-- Main Message -->
           <p class="mb-4 text-center text-gray-600 text-sm leading-relaxed">
             Your registration has been submitted successfully! Please wait for the Barangay Admin to review and approve your account before you can log in.
           </p>
+          
+          <!-- Email Notification Info -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 w-full">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h4 class="text-sm font-semibold text-blue-800 mb-1">Email Notification</h4>
+                <p class="text-xs text-blue-700 leading-relaxed">
+                  You will receive an email notification at <strong>{{ formData.personalInfo.email }}</strong> when your registration is approved or if additional information is needed.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- What's Next -->
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 w-full">
+            <h4 class="text-sm font-semibold text-gray-800 mb-2">What happens next:</h4>
+            <ul class="text-xs text-gray-600 space-y-1">
+              <li class="flex items-center">
+                <span class="text-blue-500 mr-2">1.</span>
+                Admin reviews your application (1-3 business days)
+              </li>
+              <li class="flex items-center">
+                <span class="text-blue-500 mr-2">2.</span>
+                You'll receive an email with the approval decision
+              </li>
+              <li class="flex items-center">
+                <span class="text-blue-500 mr-2">3.</span>
+                If approved, you can login and access all services
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Contact Info -->
           <p class="mb-6 text-center text-gray-500 text-xs">
-            You will be notified once your account has been approved.
+            Questions? Contact Barangay New Cabalan office at <strong>(047) 224-2176</strong><br>
+            Office Hours: Monday to Friday, 8:00 AM - 5:00 PM
           </p>
+          
           <button (click)="onSuccessOk()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-medium w-full">
             Understood
           </button>
