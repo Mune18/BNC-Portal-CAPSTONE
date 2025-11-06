@@ -361,7 +361,7 @@ import { Router } from '@angular/router';
                           'bg-red-100 text-red-800 border border-red-200': request.status === 'rejected'
                         }"
                       >
-                        {{ request.status | titlecase }}
+                        {{ getStatusDisplay(request.status) }}
                       </span>
                     </div>
                   </div>
@@ -407,7 +407,7 @@ import { Router } from '@angular/router';
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                     <div class="text-red-800 text-xs sm:text-sm">
-                      <div class="font-medium">Rejected</div>
+                      <div class="font-medium">Declined</div>
                       <div *ngIf="request.reason" class="leading-relaxed">Reason: {{ request.reason }}</div>
                     </div>
                   </div>
@@ -950,6 +950,19 @@ export class ProfileComponent implements OnInit {
       age--;
     }
     return age >= 0 ? age : '-';
+  }
+
+  getStatusDisplay(status: string): string {
+    switch (status) {
+      case 'pending':
+        return 'Pending';
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Declined';
+      default:
+        return status;
+    }
   }
 
   /**

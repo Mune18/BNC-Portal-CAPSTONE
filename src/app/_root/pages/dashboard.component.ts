@@ -28,8 +28,8 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
       <!-- Loading Indicator -->
       <div *ngIf="loading" class="space-y-6">
         <!-- Skeleton Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div *ngFor="let i of [1,2,3,4]" class="bg-white shadow rounded-lg p-6 animate-pulse">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div *ngFor="let i of [1,2,3,4,5]" class="bg-white shadow rounded-lg p-6 animate-pulse">
             <div class="flex items-center">
               <div class="p-3 rounded-full bg-gray-200 w-12 h-12"></div>
               <div class="ml-4 flex-1">
@@ -54,7 +54,7 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 
       <div *ngIf="!loading">
         <!-- Analytics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
           <!-- Total Residents -->
           <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/residents']">
             <div class="flex items-center">
@@ -66,6 +66,21 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
               <div class="ml-4">
                 <h2 class="text-lg font-semibold text-gray-800">Total Residents</h2>
                 <p class="text-gray-600 text-2xl font-bold">{{ totalResidents }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Resident Approval -->
+          <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/residents']" [queryParams]="{ filter: 'pending' }">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h2 class="text-lg font-semibold text-gray-800">Pending Registrations</h2>
+                <p class="text-gray-600 text-2xl font-bold">{{ pendingResidentApprovals }}</p>
               </div>
             </div>
           </div>
@@ -114,6 +129,36 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Priority Actions Widget -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6" *ngIf="priorityActions.length > 0">
+          <div class="flex items-center mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <h3 class="font-semibold text-red-800">Requires Immediate Attention</h3>
+            <span class="ml-auto bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">{{ priorityActions.length }}</span>
+          </div>
+          <ul class="space-y-2">
+            <li *ngFor="let action of priorityActions" 
+                class="flex items-start space-x-3 p-2 bg-white rounded border-l-4 border-red-400 hover:bg-red-50 transition cursor-pointer"
+                (click)="handlePriorityAction(action)">
+              <div class="flex-shrink-0 mt-0.5">
+                <div class="w-2 h-2 bg-red-500 rounded-full"></div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-red-800">{{ action.title }}</p>
+                <p class="text-xs text-red-600">{{ action.description }}</p>
+                <p class="text-xs text-red-500 mt-1">{{ action.timeAgo }}</p>
+              </div>
+              <div class="flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </li>
+          </ul>
         </div>
 
         <!-- Recent Activity & Charts -->
@@ -283,9 +328,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   // Statistics
   loading = true;
   totalResidents = 0;
+  pendingResidentApprovals = 0;
   pendingComplaints = 0;
   pendingUpdateRequests = 0;
   newResidentsLastMonth = 0;
+
+  // Phase 1 additions
+  priorityActions: any[] = [];
 
   // Recent data
   newestResidents: ResidentInfo[] = [];
@@ -331,6 +380,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.refreshSubscription = this.dataRefreshService.onRefresh('dashboard-stats').subscribe(() => {
         this.loadCriticalStats();
         this.loadBackgroundData();
+        this.loadPriorityActions(); // Refresh priority actions
       });
     } catch (error) {
       console.error('Error initializing dashboard:', error);
@@ -341,14 +391,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private async loadCriticalStats() {
     try {
       // Load only essential stats for immediate display
-      const [residentStats, announcements] = await Promise.all([
+      const [residentStats, announcements, pendingResidents] = await Promise.all([
         this.adminService.getResidentStats(),
-        this.announcementService.getActiveAnnouncements()
+        this.announcementService.getActiveAnnouncements(),
+        this.adminService.getPendingResidents()
       ]);
 
       // Set immediate stats
       this.totalResidents = (residentStats as any).total || 0;
       this.newResidentsLastMonth = (residentStats as any).recent || 0;
+      this.pendingResidentApprovals = pendingResidents.length || 0;
       this.recentAnnouncements = announcements.slice(0, 3);
     } catch (error) {
       console.error('Error loading critical stats:', error);
@@ -365,6 +417,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       ]);
 
       this.newestResidents = newestResidents;
+
+      // Load Phase 1 features
+      await this.loadPriorityActions();
 
       // Load full resident data for charts only if needed
       setTimeout(() => this.loadFullResidentDataForCharts(), 100);
@@ -598,6 +653,86 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     } catch {
       return '-';
+    }
+  }
+
+  // Phase 1 Methods
+  handlePriorityAction(action: any): void {
+    // Handle priority action click - navigate to appropriate page
+    if (action.route) {
+      // Use router to navigate
+      window.location.href = action.route;
+    }
+  }
+
+  private async loadPriorityActions(): Promise<void> {
+    try {
+      this.priorityActions = [];
+
+      // Check for urgent items that need immediate attention
+      
+      // 1. Check for pending approvals older than 7 days
+      const pendingResidents = await this.adminService.getPendingResidents();
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const oldPendingResidents = pendingResidents.filter(resident => {
+        const createdAt = new Date(resident.$createdAt || '');
+        return createdAt < sevenDaysAgo;
+      });
+
+      if (oldPendingResidents.length > 0) {
+        this.priorityActions.push({
+          title: `${oldPendingResidents.length} Resident Approvals Overdue`,
+          description: 'Some resident registrations have been pending for more than 7 days',
+          timeAgo: 'Over 7 days ago',
+          route: '/admin/residents?filter=pending',
+          type: 'approval'
+        });
+      }
+
+      // 2. Check for unresolved complaints older than 5 days
+      const complaints = await this.complaintService.getAllComplaints();
+      const fiveDaysAgo = new Date();
+      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+      
+      const oldComplaints = complaints.filter(complaint => {
+        const createdAt = new Date(complaint.createdAt);
+        return createdAt < fiveDaysAgo && (complaint.status === 'pending' || complaint.status === 'in_review');
+      });
+
+      if (oldComplaints.length > 0) {
+        this.priorityActions.push({
+          title: `${oldComplaints.length} Unresolved Complaints`,
+          description: 'Some complaints have been pending for more than 5 days',
+          timeAgo: 'Over 5 days ago',
+          route: '/admin/reports?status=pending',
+          type: 'complaint'
+        });
+      }
+
+      // 3. Check for pending update requests older than 3 days
+      const updateRequests = await this.residentUpdateService.getAllUpdateRequests();
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      
+      const oldUpdateRequests = updateRequests.filter(request => {
+        const createdAt = new Date(request.createdAt);
+        return createdAt < threeDaysAgo && request.status === 'pending';
+      });
+
+      if (oldUpdateRequests.length > 0) {
+        this.priorityActions.push({
+          title: `${oldUpdateRequests.length} Update Requests Pending`,
+          description: 'Some update requests have been pending for more than 3 days',
+          timeAgo: 'Over 3 days ago',
+          route: '/admin/update-requests',
+          type: 'update'
+        });
+      }
+
+    } catch (error) {
+      console.error('Error loading priority actions:', error);
     }
   }
 }

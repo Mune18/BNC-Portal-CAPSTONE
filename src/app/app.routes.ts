@@ -46,7 +46,6 @@ export const routes: Routes = [
             // {path: 'documents', component: DocuComponent},
             {path: 'announcements', component: AnnouncementComponent},
             {path: 'reports', component: ReportsComponent},
-            {path: 'email-config', component: EmailConfigComponent}
         ]
     },
     {

@@ -111,13 +111,13 @@ import Swal from 'sweetalert2';
             </button>
             
             <!-- Export Dropdown Menu -->
-            <div *ngIf="showExportDropdown" class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            <div *ngIf="showExportDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
               <div class="p-3 border-b border-gray-200">
                 <h3 class="text-sm font-semibold text-gray-800">Export Residents Data</h3>
-                <p class="text-xs text-gray-600 mt-1">Choose your export options</p>
+                <p class="text-xs text-gray-600 mt-1">Choose your export options and customize columns</p>
               </div>
               
-              <div class="p-3 space-y-2">
+              <div class="p-3 space-y-3">
                 <!-- Loading state -->
                 <div *ngIf="isExporting" class="text-center py-4">
                   <div class="inline-flex items-center text-sm text-gray-600">
@@ -131,12 +131,61 @@ import Swal from 'sweetalert2';
                 
                 <!-- Export options -->
                 <div *ngIf="!isExporting">
+                  <!-- Column Selection Toggle -->
+                  <div class="mb-4">
+                    <button 
+                      (click)="showColumnSelection = !showColumnSelection"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center justify-between border border-gray-200"
+                    >
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                        </svg>
+                        <span>Customize Columns ({{ getSelectedColumnsCount() }} selected)</span>
+                      </div>
+                      <svg class="w-4 h-4 transition-transform" [class.rotate-180]="showColumnSelection" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                      </svg>
+                    </button>
+                    
+                    <!-- Column Selection Panel -->
+                    <div *ngIf="showColumnSelection" class="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 max-h-60 overflow-y-auto">
+                      <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-medium text-gray-700">Select columns to export:</span>
+                        <div class="flex gap-2">
+                          <button 
+                            (click)="selectAllColumns()"
+                            class="text-xs text-blue-600 hover:text-blue-800"
+                          >
+                            Select All
+                          </button>
+                          <button 
+                            (click)="deselectAllColumns()"
+                            class="text-xs text-gray-600 hover:text-gray-800"
+                          >
+                            Clear All
+                          </button>
+                        </div>
+                      </div>
+                      <div class="grid grid-cols-2 gap-2">
+                        <label *ngFor="let column of availableColumns" class="flex items-center">
+                          <input 
+                            type="checkbox" 
+                            [(ngModel)]="column.selected"
+                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                          >
+                          <span class="ml-2 text-xs text-gray-700">{{ column.label }}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                   <!-- Export All -->
-                  <div class="border-b border-gray-100 pb-2">
+                  <div class="border-b border-gray-100 pb-3">
                     <p class="text-xs font-medium text-gray-700 mb-2">Export Scope</p>
                     <button 
                       (click)="exportResidents('all', 'csv')"
-                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2 mb-2"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -159,7 +208,7 @@ import Swal from 'sweetalert2';
                     <p class="text-xs font-medium text-gray-700 mb-2">PDF Reports</p>
                     <button 
                       (click)="exportResidents('all', 'pdf')"
-                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2"
+                      class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded flex items-center gap-2 mb-2"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -525,7 +574,7 @@ import Swal from 'sweetalert2';
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                           </svg>
-                          Reject
+                          Decline
                         </button>
                       </div>
                     </td>
@@ -612,6 +661,29 @@ export class ResidentsComponent implements OnInit {
   // Export related properties
   showExportDropdown: boolean = false;
   isExporting: boolean = false;
+  
+  // Column selection for export
+  availableColumns = [
+    { key: 'fullName', label: 'Full Name', selected: true },
+    { key: 'gender', label: 'Gender', selected: true },
+    { key: 'age', label: 'Age', selected: true },
+    { key: 'birthDate', label: 'Birth Date', selected: false },
+    { key: 'civilStatus', label: 'Civil Status', selected: false },
+    { key: 'address', label: 'Address', selected: true },
+    { key: 'contactNo', label: 'Contact Number', selected: true },
+    { key: 'occupation', label: 'Occupation', selected: false },
+    { key: 'monthlyIncome', label: 'Monthly Income', selected: false },
+    { key: 'pwd', label: 'PWD', selected: false },
+    { key: 'indigent', label: 'Indigent', selected: false },
+    { key: 'soloParent', label: 'Solo Parent', selected: false },
+    { key: 'seniorCitizen', label: 'Senior Citizen', selected: false },
+    { key: 'fourPsMember', label: '4Ps Member', selected: false },
+    { key: 'registeredVoter', label: 'Registered Voter', selected: false },
+    { key: 'dateOfRegistration', label: 'Date of Registration', selected: false },
+    { key: 'status', label: 'Status', selected: true }
+  ];
+  
+  showColumnSelection: boolean = false;
 
   constructor(private adminService: AdminService) {}
 
@@ -1082,6 +1154,19 @@ export class ResidentsComponent implements OnInit {
     this.showExportDropdown = false;
   }
 
+  // Column selection methods
+  getSelectedColumnsCount(): number {
+    return this.availableColumns.filter(col => col.selected).length;
+  }
+
+  selectAllColumns() {
+    this.availableColumns.forEach(col => col.selected = true);
+  }
+
+  deselectAllColumns() {
+    this.availableColumns.forEach(col => col.selected = false);
+  }
+
   async exportResidents(scope: 'all' | 'filtered', format: 'csv' | 'pdf') {
     if (this.isExporting) return;
     
@@ -1105,25 +1190,15 @@ export class ResidentsComponent implements OnInit {
   }
 
   private exportToCSV(residents: ResidentInfo[], scope: string) {
-    const headers = [
-      'Full Name',
-      'Gender',
-      'Age',
-      'Birth Date',
-      'Civil Status',
-      'Address',
-      'Contact Number',
-      'Occupation',
-      'Monthly Income',
-      'PWD',
-      'Indigent',
-      'Solo Parent',
-      'Senior Citizen',
-      '4Ps Member',
-      'Registered Voter',
-      'Date of Registration',
-      'Status'
-    ];
+    // Get selected columns
+    const selectedColumns = this.availableColumns.filter(col => col.selected);
+    
+    if (selectedColumns.length === 0) {
+      alert('Please select at least one column to export.');
+      return;
+    }
+
+    const headers = selectedColumns.map(col => col.label);
 
     const csvData = residents.map(resident => {
       const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
@@ -1131,25 +1206,27 @@ export class ResidentsComponent implements OnInit {
       const age = this.calculateAge(resident.personalInfo.birthDate);
       const status = resident.otherDetails.status;
       
-      return [
-        fullName,
-        resident.personalInfo.gender || '',
-        age.toString(),
-        resident.personalInfo.birthDate || '',
-        resident.personalInfo.civilStatus || '',
-        address,
-        resident.personalInfo.contactNo || '',
-        resident.personalInfo.occupation || '',
-        resident.personalInfo.monthlyIncome?.toString() || '',
-        resident.personalInfo.pwd || '',
-        resident.personalInfo.indigent || '',
-        resident.personalInfo.soloParent || '',
-        resident.personalInfo.seniorCitizen || '',
-        resident.personalInfo.fourPsMember || '',
-        resident.personalInfo.registeredVoter || '',
-        this.formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt),
-        status
-      ];
+      const rowData: { [key: string]: string } = {
+        fullName: fullName,
+        gender: resident.personalInfo.gender || '',
+        age: age.toString(),
+        birthDate: resident.personalInfo.birthDate || '',
+        civilStatus: resident.personalInfo.civilStatus || '',
+        address: address,
+        contactNo: resident.personalInfo.contactNo || '',
+        occupation: resident.personalInfo.occupation || '',
+        monthlyIncome: resident.personalInfo.monthlyIncome?.toString() || '',
+        pwd: resident.personalInfo.pwd || '',
+        indigent: resident.personalInfo.indigent || '',
+        soloParent: resident.personalInfo.soloParent || '',
+        seniorCitizen: resident.personalInfo.seniorCitizen || '',
+        fourPsMember: resident.personalInfo.fourPsMember || '',
+        registeredVoter: resident.personalInfo.registeredVoter || '',
+        dateOfRegistration: this.formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt),
+        status: status
+      };
+      
+      return selectedColumns.map(col => rowData[col.key] || '');
     });
 
     // Convert to CSV format
@@ -1175,8 +1252,13 @@ export class ResidentsComponent implements OnInit {
   }
 
   private exportToPDF(residents: ResidentInfo[], scope: string) {
-    // For PDF export, we'll create a simple HTML structure and use window.print()
-    // In a production environment, you might want to use a library like jsPDF or PDFMake
+    // Get selected columns
+    const selectedColumns = this.availableColumns.filter(col => col.selected);
+    
+    if (selectedColumns.length === 0) {
+      alert('Please select at least one column to export.');
+      return;
+    }
     
     const today = new Date().toLocaleDateString('en-US', {
       year: 'numeric',
@@ -1184,83 +1266,421 @@ export class ResidentsComponent implements OnInit {
       day: 'numeric'
     });
     
-    const scopeText = scope === 'all' ? 'All Residents' : 'Filtered Residents';
+    const timeGenerated = new Date().toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+    
+    const scopeText = scope === 'all' ? 'Complete Residents Registry' : 'Filtered Residents Report';
     
     const htmlContent = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Barangay New Cabalan - ${scopeText} Report</title>
+        <title>Barangay New Cabalan - ${scopeText}</title>
+        <meta charset="UTF-8">
         <style>
-          body { font-family: Arial, sans-serif; margin: 20px; }
-          .header { text-align: center; margin-bottom: 30px; }
-          .logo { width: 80px; height: 80px; margin: 0 auto 10px; }
-          .title { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-          .subtitle { font-size: 16px; color: #666; margin-bottom: 10px; }
-          .date { font-size: 14px; color: #888; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
-          th { background-color: #f5f5f5; font-weight: bold; }
-          tr:nth-child(even) { background-color: #f9f9f9; }
-          .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+          
+          body { 
+            font-family: 'Times New Roman', serif;
+            line-height: 1.4;
+            color: #333;
+            background: white;
+            margin: 0;
+            padding: 20px;
+          }
+          
+          .document-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+          }
+          
+          .letterhead {
+            position: relative;
+            text-align: center;
+            padding: 20px 0 30px;
+            border-bottom: 3px solid #1e40af;
+            margin-bottom: 30px;
+          }
+          
+          .logo-left {
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 80px;
+            height: 80px;
+          }
+          
+          .logo-right {
+            position: absolute;
+            right: 0;
+            top: 10px;
+            width: 80px;
+            height: 80px;
+          }
+          
+          .header-text {
+            margin: 0 100px;
+          }
+          
+          .republic {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          
+          .province {
+            font-size: 13px;
+            color: #666;
+            margin: 2px 0;
+          }
+          
+          .city {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1e40af;
+            margin: 5px 0;
+          }
+          
+          .barangay {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 5px 0;
+          }
+          
+          .office {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+          }
+          
+          .report-title {
+            margin: 30px 0 20px;
+            text-align: center;
+          }
+          
+          .title-main {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e40af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+          }
+          
+          .title-sub {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+          }
+          
+          .report-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+          }
+          
+          .info-item {
+            text-align: center;
+          }
+          
+          .info-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+          }
+          
+          .info-value {
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e40af;
+          }
+          
+          .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          }
+          
+          .data-table thead tr {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+          }
+          
+          .data-table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #1e40af;
+          }
+          
+          .data-table td {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 9px;
+            vertical-align: top;
+          }
+          
+          .data-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+          }
+          
+          .data-table tbody tr:hover {
+            background: #e2e8f0;
+          }
+          
+          .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #1e40af;
+            text-align: center;
+          }
+          
+          .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0 20px;
+          }
+          
+          .signature-box {
+            text-align: center;
+            width: 200px;
+          }
+          
+          .signature-line {
+            border-bottom: 1px solid #333;
+            margin: 30px 0 5px;
+            height: 1px;
+          }
+          
+          .signature-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .document-info {
+            font-size: 9px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 4px;
+          }
+          
+          .page-break {
+            page-break-before: always;
+          }
+          
           @media print {
-            body { margin: 0; }
-            .no-print { display: none; }
+            body { 
+              margin: 0; 
+              padding: 15px;
+              font-size: 12px;
+            }
+            
+            .document-container {
+              max-width: none;
+              margin: 0;
+            }
+            
+            .no-print { 
+              display: none; 
+            }
+            
+            .data-table {
+              page-break-inside: auto;
+            }
+            
+            .data-table tr {
+              page-break-inside: avoid;
+              page-break-after: auto;
+            }
+            
+            .data-table thead {
+              display: table-header-group;
+            }
+            
+            .letterhead {
+              position: relative;
+              margin-bottom: 20px;
+            }
+          }
+          
+          @page {
+            margin: 0.5in;
+            size: A4;
           }
         </style>
       </head>
       <body>
-        <div class="header">
-          <div class="title">BARANGAY NEW CABALAN</div>
-          <div class="subtitle">Residents Management Report</div>
-          <div class="subtitle">${scopeText} (${residents.length} residents)</div>
-          <div class="date">Generated on ${today}</div>
-        </div>
-        
-        <table>
-          <thead>
-            <tr>
-              <th>Full Name</th>
-              <th>Age</th>
-              <th>Gender</th>
-              <th>Address</th>
-              <th>Contact</th>
-              <th>Occupation</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${residents.map(resident => {
-              const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`;
-              const address = this.getFullAddress(resident);
-              const age = this.calculateAge(resident.personalInfo.birthDate);
-              const status = resident.otherDetails.status;
-              
-              return `
-                <tr>
-                  <td>${fullName}</td>
-                  <td>${age}</td>
-                  <td>${resident.personalInfo.gender || '-'}</td>
-                  <td>${address}</td>
-                  <td>${resident.personalInfo.contactNo || '-'}</td>
-                  <td>${resident.personalInfo.occupation || '-'}</td>
-                  <td>${status}</td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
-        
-        <div class="footer">
-          <p>This document was generated automatically by the Barangay New Cabalan Portal System.</p>
+        <div class="document-container">
+          <!-- Letterhead -->
+          <div class="letterhead">
+            <div class="logo-left">
+              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                <circle cx="50" cy="50" r="45" fill="#1e40af" stroke="#fff" stroke-width="2"/>
+                <text x="50" y="35" text-anchor="middle" fill="white" font-size="8" font-weight="bold">BARANGAY</text>
+                <text x="50" y="50" text-anchor="middle" fill="white" font-size="6">NEW</text>
+                <text x="50" y="65" text-anchor="middle" fill="white" font-size="6">CABALAN</text>
+              </svg>
+            </div>
+            
+            <div class="logo-right">
+              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+                <circle cx="50" cy="50" r="45" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+                <text x="50" y="30" text-anchor="middle" fill="white" font-size="6" font-weight="bold">OLONGAPO</text>
+                <text x="50" y="45" text-anchor="middle" fill="white" font-size="6">CITY</text>
+                <text x="50" y="60" text-anchor="middle" fill="white" font-size="5">GOVERNMENT</text>
+              </svg>
+            </div>
+            
+            <div class="header-text">
+              <div class="republic">Republic of the Philippines</div>
+              <div class="province">Province of Zambales</div>
+              <div class="city">City of Olongapo</div>
+              <div class="barangay">Barangay New Cabalan</div>
+              <div class="office">Office of the Punong Barangay</div>
+            </div>
+          </div>
+          
+          <!-- Report Title -->
+          <div class="report-title">
+            <div class="title-main">${scopeText}</div>
+            <div class="title-sub">Official Residents Database Report</div>
+          </div>
+          
+          <!-- Report Information -->
+          <div class="report-info">
+            <div class="info-item">
+              <div class="info-label">Total Records</div>
+              <div class="info-value">${residents.length.toLocaleString()}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Report Type</div>
+              <div class="info-value">${scope === 'all' ? 'Complete Database' : 'Filtered Results'}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Generated On</div>
+              <div class="info-value">${today}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Time</div>
+              <div class="info-value">${timeGenerated}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Columns</div>
+              <div class="info-value">${selectedColumns.length}</div>
+            </div>
+          </div>
+          
+          <!-- Data Table -->
+          <table class="data-table">
+            <thead>
+              <tr>
+                ${selectedColumns.map(col => `<th>${col.label}</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${residents.map(resident => {
+                const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`.trim();
+                const address = this.getFullAddress(resident);
+                const age = this.calculateAge(resident.personalInfo.birthDate);
+                const status = resident.otherDetails.status;
+                
+                const rowData: { [key: string]: string } = {
+                  fullName: fullName,
+                  gender: resident.personalInfo.gender || '-',
+                  age: age.toString(),
+                  birthDate: resident.personalInfo.birthDate ? new Date(resident.personalInfo.birthDate).toLocaleDateString() : '-',
+                  civilStatus: resident.personalInfo.civilStatus || '-',
+                  address: address,
+                  contactNo: resident.personalInfo.contactNo || '-',
+                  occupation: resident.personalInfo.occupation || '-',
+                  monthlyIncome: resident.personalInfo.monthlyIncome ? '₱' + resident.personalInfo.monthlyIncome.toLocaleString() : '-',
+                  pwd: resident.personalInfo.pwd || '-',
+                  indigent: resident.personalInfo.indigent || '-',
+                  soloParent: resident.personalInfo.soloParent || '-',
+                  seniorCitizen: resident.personalInfo.seniorCitizen || '-',
+                  fourPsMember: resident.personalInfo.fourPsMember || '-',
+                  registeredVoter: resident.personalInfo.registeredVoter || '-',
+                  dateOfRegistration: this.formatDate(resident.otherDetails.dateOfRegistration || resident.$createdAt),
+                  status: status
+                };
+                
+                return `
+                  <tr>
+                    ${selectedColumns.map(col => `<td>${rowData[col.key] || '-'}</td>`).join('')}
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+          
+          <!-- Signature Section -->
+          <div class="signature-section">
+            <div class="signature-box">
+              <div>Prepared by:</div>
+              <div class="signature-line"></div>
+              <div class="signature-label">Database Administrator</div>
+            </div>
+            <div class="signature-box">
+              <div>Reviewed by:</div>
+              <div class="signature-line"></div>
+              <div class="signature-label">Barangay Secretary</div>
+            </div>
+            <div class="signature-box">
+              <div>Approved by:</div>
+              <div class="signature-line"></div>
+              <div class="signature-label">Punong Barangay</div>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div class="footer">
+            <div class="document-info">
+              <strong>Document Reference:</strong> BNC-RES-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}<br>
+              <strong>Generated by:</strong> Barangay New Cabalan Portal System v1.0<br>
+              <strong>Authorized for:</strong> Official Use Only - Confidential<br>
+              <em>This document contains sensitive personal information. Handle with care and dispose of securely.</em>
+            </div>
+          </div>
         </div>
         
         <script>
           window.onload = function() {
-            window.print();
-            window.onafterprint = function() {
-              window.close();
-            }
+            setTimeout(() => {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              }
+            }, 500);
           }
         </script>
       </body>
@@ -1268,10 +1688,12 @@ export class ResidentsComponent implements OnInit {
     `;
     
     // Open in new window and print
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open('', '_blank', 'width=1200,height=800');
     if (printWindow) {
       printWindow.document.write(htmlContent);
       printWindow.document.close();
+    } else {
+      alert('Please allow pop-ups to export PDF reports.');
     }
   }
 

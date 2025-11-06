@@ -104,19 +104,30 @@ import Swal from 'sweetalert2';
                     {{ complaint.createdAt | date:'short' }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" (click)="$event.stopPropagation()">
-                    <a 
-                      *ngIf="complaint.attachments" 
-                      [href]="getAttachmentUrl(complaint.attachments)" 
-                      target="_blank"
-                      class="text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center space-x-1"
-                      title="View attachment"
-                    >
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"/>
-                      </svg>
-                      <span class="text-xs">View</span>
-                    </a>
-                    <span *ngIf="!complaint.attachments" class="text-gray-400">-</span>
+                    <div *ngIf="complaint.attachments; else noAttachment" class="w-16 h-16">
+                      <!-- Try to display as image first -->
+                      <img 
+                        [src]="getAttachmentUrl(complaint.attachments)" 
+                        alt="Attachment preview" 
+                        class="w-full h-full object-cover rounded-lg border border-gray-200"
+                        (error)="onTableImageError($event, complaint.$id || '')"
+                        (load)="onTableImageLoad($event, complaint.$id || '')"
+                        [style.display]="isTableImageError(complaint.$id || '') ? 'none' : 'block'"
+                      >
+                      <!-- Fallback file icon when image fails to load -->
+                      <div *ngIf="isTableImageError(complaint.$id || '')" class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg border border-gray-200">
+                        <div class="text-center">
+                          <svg class="w-6 h-6 text-gray-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/>
+                            <path d="M6 5h8v2H6V5zM6 8h8v2H6V8zM6 11h4v2H6v-2z"/>
+                          </svg>
+                          <span class="text-xs text-gray-500 mt-1">File</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #noAttachment>
+                      <span class="text-gray-400">-</span>
+                    </ng-template>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <span *ngIf="complaint.barangayResponse" class="text-green-600 font-medium">
@@ -175,18 +186,26 @@ import Swal from 'sweetalert2';
 
                   <!-- Attachment indicator -->
                   <div *ngIf="complaint.attachments" class="flex items-center">
-                    <a 
-                      [href]="getAttachmentUrl(complaint.attachments)" 
-                      target="_blank"
-                      class="text-blue-600 flex items-center hover:text-blue-800 transition-colors"
-                      (click)="$event.stopPropagation()"
-                      title="View attachment"
-                    >
-                      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"/>
-                      </svg>
-                      <span>File</span>
-                    </a>
+                    <!-- Try to display as image first -->
+                    <div class="w-8 h-8 mr-2">
+                      <img 
+                        [src]="getAttachmentUrl(complaint.attachments)" 
+                        alt="Attachment preview" 
+                        class="w-full h-full object-cover rounded border border-gray-200"
+                        (error)="onTableImageError($event, complaint.$id || '')"
+                        (load)="onTableImageLoad($event, complaint.$id || '')"
+                        [style.display]="isTableImageError(complaint.$id || '') ? 'none' : 'block'"
+                      >
+                      <!-- Fallback file icon when image fails to load -->
+                      <div *ngIf="isTableImageError(complaint.$id || '')" class="w-full h-full flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-blue-600">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/>
+                          <path d="M6 5h8v2H6V5zM6 8h8v2H6V8zM6 11h4v2H6v-2z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <span *ngIf="!isTableImageError(complaint.$id || '')" class="text-blue-600">Image</span>
+                    <span *ngIf="isTableImageError(complaint.$id || '')" class="text-blue-600">File</span>
                   </div>
                 </div>
 
@@ -499,31 +518,29 @@ import Swal from 'sweetalert2';
                 Attachment
               </h4>
               <div class="space-y-3">
-                <!-- Image Preview -->
-                <div *ngIf="isImageAttachment(selectedComplaint.attachments)" class="rounded-xl overflow-hidden bg-gray-100">
+                <!-- Try to display as image first, fallback to file display if it fails -->
+                <div class="rounded-xl overflow-hidden bg-gray-100">
                   <img 
                     [src]="getAttachmentUrl(selectedComplaint.attachments)" 
                     alt="Attachment" 
-                    class="w-full h-auto max-h-64 object-contain"
+                    class="w-full h-auto max-h-96 object-contain"
+                    (error)="onImageError($event)"
+                    (load)="onImageLoad($event)"
+                    [style.display]="showImageError ? 'none' : 'block'"
                   >
+                  
+                  <!-- File Display (shown when image fails to load) -->
+                  <div *ngIf="showImageError" class="flex items-center justify-center p-6 bg-gray-50 rounded-xl">
+                    <div class="text-center">
+                      <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/>
+                        <path d="M6 5h8v2H6V5zM6 8h8v2H6V8zM6 11h4v2H6v-2z"/>
+                      </svg>
+                      <p class="text-sm text-gray-600 font-medium">File Attachment</p>
+                      <p class="text-xs text-gray-500 mt-1">Non-image file attached</p>
+                    </div>
+                  </div>
                 </div>
-                
-                <!-- File Download Link -->
-                <a 
-                  [href]="getAttachmentUrl(selectedComplaint.attachments)" 
-                  target="_blank"
-                  class="flex items-center justify-center p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group"
-                >
-                  <svg class="w-5 h-5 text-blue-600 mr-3 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"/>
-                  </svg>
-                  <span class="text-blue-800 font-medium">
-                    {{ isImageAttachment(selectedComplaint.attachments) ? 'View Full Image' : 'Download Attachment' }}
-                  </span>
-                  <svg class="w-4 h-4 text-blue-600 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                  </svg>
-                </a>
               </div>
             </div>
           </div>
@@ -845,6 +862,10 @@ export class ComplaintsComponent implements OnInit {
   
   // New properties for custom notification
   notificationMessage = '';
+  
+  // Properties for image error handling
+  showImageError = false;
+  tableImageErrors: { [key: string]: boolean } = {};
 
   constructor(
     private complaintService: ComplaintService,
@@ -1015,6 +1036,7 @@ export class ComplaintsComponent implements OnInit {
 
   viewReply(complaint: Complaint) {
     this.selectedComplaint = complaint;
+    this.showImageError = false; // Reset image error state for modal
   }
 
   closeReply() {
@@ -1026,8 +1048,34 @@ export class ComplaintsComponent implements OnInit {
   }
 
   isImageAttachment(fileUrl: string): boolean {
-    // Works with both full URLs and file IDs
     if (!fileUrl) return false;
-    return fileUrl.match(/\.(jpeg|jpg|gif|png|webp)/i) !== null;
+    
+    // First try to check if URL has image extension
+    const hasImageExtension = fileUrl.match(/\.(jpeg|jpg|gif|png|webp)(\?|$)/i) !== null;
+    if (hasImageExtension) return true;
+    
+    // If no extension found, assume it's an image since most complaints use images
+    // This is a fallback for file IDs or URLs without extensions
+    return true;
+  }
+
+  onImageError(event: any): void {
+    this.showImageError = true;
+  }
+
+  onImageLoad(event: any): void {
+    this.showImageError = false;
+  }
+
+  onTableImageError(event: any, complaintId: string): void {
+    this.tableImageErrors[complaintId] = true;
+  }
+
+  onTableImageLoad(event: any, complaintId: string): void {
+    this.tableImageErrors[complaintId] = false;
+  }
+
+  isTableImageError(complaintId: string): boolean {
+    return this.tableImageErrors[complaintId] || false;
   }
 }

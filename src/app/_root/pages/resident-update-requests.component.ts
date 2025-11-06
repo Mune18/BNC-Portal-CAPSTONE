@@ -129,7 +129,7 @@ import Swal from 'sweetalert2';
                           'bg-red-100 text-red-800': request.status === 'rejected'
                         }"
                       >
-                        {{ request.status | titlecase }}
+                        {{ getStatusDisplay(request.status) }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -166,15 +166,15 @@ import Swal from 'sweetalert2';
                           Approve
                         </button>
                         <button
-                          (click)="showRejectModal(request)"
+                          (click)="showDeclineModal(request)"
                           [disabled]="reviewLoading[request.$id!]"
                           class="text-red-600 hover:text-red-900 text-sm ml-3"
                         >
-                          Reject
+                          Decline
                         </button>
                       </div>
                       <div *ngIf="request.status !== 'pending'" class="text-gray-400 text-sm">
-                        {{ request.status === 'approved' ? 'Approved' : 'Rejected' }}
+                        {{ request.status === 'approved' ? 'Approved' : 'Declined' }}
                       </div>
                     </td>
                   </tr>
@@ -197,9 +197,9 @@ import Swal from 'sweetalert2';
                           </div>
                         </div>
                         
-                        <!-- Rejection Reason (if rejected) -->
+                        <!-- Decline Reason (if declined) -->
                         <div *ngIf="request.status === 'rejected' && request.reason" class="bg-red-50 border border-red-200 rounded-lg p-4">
-                          <h4 class="text-sm font-semibold text-red-900 mb-2">Rejection Reason:</h4>
+                          <h4 class="text-sm font-semibold text-red-900 mb-2">Decline Reason:</h4>
                           <p class="text-sm text-red-700">{{ request.reason }}</p>
                         </div>
                       </div>
@@ -222,34 +222,34 @@ import Swal from 'sweetalert2';
       </div>
     </div>
 
-    <!-- Reject Modal -->
-    <div *ngIf="showRejectModalFlag" class="fixed inset-0 flex items-center justify-center z-50">
-      <div class="absolute inset-0 backdrop-blur-sm bg-black/30" (click)="showRejectModalFlag = false"></div>
+    <!-- Decline Modal -->
+    <div *ngIf="showDeclineModalFlag" class="fixed inset-0 flex items-center justify-center z-50">
+      <div class="absolute inset-0 backdrop-blur-sm bg-black/30" (click)="showDeclineModalFlag = false"></div>
       <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md relative z-10">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Reject Update Request</h3>
-        <p class="text-gray-600 mb-4">Please provide a reason for rejecting this update request:</p>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Decline Update Request</h3>
+        <p class="text-gray-600 mb-4">Please provide a reason for declining this update request:</p>
         
         <textarea
-          [(ngModel)]="rejectReason"
-          placeholder="Enter rejection reason..."
+          [(ngModel)]="declineReason"
+          placeholder="Enter decline reason..."
           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
           rows="4"
         ></textarea>
         
         <div class="flex justify-end gap-3 mt-4">
           <button
-            (click)="showRejectModalFlag = false"
+            (click)="showDeclineModalFlag = false"
             class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm transition"
           >
             Cancel
           </button>
           <button
-            (click)="confirmReject()"
-            [disabled]="!rejectReason.trim() || rejectLoading"
+            (click)="confirmDecline()"
+            [disabled]="!declineReason.trim() || declineLoading"
             class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm transition disabled:opacity-50"
           >
-            <span *ngIf="rejectLoading" class="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-1"></span>
-            Reject Request
+            <span *ngIf="declineLoading" class="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-1"></span>
+            Decline Request
           </button>
         </div>
       </div>
@@ -297,11 +297,11 @@ export class ResidentUpdateRequestsComponent implements OnInit {
   errorMessage = '';
   reviewLoading: { [key: string]: boolean } = {};
   
-  // Reject modal
-  showRejectModalFlag = false;
-  currentRequestToReject: ResidentUpdate | null = null;
-  rejectReason = '';
-  rejectLoading = false;
+  // Decline modal
+  showDeclineModalFlag = false;
+  currentRequestToDecline: ResidentUpdate | null = null;
+  declineReason = '';
+  declineLoading = false;
 
   // Expandable rows for table
   expandedRows: { [key: number]: boolean } = {};
@@ -382,7 +382,7 @@ export class ResidentUpdateRequestsComponent implements OnInit {
       });
       
       // Show success message with SweetAlert2
-      const actionText = action === 'approve' ? 'approved' : 'rejected';
+      const actionText = action === 'approve' ? 'approved' : 'declined';
       await this.showCustomAlert(`Request ${actionText} successfully`, 'success');
       
       // Reload the requests
@@ -395,27 +395,27 @@ export class ResidentUpdateRequestsComponent implements OnInit {
     }
   }
 
-  showRejectModal(request: ResidentUpdate) {
-    this.currentRequestToReject = request;
-    this.rejectReason = '';
-    this.showRejectModalFlag = true;
+  showDeclineModal(request: ResidentUpdate) {
+    this.currentRequestToDecline = request;
+    this.declineReason = '';
+    this.showDeclineModalFlag = true;
   }
 
-  async confirmReject() {
-    if (!this.currentRequestToReject || !this.rejectReason.trim()) return;
+  async confirmDecline() {
+    if (!this.currentRequestToDecline || !this.declineReason.trim()) return;
     
-    this.rejectLoading = true;
+    this.declineLoading = true;
     
     try {
-      await this.reviewRequest(this.currentRequestToReject.$id!, 'reject', this.rejectReason.trim());
-      this.showRejectModalFlag = false;
-      this.currentRequestToReject = null;
-      this.rejectReason = '';
+      await this.reviewRequest(this.currentRequestToDecline.$id!, 'reject', this.declineReason.trim());
+      this.showDeclineModalFlag = false;
+      this.currentRequestToDecline = null;
+      this.declineReason = '';
     } catch (error) {
-      console.error('Error rejecting request:', error);
-      await this.showCustomAlert('Failed to reject request. Please try again.', 'error');
+      console.error('Error declining request:', error);
+      await this.showCustomAlert('Failed to decline request. Please try again.', 'error');
     } finally {
-      this.rejectLoading = false;
+      this.declineLoading = false;
     }
   }
 
@@ -524,6 +524,19 @@ export class ResidentUpdateRequestsComponent implements OnInit {
 
   parseChanges(changesJSON: string) {
     return this.residentUpdateService.parseChanges(changesJSON);
+  }
+
+  getStatusDisplay(status: string): string {
+    switch (status) {
+      case 'pending':
+        return 'Pending';
+      case 'approved':
+        return 'Approved';
+      case 'rejected':
+        return 'Declined';
+      default:
+        return status;
+    }
   }
 
   formatDate(dateString: string): string {

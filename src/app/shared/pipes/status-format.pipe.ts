@@ -16,7 +16,7 @@ export class StatusFormatPipe implements PipeTransform {
       case 'resolved':
         return 'Resolved';
       case 'rejected':
-        return 'Rejected';
+        return 'Declined';
       default:
         return value.charAt(0).toUpperCase() + value.slice(1);
     }
