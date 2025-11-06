@@ -1544,20 +1544,26 @@ export class ResidentsComponent implements OnInit {
           <!-- Letterhead -->
           <div class="letterhead">
             <div class="logo-left">
-              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+              <img src="${window.location.origin}/assets/BNC_Portal_Logo.png" alt="" style="width: 100%; height: 100%; object-fit: contain;" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: none;">
                 <circle cx="50" cy="50" r="45" fill="#1e40af" stroke="#fff" stroke-width="2"/>
-                <text x="50" y="35" text-anchor="middle" fill="white" font-size="8" font-weight="bold">BARANGAY</text>
-                <text x="50" y="50" text-anchor="middle" fill="white" font-size="6">NEW</text>
-                <text x="50" y="65" text-anchor="middle" fill="white" font-size="6">CABALAN</text>
+                <text x="50" y="30" text-anchor="middle" fill="white" font-size="7" font-weight="bold">BARANGAY</text>
+                <text x="50" y="42" text-anchor="middle" fill="white" font-size="6">NEW</text>
+                <text x="50" y="54" text-anchor="middle" fill="white" font-size="6">CABALAN</text>
+                <text x="50" y="70" text-anchor="middle" fill="white" font-size="4">OLONGAPO CITY</text>
               </svg>
             </div>
             
             <div class="logo-right">
-              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
+              <img src="${window.location.origin}/assets/Olongapo_City_Logo.png" alt="" style="width: 100%; height: 100%; object-fit: contain;" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; display: none;">
                 <circle cx="50" cy="50" r="45" fill="#dc2626" stroke="#fff" stroke-width="2"/>
-                <text x="50" y="30" text-anchor="middle" fill="white" font-size="6" font-weight="bold">OLONGAPO</text>
-                <text x="50" y="45" text-anchor="middle" fill="white" font-size="6">CITY</text>
-                <text x="50" y="60" text-anchor="middle" fill="white" font-size="5">GOVERNMENT</text>
+                <text x="50" y="28" text-anchor="middle" fill="white" font-size="6" font-weight="bold">OLONGAPO</text>
+                <text x="50" y="40" text-anchor="middle" fill="white" font-size="6">CITY</text>
+                <text x="50" y="55" text-anchor="middle" fill="white" font-size="5">ZAMBALES</text>
+                <text x="50" y="68" text-anchor="middle" fill="white" font-size="4">PHILIPPINES</text>
               </svg>
             </div>
             
@@ -1648,7 +1654,7 @@ export class ResidentsComponent implements OnInit {
             <div class="signature-box">
               <div>Prepared by:</div>
               <div class="signature-line"></div>
-              <div class="signature-label">Database Administrator</div>
+              <div class="signature-label">Administrator</div>
             </div>
             <div class="signature-box">
               <div>Reviewed by:</div>

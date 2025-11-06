@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 interface DocumentRequest {
   id: string;
@@ -144,8 +145,42 @@ export class DocumentsComponent {
 
   showRequestForm = false;
 
-  submitRequest() {
+  async submitRequest() {
     if (!this.newRequest.type || !this.newRequest.purpose || !this.newRequest.qty) return;
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Submit Document Request?',
+      html: `
+        <div class="text-left">
+          <p class="mb-3">You are about to submit a request for the following document:</p>
+          <div class="bg-gray-100 p-3 rounded-lg text-sm">
+            <div class="mb-2"><strong>Document Type:</strong> ${this.newRequest.type}</div>
+            <div class="mb-2"><strong>Purpose:</strong> ${this.newRequest.purpose}</div>
+            <div class="mb-2"><strong>Quantity:</strong> ${this.newRequest.qty}</div>
+          </div>
+          <p class="mt-3 text-sm text-gray-600">
+            <strong>Note:</strong> Your request will be processed by the Barangay office. 
+            You will be notified when your document is ready for pickup or if additional information is needed.
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Submit Request',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      customClass: {
+        popup: 'swal2-popup-blur-bg'
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    // Proceed with submission
     const now = new Date();
     this.requests.unshift({
       id: (Math.random() * 100000).toFixed(0),
@@ -155,8 +190,22 @@ export class DocumentsComponent {
       date: now.toLocaleString(),
       status: 'Request'
     });
+
+    // Reset form and close modal
     this.newRequest = { type: '', purpose: '', qty: 1 };
     this.showRequestForm = false;
+
+    // Show success notification
+    await Swal.fire({
+      icon: 'success',
+      title: 'Request Submitted!',
+      text: 'Your document request has been submitted successfully. You will be notified when it is ready.',
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#3b82f6',
+      customClass: {
+        popup: 'swal2-popup-blur-bg'
+      }
+    });
   }
 
   statusClass(status: string) {

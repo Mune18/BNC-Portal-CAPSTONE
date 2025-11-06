@@ -639,6 +639,47 @@ export class AnnouncementComponent implements OnInit, OnDestroy {
       await this.showCustomAlert('Please fill in all required fields', 'warning');
       return;
     }
+
+    // Show confirmation dialog before updating
+    const confirmResult = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Update',
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-3">Are you sure you want to save these changes to the announcement?</p>
+          <div class="bg-blue-50 p-3 rounded-lg text-sm border border-blue-200">
+            <strong class="text-blue-800">Announcement:</strong> 
+            <span class="text-gray-700">${this.editingAnnouncement.title?.substring(0, 50)}${(this.editingAnnouncement.title?.length || 0) > 50 ? '...' : ''}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-3">All community members will see the updated announcement.</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      reverseButtons: true,
+      customClass: {
+        popup: 'rounded-xl shadow-2xl border-0 swal2-popup-blur-bg',
+        title: 'text-xl font-bold text-gray-800 mb-2',
+        htmlContainer: 'text-gray-600',
+        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg mr-3',
+        cancelButton: 'bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg'
+      },
+      backdrop: `
+        rgba(0, 0, 0, 0.4)
+        left top
+        no-repeat
+      `,
+      allowOutsideClick: false,
+      allowEscapeKey: true
+    });
+
+    // If user cancelled, return early
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
     
     this.isSubmitting = true;
     

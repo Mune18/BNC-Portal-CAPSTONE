@@ -629,6 +629,47 @@ export class ResidentEditModalComponent implements OnInit, OnChanges {
       return;
     }
 
+    // Show confirmation dialog before saving
+    const confirmResult = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Changes',
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-3">Are you sure you want to save the changes made to this resident's information?</p>
+          <div class="bg-blue-50 p-3 rounded-lg text-sm">
+            <strong class="text-blue-800">Resident:</strong> 
+            <span class="text-gray-700">${this.editedResident.personalInfo?.firstName} ${this.editedResident.personalInfo?.lastName}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-3">This action cannot be undone.</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Save Changes',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      reverseButtons: true,
+      customClass: {
+        popup: 'rounded-xl shadow-2xl border-0 swal2-popup-blur-bg',
+        title: 'text-xl font-bold text-gray-800 mb-2',
+        htmlContainer: 'text-gray-600',
+        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg mr-3',
+        cancelButton: 'bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg'
+      },
+      backdrop: `
+        rgba(0, 0, 0, 0.4)
+        left top
+        no-repeat
+      `,
+      allowOutsideClick: false,
+      allowEscapeKey: true
+    });
+
+    // If user cancelled, return early
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
+
     this.isSaving = true;
     
     try {

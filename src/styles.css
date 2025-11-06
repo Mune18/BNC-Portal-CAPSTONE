@@ -56,3 +56,13 @@ html, body {
 .animate-pulse-soft {
   animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* SweetAlert2 Custom Styles */
+.swal2-popup-blur-bg {
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+.swal2-container.swal2-backdrop-show {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}

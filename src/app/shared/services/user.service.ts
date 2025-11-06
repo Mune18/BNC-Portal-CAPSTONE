@@ -315,4 +315,89 @@ export class UserService extends BaseAppwriteService {
       throw error;
     }
   }
+
+  // Check for duplicate resident registration based on personal information
+  async checkDuplicateResident(firstName: string, lastName: string, birthDate: string, contactNo?: string, email?: string): Promise<{ isDuplicate: boolean; existingResident?: any; duplicateType?: string }> {
+    try {
+      console.log('Checking for duplicate resident:', { firstName, lastName, birthDate, contactNo, email });
+      
+      // First check for email duplicates if email is provided
+      if (email) {
+        const emailQuery = await this.database.listDocuments(
+          environment.appwriteDatabaseId,
+          environment.residentCollectionId,
+          [Query.equal('email', email.trim())]
+        );
+
+        if (emailQuery.documents.length > 0) {
+          const emailMatch = emailQuery.documents[0];
+          return {
+            isDuplicate: true,
+            duplicateType: 'email',
+            existingResident: {
+              name: `${emailMatch['firstName']} ${emailMatch['middleName'] || ''} ${emailMatch['lastName']}`.trim(),
+              contactNo: emailMatch['contactNo'],
+              email: emailMatch['email'],
+              registrationDate: emailMatch.$createdAt
+            }
+          };
+        }
+      }
+      
+      // Search for residents with the same first name, last name, and birth date
+      const queries = [
+        Query.equal('firstName', firstName.trim()),
+        Query.equal('lastName', lastName.trim()),
+        Query.equal('birthDate', birthDate)
+      ];
+
+      const response = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        queries
+      );
+
+      if (response.documents.length > 0) {
+        console.log('Found potential duplicate resident(s):', response.documents.length);
+        
+        // If we have a contact number, do additional verification
+        if (contactNo) {
+          const formattedContactNo = '+63' + contactNo;
+          const exactMatch = response.documents.find(doc => doc['contactNo'] === formattedContactNo);
+          if (exactMatch) {
+            return {
+              isDuplicate: true,
+              duplicateType: 'personal_info',
+              existingResident: {
+                name: `${exactMatch['firstName']} ${exactMatch['middleName'] || ''} ${exactMatch['lastName']}`.trim(),
+                contactNo: exactMatch['contactNo'],
+                email: exactMatch['email'],
+                registrationDate: exactMatch.$createdAt
+              }
+            };
+          }
+        }
+
+        // Return the first match even without contact verification
+        const match = response.documents[0];
+        return {
+          isDuplicate: true,
+          duplicateType: 'personal_info',
+          existingResident: {
+            name: `${match['firstName']} ${match['middleName'] || ''} ${match['lastName']}`.trim(),
+            contactNo: match['contactNo'],
+            email: match['email'],
+            registrationDate: match.$createdAt
+          }
+        };
+      }
+
+      console.log('No duplicate resident found');
+      return { isDuplicate: false };
+    } catch (error) {
+      console.error('Error checking duplicate resident:', error);
+      // Return false on error to allow registration to proceed
+      return { isDuplicate: false };
+    }
+  }
 }

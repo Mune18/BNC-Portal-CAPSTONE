@@ -585,6 +585,64 @@ export class ReportsComponent implements OnInit {
       await this.showCustomAlert('Please select a status', 'warning');
       return;
     }
+
+    // Show confirmation dialog before updating
+    const statusMap: { [key: string]: string } = {
+      'pending': 'Pending',
+      'in-progress': 'In Progress', 
+      'resolved': 'Resolved',
+      'dismissed': 'Dismissed'
+    };
+    const statusText = statusMap[this.statusToUpdate] || this.statusToUpdate;
+    const hasReply = this.replyMessage && this.replyMessage.trim().length > 0;
+    
+    const confirmResult = await Swal.fire({
+      icon: 'question',
+      title: 'Confirm Status Update',
+      html: `
+        <div class="text-left">
+          <p class="text-gray-700 mb-3">Are you sure you want to update this complaint?</p>
+          <div class="bg-blue-50 p-3 rounded-lg text-sm border border-blue-200">
+            <strong class="text-blue-800">Update Details:</strong><br>
+            <span class="text-gray-700">Complaint ID: #${this.selectedComplaint.$id?.substring(0, 8)}...</span><br>
+            <span class="text-gray-700">New Status: <strong>${statusText}</strong></span><br>
+            <span class="text-gray-700">Reply: ${hasReply ? 'Yes' : 'No reply'}</span>
+          </div>
+          ${hasReply ? `
+            <div class="bg-gray-50 p-3 rounded-lg text-sm border border-gray-200 mt-2">
+              <strong class="text-gray-800">Your Reply:</strong><br>
+              <span class="text-gray-700">${this.replyMessage.substring(0, 100)}${this.replyMessage.length > 100 ? '...' : ''}</span>
+            </div>
+          ` : ''}
+          <p class="text-xs text-gray-500 mt-3">The resident will be notified of this update via email.</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      reverseButtons: true,
+      customClass: {
+        popup: 'rounded-xl shadow-2xl border-0 swal2-popup-blur-bg',
+        title: 'text-xl font-bold text-gray-800 mb-2',
+        htmlContainer: 'text-gray-600',
+        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg mr-3',
+        cancelButton: 'bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg'
+      },
+      backdrop: `
+        rgba(0, 0, 0, 0.4)
+        left top
+        no-repeat
+      `,
+      allowOutsideClick: false,
+      allowEscapeKey: true
+    });
+
+    // If user cancelled, return early
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
     
     this.isSubmitting = true;
     

@@ -365,6 +365,58 @@ export class ResidentUpdateRequestsComponent implements OnInit {
   }
 
   async reviewRequest(requestId: string, action: 'approve' | 'reject', reason?: string) {
+    // Find the request details for confirmation
+    const request = this.updateRequests.find(req => req.$id === requestId);
+    if (!request) return;
+
+    // Show confirmation dialog for approve action (reject already has a modal)
+    if (action === 'approve') {
+      const submittedDate = request.$createdAt ? new Date(request.$createdAt).toLocaleDateString() : 'Unknown date';
+      
+      const confirmResult = await Swal.fire({
+        icon: 'question',
+        title: 'Approve Update Request',
+        html: `
+          <div class="text-left">
+            <p class="text-gray-700 mb-3">Are you sure you want to approve this update request?</p>
+            <div class="bg-green-50 p-3 rounded-lg text-sm border border-green-200">
+              <strong class="text-green-800">Request Details:</strong><br>
+              <span class="text-gray-700">Request ID: ${request.$id || 'N/A'}</span><br>
+              <span class="text-gray-700">Request Type: Information Update</span><br>
+              <span class="text-gray-700">Submitted: ${submittedDate}</span><br>
+              <span class="text-gray-700">Status: ${request.status}</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-3">This will update the resident's information with the requested changes.</p>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Approve',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        reverseButtons: true,
+        customClass: {
+          popup: 'rounded-xl shadow-2xl border-0 swal2-popup-blur-bg',
+          title: 'text-xl font-bold text-gray-800 mb-2',
+          htmlContainer: 'text-gray-600',
+          confirmButton: 'bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg mr-3',
+          cancelButton: 'bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 border-0 shadow-md hover:shadow-lg'
+        },
+        backdrop: `
+          rgba(0, 0, 0, 0.4)
+          left top
+          no-repeat
+        `,
+        allowOutsideClick: false,
+        allowEscapeKey: true
+      });
+
+      // If user cancelled, return early
+      if (!confirmResult.isConfirmed) {
+        return;
+      }
+    }
+
     this.reviewLoading[requestId] = true;
     
     try {

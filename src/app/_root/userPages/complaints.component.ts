@@ -927,6 +927,40 @@ export class ComplaintsComponent implements OnInit {
       await this.showNotification('Please fill in all required fields', 'warning');
       return;
     }
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Submit Complaint?',
+      html: `
+        <div class="text-left">
+          <p class="mb-3">You are about to submit the following complaint:</p>
+          <div class="bg-gray-100 p-3 rounded-lg text-sm">
+            <div class="mb-2"><strong>Subject:</strong> ${this.newComplaint.subject}</div>
+            <div class="mb-2"><strong>Category:</strong> ${this.newComplaint.category}</div>
+            <div class="mb-2"><strong>Description:</strong> ${this.newComplaint.description.length > 100 ? this.newComplaint.description.substring(0, 100) + '...' : this.newComplaint.description}</div>
+            ${this.attachmentFile ? `<div class="mb-2"><strong>Attachment:</strong> ${this.attachmentFileName}</div>` : ''}
+            ${this.newComplaint.isAnonymous ? '<div class="mb-2"><strong>Anonymous:</strong> Yes</div>' : ''}
+          </div>
+          <p class="mt-3 text-sm text-gray-600">
+            <strong>Note:</strong> Once submitted, your complaint will be reviewed by the Barangay officials. 
+            You will be notified of any updates on its status.
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Submit Complaint',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      customClass: {
+        popup: 'swal2-popup-blur-bg'
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
     
     this.isSubmitting = true;
     

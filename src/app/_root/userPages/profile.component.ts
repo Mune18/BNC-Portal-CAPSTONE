@@ -7,6 +7,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { UserService } from '../../shared/services/user.service';
 import { ResidentUpdateService } from '../../shared/services/resident-update.service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-profile',
@@ -824,6 +825,44 @@ export class ProfileComponent implements OnInit {
   }
 
   async saveEdit() {
+    // Calculate the changes between original and edited info first
+    const changes = this.getChanges(this.residentInfo, this.editInfo);
+    
+    if (Object.keys(changes).length === 0) {
+      this.errorMessage = 'No changes detected.';
+      return;
+    }
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: 'Submit Information Update Request?',
+      html: `
+        <div class="text-left">
+          <p class="mb-3">You are about to submit a request to update the following information:</p>
+          <div class="bg-gray-100 p-3 rounded-lg text-sm max-h-40 overflow-y-auto">
+            ${this.formatChangesForDisplay(changes)}
+          </div>
+          <p class="mt-3 text-sm text-gray-600">
+            <strong>Note:</strong> This request will be sent to the administrator for approval. 
+            You will be notified once it has been reviewed.
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Submit Request',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#6b7280',
+      customClass: {
+        popup: 'swal2-popup-blur-bg'
+      }
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
     this.saveLoading = true;
     this.saveSuccess = false;
     this.errorMessage = '';
@@ -840,13 +879,6 @@ export class ProfileComponent implements OnInit {
       const userDoc = await this.userService.getUserInformation(account.$id);
       
       if (userDoc && userDoc.$id) {
-        // Calculate the changes between original and edited info
-        const changes = this.getChanges(this.residentInfo, this.editInfo);
-        
-        if (Object.keys(changes).length === 0) {
-          this.errorMessage = 'No changes detected.';
-          return;
-        }
         
         // Submit update request instead of directly updating
         await this.residentUpdateService.submitUpdateRequest({
@@ -1011,5 +1043,100 @@ export class ProfileComponent implements OnInit {
     }
     
     return changes;
+  }
+
+  /**
+   * Get nested property value from object using dot notation
+   */
+  private getNestedValue(obj: any, path: string): any {
+    return path.split('.').reduce((o, p) => o && o[p], obj);
+  }
+
+  /**
+   * Format field name for display (convert camelCase to readable text)
+   */
+  private formatFieldName(fieldName: string): string {
+    // Handle nested properties
+    if (fieldName.includes('.')) {
+      const parts = fieldName.split('.');
+      const section = parts[0];
+      const field = parts[1];
+      return `${this.formatSectionName(section)} - ${this.camelToTitle(field)}`;
+    }
+    return this.camelToTitle(fieldName);
+  }
+
+  /**
+   * Format section name for display
+   */
+  private formatSectionName(section: string): string {
+    switch (section) {
+      case 'personalInfo': return 'Personal Information';
+      case 'emergencyContact': return 'Emergency Contact';
+      case 'otherDetails': return 'Other Details';
+      default: return section;
+    }
+  }
+
+  /**
+   * Convert camelCase to Title Case
+   */
+  private camelToTitle(camelCase: string): string {
+    const result = camelCase.replace(/([A-Z])/g, ' $1');
+    return result.charAt(0).toUpperCase() + result.slice(1);
+  }
+
+  /**
+   * Format changes for display in SweetAlert2 confirmation
+   */
+  private formatChangesForDisplay(changes: any): string {
+    let html = '';
+    
+    Object.keys(changes).forEach(sectionKey => {
+      const sectionChanges = changes[sectionKey];
+      const sectionName = this.formatSectionName(sectionKey);
+      
+      if (typeof sectionChanges === 'object') {
+        // This is a nested object (like personalInfo, emergencyContact, etc.)
+        Object.keys(sectionChanges).forEach(fieldKey => {
+          const fieldName = this.camelToTitle(fieldKey);
+          const oldValue = this.getNestedValue(this.residentInfo, `${sectionKey}.${fieldKey}`) || 'Not set';
+          const newValue = sectionChanges[fieldKey] || 'Not set';
+          
+          html += `<div class="mb-2">
+                     <strong>${sectionName} - ${fieldName}:</strong><br>
+                     <span class="text-red-600">Old: ${this.formatDisplayValue(oldValue)}</span><br>
+                     <span class="text-green-600">New: ${this.formatDisplayValue(newValue)}</span>
+                   </div>`;
+        });
+      } else {
+        // This is a direct field change
+        const oldValue = (this.residentInfo as any)[sectionKey] || 'Not set';
+        const newValue = sectionChanges || 'Not set';
+        
+        html += `<div class="mb-2">
+                   <strong>${this.camelToTitle(sectionKey)}:</strong><br>
+                   <span class="text-red-600">Old: ${this.formatDisplayValue(oldValue)}</span><br>
+                   <span class="text-green-600">New: ${this.formatDisplayValue(newValue)}</span>
+                 </div>`;
+      }
+    });
+    
+    return html;
+  }
+
+  /**
+   * Format a value for display (handle dates, empty values, etc.)
+   */
+  private formatDisplayValue(value: any): string {
+    if (!value || value === '') return 'Not set';
+    if (typeof value === 'object') return JSON.stringify(value);
+    
+    // Check if it's a date string (YYYY-MM-DD format)
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return this.formatDate(value);
+    }
+    
+    return String(value);
   }
 }

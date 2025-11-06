@@ -8,6 +8,7 @@ import { AuthService } from '../../shared/services/auth.service';
 import { UserService } from '../../shared/services/user.service';
 import { Client, Storage, ID } from 'appwrite';
 import { environment } from '../../environment/environment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sign-up-information-form',
@@ -1310,8 +1311,8 @@ import { environment } from '../../environment/environment';
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <h2 class="text-xl font-bold mb-2 text-center">Creating Account</h2>
-          <p class="text-center text-gray-600">Please wait while we set up your account...</p>
+          <h2 class="text-xl font-bold mb-2 text-center">{{ loadingStatus }}</h2>
+          <p class="text-center text-gray-600">Please wait while we process your registration...</p>
         </div>
       </div>
 
@@ -1633,6 +1634,40 @@ import { environment } from '../../environment/environment';
         border-radius: 50%;
       }
     }
+    
+    /* SweetAlert2 Custom Styles */
+    :host ::ng-deep .swal2-container {
+      backdrop-filter: blur(5px) !important;
+      background-color: rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    :host ::ng-deep .swal2-popup-custom {
+      border-radius: 12px !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+      border: 1px solid rgba(229, 231, 235, 0.2) !important;
+    }
+    
+    :host ::ng-deep .swal2-title {
+      font-size: 1.125rem !important;
+      font-weight: 600 !important;
+      color: #374151 !important;
+    }
+    
+    :host ::ng-deep .swal2-html-container {
+      margin: 1rem 0 !important;
+    }
+    
+    :host ::ng-deep .swal2-confirm {
+      border-radius: 8px !important;
+      font-weight: 500 !important;
+      padding: 0.5rem 1rem !important;
+      transition: all 0.2s ease !important;
+    }
+    
+    :host ::ng-deep .swal2-confirm:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+    }
   `]
 })
 export class SignUpInformationFormComponent implements OnInit {
@@ -1641,6 +1676,7 @@ export class SignUpInformationFormComponent implements OnInit {
   showSuccessModal = false;
   showTermsModal = false;
   isLoading = false;
+  loadingStatus = 'Creating Account';
   errorMessage = '';
   validationErrors: { [key: string]: string } = {};
   acceptedTerms = false;
@@ -2292,7 +2328,69 @@ export class SignUpInformationFormComponent implements OnInit {
         throw new Error('Passwords do not match.');
       }
 
-      console.log('All validation passed. Proceeding with account creation...');
+      console.log('All validation passed. Checking for duplicate registration...');
+
+      // Update loading status for duplicate check
+      this.loadingStatus = 'Checking Duplicate Registration';
+
+      // Check for duplicate resident registration BEFORE creating any accounts
+      const duplicateCheck = await this.userService.checkDuplicateResident(
+        this.formData.personalInfo.firstName,
+        this.formData.personalInfo.lastName,
+        this.formData.personalInfo.birthDate,
+        this.formData.personalInfo.contactNo,
+        this.formData.personalInfo.email
+      );
+
+      if (duplicateCheck.isDuplicate) {
+        const existing = duplicateCheck.existingResident!;
+        const registrationDate = new Date(existing.registrationDate).toLocaleDateString();
+        
+        // Reset loading state before showing dialog
+        this.isLoading = false;
+        this.loadingStatus = 'Creating Account';
+        
+        let title = 'Duplicate Registration Detected';
+        let message = 'A resident with similar information is already registered:';
+        
+        if (duplicateCheck.duplicateType === 'email') {
+          title = 'User Already Registered';
+          message = 'This email address is already registered to another resident:';
+        }
+        
+        await Swal.fire({
+          icon: 'warning',
+          title: title,
+          html: `
+            <div style="text-align: left;">
+              <p style="margin-bottom: 12px; color: #374151;">${message}</p>
+              <div style="background-color: #f3f4f6; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 12px;">
+                <strong>Name:</strong> ${existing.name}<br>
+                <strong>Contact:</strong> ${existing.contactNo}<br>
+                <strong>Email:</strong> ${existing.email}<br>
+                <strong>Registered:</strong> ${registrationDate}
+              </div>
+              <p style="margin-top: 12px; font-size: 14px; color: #6b7280;">
+                If this is you, please try logging in instead or contact the administrator for assistance.
+              </p>
+            </div>
+          `,
+          confirmButtonText: 'Understood',
+          confirmButtonColor: '#3b82f6',
+          backdrop: `rgba(0, 0, 0, 0.4)`,
+          allowOutsideClick: false,
+          customClass: {
+            popup: 'swal2-popup-custom'
+          }
+        });
+        
+        return;
+      }
+
+      console.log('No duplicate found. Proceeding with account creation...');
+      
+      // Update loading status for account creation
+      this.loadingStatus = 'Creating Account';
 
       // Variables to track what was created for rollback
       let authResponse: any = null;
@@ -2302,6 +2400,7 @@ export class SignUpInformationFormComponent implements OnInit {
       try {
         // STEP 1: Create user in Appwrite Auth
         console.log('Step 1: Creating user account...');
+        this.loadingStatus = 'Creating User Account';
         authResponse = await this.authService.register({
           username: this.formData.account.username,
           password: this.formData.account.password,
@@ -2311,6 +2410,7 @@ export class SignUpInformationFormComponent implements OnInit {
 
         // STEP 2: Create user document in users collection
         console.log('Step 2: Creating user document...');
+        this.loadingStatus = 'Setting Up User Profile';
         const userDoc = {
           uid: authResponse.$id,
           username: this.formData.account.username,
@@ -2325,6 +2425,7 @@ export class SignUpInformationFormComponent implements OnInit {
 
         // STEP 3: Create resident document
         console.log('Step 3: Creating resident document...');
+        this.loadingStatus = 'Saving Resident Information';
         const residentDoc = {
           profileImage: this.formData.profileImage || '', 
           userId: authResponse.$id,
@@ -2451,6 +2552,7 @@ export class SignUpInformationFormComponent implements OnInit {
       }
     } finally {
       this.isLoading = false;
+      this.loadingStatus = 'Creating Account';
     }
   }
 
