@@ -12,28 +12,15 @@ import Swal from 'sweetalert2';
   imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
   template: `
     <div class="flex h-screen overflow-hidden">
-      <!-- Mobile backdrop -->
-      <div *ngIf="!isSidebarHidden && isMobile" 
-           (click)="toggleSidebar()" 
-           class="fixed inset-0 bg-opacity-50 z-30 lg:hidden"></div>
+      <!-- Mobile backdrop (removed - no longer needed) -->
       
       <aside id="separator-sidebar" 
-             [class.hidden]="isSidebarHidden && !isMobile" 
-             [class.translate-x-0]="!isSidebarHidden"
-             [class.-translate-x-full]="isSidebarHidden"
-             [class.w-full]="isMobile && !isSidebarHidden"
-             [class.w-64]="!isMobile"
-             class="fixed top-0 left-0 z-40 h-screen transition-transform duration-300 ease-in-out lg:translate-x-0" 
+             [class.hidden]="isMobile" 
+             [class.translate-x-0]="!isSidebarHidden && !isMobile"
+             [class.-translate-x-full]="isSidebarHidden && !isMobile"
+             class="hidden md:block fixed top-0 left-0 z-40 w-64 h-screen transition-transform duration-300 ease-in-out" 
              aria-label="Sidebar">
         <div class="h-full border-r-1 border-gray-200 drop-shadow-sm px-3 py-4 overflow-y-auto bg-gray-50">
-          <!-- Mobile close button -->
-          <div *ngIf="isMobile" class="flex justify-end mb-4">
-            <button (click)="toggleSidebar()" class="p-2 text-gray-500 rounded-lg hover:bg-gray-100">
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
-              </svg>
-            </button>
-          </div>
           
           <div class="flex items-center justify-center mb-1">
             <img src="/assets/BNC_Portal_Logo.png" alt="Logo" class="h-28 w-28">
@@ -71,19 +58,23 @@ import Swal from 'sweetalert2';
         </div>
       </aside>
 
-      <div [class.lg:ml-64]="!isSidebarHidden && !isMobile" 
-           [class.ml-0]="isSidebarHidden || isMobile" 
-           class="flex-1 flex flex-col h-full transition-all duration-300">
+      <div class="flex-1 flex flex-col h-full transition-all duration-300 ml-0 md:ml-0"
+           [class.md:ml-64]="!isSidebarHidden">
         <nav class="bg-gray-50 border-b border-gray-200 sticky top-0 z-30">
-          <div class="flex flex-wrap items-center justify-between mx-auto p-3">
-            <button (click)="toggleSidebar()" class="inline-flex items-center p-2 text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
-              <span class="sr-only">Open sidebar</span>
-              <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
-              </svg>
-            </button>
+          <div class="flex items-center justify-between mx-auto p-3">
+            <!-- Left side - Empty on desktop (sidebar always visible) -->
+            <div class="hidden md:flex items-center">
+              <!-- No hamburger button needed - sidebar always visible on desktop -->
+            </div>
 
-            <div class="flex items-center gap-4">
+            <!-- Left side - Mobile logo/brand -->
+            <div class="flex md:hidden items-center">
+              <img src="/assets/BNC_Portal_Logo.png" alt="Logo" class="h-8 w-8 mr-2">
+              <span class="text-lg font-bold text-gray-900">BNC Portal</span>
+            </div>
+
+            <!-- Right side - Icons -->
+            <div class="flex items-center gap-4 ml-auto">
               <!-- Notification Button -->
               <div class="relative">
                 <button (click)="toggleNotificationMenu()" class="notification-button relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors">
@@ -98,17 +89,17 @@ import Swal from 'sweetalert2';
                 </button>
 
                 <!-- Notification Dropdown -->
-                <div *ngIf="isNotificationMenuOpen" class="notification-menu absolute -right-14 mt-2 w-96 max-w-sm bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
-                  <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div *ngIf="isNotificationMenuOpen" class="notification-menu absolute right-0 sm:-right-14 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] sm:max-w-sm bg-white rounded-lg shadow-lg border border-gray-200 z-[60] max-h-96 overflow-hidden">
+                  <div class="px-3 sm:px-4 py-3 border-b border-gray-200 bg-gray-50">
                     <div class="flex items-center justify-between">
                       <h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
-                      <div class="flex items-center gap-2">
+                      <div class="flex items-center gap-1 sm:gap-2">
                         <span class="text-xs text-gray-500" *ngIf="unreadNotificationsCount > 0">
                           {{ unreadNotificationsCount }} unread
                         </span>
                         <button *ngIf="notifications.length > 0" 
                                 (click)="markAllAsRead()" 
-                                class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                class="text-xs text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap">
                           Mark all read
                         </button>
                       </div>
@@ -121,8 +112,8 @@ import Swal from 'sweetalert2';
                       <p class="text-sm text-gray-600 mt-2">Loading notifications...</p>
                     </div>
 
-                    <div *ngIf="!notificationsLoading && notifications.length === 0" class="p-6 text-center">
-                      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div *ngIf="!notificationsLoading && notifications.length === 0" class="p-4 sm:p-6 text-center">
+                      <svg class="mx-auto h-10 sm:h-12 w-10 sm:w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1H7a1 1 0 00-1 1v1m0 0V4a1 1 0 011-1h10a1 1 0 011 1v1M6 20v1a1 1 0 001 1h10a1 1 0 001-1v-1"></path>
                       </svg>
                       <p class="text-sm text-gray-600 mt-2">No notifications</p>
@@ -131,15 +122,15 @@ import Swal from 'sweetalert2';
 
                     <div *ngIf="!notificationsLoading && notifications.length > 0" class="divide-y divide-gray-100">
                       <div *ngFor="let notification of notifications; let i = index" 
-                           class="p-3 hover:bg-gray-50 transition-colors cursor-pointer"
+                           class="p-2 sm:p-3 hover:bg-gray-50 transition-colors cursor-pointer"
                            [class.bg-blue-50]="!notification.isRead"
                            (click)="handleNotificationClick(notification)">
-                        <div class="flex items-start space-x-3">
+                        <div class="flex items-start space-x-2 sm:space-x-3">
                           <!-- Notification Icon -->
                           <div class="flex-shrink-0 mt-1">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center"
                                  [ngClass]="notificationService.getNotificationColor(notification.type)">
-                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                       [attr.d]="notificationService.getNotificationIcon(notification.type)"></path>
                               </svg>
@@ -149,17 +140,17 @@ import Swal from 'sweetalert2';
                           <!-- Notification Content -->
                           <div class="flex-1 min-w-0">
                             <div class="flex items-start justify-between">
-                              <p class="text-sm font-medium text-gray-900 truncate">{{ notification.title }}</p>
-                              <div class="flex items-center ml-2">
+                              <p class="text-xs sm:text-sm font-medium text-gray-900 truncate pr-2">{{ notification.title }}</p>
+                              <div class="flex items-center flex-shrink-0">
                                 <span *ngIf="notification.priority === 'high'" 
-                                      class="inline-block w-2 h-2 bg-red-500 rounded-full mr-1" 
+                                      class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full mr-1" 
                                       title="High Priority"></span>
                                 <span *ngIf="!notification.isRead" 
-                                      class="inline-block w-2 h-2 bg-blue-500 rounded-full"
+                                      class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full"
                                       title="Unread"></span>
                               </div>
                             </div>
-                            <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ notification.message }}</p>
+                            <p class="text-xs text-gray-600 mt-1 line-clamp-2 pr-1">{{ notification.message }}</p>
                             <p class="text-xs text-gray-500 mt-1">{{ formatTimeAgo(notification.timestamp) }}</p>
                           </div>
                         </div>
@@ -167,17 +158,25 @@ import Swal from 'sweetalert2';
                     </div>
                   </div>
 
-                  <div *ngIf="notifications.length > 5" class="border-t border-gray-200 bg-gray-50 px-4 py-2">
-                    <button class="text-sm text-blue-600 hover:text-blue-800 font-medium w-full text-center">
+                  <div *ngIf="notifications.length > 5" class="border-t border-gray-200 bg-gray-50 px-3 sm:px-4 py-2">
+                    <button class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium w-full text-center">
                       View all notifications
                     </button>
                   </div>
                 </div>
               </div>
 
-            <!-- Add profile dropdown -->
+            <!-- Desktop Logout Button -->
+            <button (click)="logout()" class="hidden md:inline-flex items-center p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            </button>
+
+            <!-- Desktop profile dropdown / Mobile logout button -->
             <div class="relative">
-              <button (click)="toggleProfileMenu()" class="profile-button flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
+              <!-- Desktop Profile Button -->
+              <button (click)="toggleProfileMenu()" class="profile-button hidden md:flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
                 <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                   <img *ngIf="userProfile && userProfile.profileImage" [src]="userProfile.profileImage" alt="Profile" class="w-full h-full object-cover">
                   <span *ngIf="!userProfile || !userProfile.profileImage" class="text-gray-600 font-medium">
@@ -187,9 +186,16 @@ import Swal from 'sweetalert2';
                 </div>
               </button>
 
-              <!-- Dropdown menu -->
+              <!-- Logout Button (Mobile & Desktop) -->
+              <button (click)="logout()" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+              </button>
+
+              <!-- Desktop Dropdown menu -->
               <div *ngIf="isProfileMenuOpen" class="profile-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                <a [routerLink]="['/user/settings']" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
+                <a [routerLink]="['/user/settings']" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" (click)="closeMenusOnMobile()">Settings</a>
                 <hr class="my-1 border-gray-200">
                 <a (click)="logout()" class="block px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer">Logout</a>
               </div>
@@ -198,10 +204,64 @@ import Swal from 'sweetalert2';
           </div>
         </nav>
 
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto pb-16 md:pb-0">
           <!-- Main content goes here -->
           <router-outlet></router-outlet>
         </div>
+
+        <!-- Mobile Bottom Navigation (Instagram-style) -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 bottom-nav-shadow">
+          <div class="flex items-center justify-around py-2 px-4">
+            <!-- Home -->
+            <a [routerLink]="['/user/home']" 
+               routerLinkActive="text-blue-600" 
+               #homeLink="routerLinkActive"
+               class="flex flex-col items-center py-2 px-3 transition-colors duration-200"
+               [class.text-blue-600]="homeLink.isActive"
+               [class.text-gray-600]="!homeLink.isActive">
+              <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+              </svg>
+              <span class="text-xs">Home</span>
+            </a>
+
+            <!-- Complaints & Reports -->
+            <a [routerLink]="['/user/complaints']" 
+               routerLinkActive="text-blue-600" 
+               #complaintsLink="routerLinkActive"
+               class="flex flex-col items-center py-2 px-3 transition-colors duration-200"
+               [class.text-blue-600]="complaintsLink.isActive"
+               [class.text-gray-600]="!complaintsLink.isActive">
+              <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span class="text-xs">Report</span>
+            </a>
+
+            <!-- Profile -->
+            <a [routerLink]="['/user/profile']" 
+               routerLinkActive="text-blue-600" 
+               #profileLink="routerLinkActive"
+               class="flex flex-col items-center py-2 px-3 transition-colors duration-200"
+               [class.text-blue-600]="profileLink.isActive"
+               [class.text-gray-600]="!profileLink.isActive">
+              <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-1 border-2"
+                   [class.border-blue-600]="profileLink.isActive"
+                   [class.border-transparent]="!profileLink.isActive">
+                <img *ngIf="userProfile && userProfile.profileImage" 
+                     [src]="userProfile.profileImage" 
+                     alt="Profile" 
+                     class="w-full h-full object-cover">
+                <span *ngIf="!userProfile || !userProfile.profileImage" 
+                      class="text-xs text-gray-600 font-medium">
+                  {{ userProfile && userProfile.personalInfo && userProfile.personalInfo.firstName ? 
+                     userProfile.personalInfo.firstName.charAt(0) : 'U' }}
+                </span>
+              </div>
+              <span class="text-xs">Profile</span>
+            </a>
+          </div>
+        </nav>
       </div>
     </div>
   `,
@@ -226,17 +286,57 @@ import Swal from 'sweetalert2';
       transition: transform 0.2s ease;
     }
     
-    @media (max-width: 1024px) {
-      .lg\\:ml-64 {
-        margin-left: 0 !important;
+    /* Mobile notification menu positioning */
+    @media (max-width: 640px) {
+      .notification-menu {
+        position: fixed !important;
+        top: 60px !important;
+        right: 8px !important;
+        left: 8px !important;
+        bottom: auto !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        transform: none !important;
+        z-index: 9999 !important;
+        max-height: calc(100vh - 160px) !important;
       }
     }
     
-    /* Ensure sidebar is properly positioned on mobile */
-    @media (max-width: 768px) {
-      aside {
-        width: 100% !important;
+    /* Mobile profile menu positioning */
+    @media (max-width: 640px) {
+      .profile-menu {
+        position: fixed !important;
+        bottom: 80px !important;
+        right: 8px !important;
+        left: auto !important;
+        top: auto !important;
+        width: 200px !important;
+        margin: 0 !important;
+        transform: none !important;
       }
+    }
+    
+    /* Bottom navigation styling */
+    .bottom-nav-shadow {
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Active bottom nav item */
+    .bottom-nav-active {
+      position: relative;
+    }
+    
+    .bottom-nav-active::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      background-color: #3b82f6;
+      border-radius: 1px;
     }
     
     /* Smooth transitions */
@@ -278,9 +378,11 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    // Set sidebar hidden by default on mobile
+    // Hide sidebar on mobile (we use bottom nav instead), but always show on desktop
     if (this.isMobile) {
       this.isSidebarHidden = true;
+    } else {
+      this.isSidebarHidden = false; // Always show sidebar on desktop
     }
     
     // Update time every second
@@ -320,7 +422,10 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
   }
 
   toggleSidebar() {
-    this.isSidebarHidden = !this.isSidebarHidden;
+    // Only allow toggling on mobile, keep sidebar always open on desktop
+    if (this.isMobile) {
+      this.isSidebarHidden = !this.isSidebarHidden;
+    }
   }
 
   toggleProfileMenu() {
@@ -454,12 +559,28 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
     }
   }
 
+  closeMenusOnMobile() {
+    // Close dropdown menus when navigating on mobile
+    if (this.isMobile) {
+      this.isProfileMenuOpen = false;
+      this.isNotificationMenuOpen = false;
+    }
+  }
+
   @HostListener('window:resize', [])
   onResize() {
     this.checkIfMobile();
-    // Close sidebar when switching to mobile
-    if (this.isMobile && !this.isSidebarHidden) {
+    
+    // Handle sidebar visibility based on screen size
+    if (this.isMobile) {
+      // Hide sidebar on mobile (we use bottom nav instead)
       this.isSidebarHidden = true;
+      // Close menus when switching to mobile
+      this.isProfileMenuOpen = false;
+      this.isNotificationMenuOpen = false;
+    } else {
+      // Always show sidebar on desktop
+      this.isSidebarHidden = false;
     }
   }
 
