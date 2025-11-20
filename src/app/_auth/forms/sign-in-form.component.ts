@@ -85,7 +85,7 @@ import Swal from 'sweetalert2';
           <div class="text-center">
             <p class="text-sm sm:text-base text-gray-600">
               Don't have an account? 
-              <a href="sign-up-information" class="text-blue-600 hover:text-blue-800 font-semibold hover:underline transition">
+              <a href="sign-up" class="text-blue-600 hover:text-blue-800 font-semibold hover:underline transition">
                 Create Account
               </a>
             </p>

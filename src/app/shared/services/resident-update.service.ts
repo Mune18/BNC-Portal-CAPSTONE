@@ -185,7 +185,11 @@ export class ResidentUpdateService extends BaseAppwriteService {
       if (review.action === 'approve') {
         // Apply the changes to the resident document
         const changes = JSON.parse(updateRequest.changesJSON);
-        const flattenedChanges = this.flattenChangesForDatabase(changes);
+        
+        // Filter out restricted name fields for security
+        const filteredChanges = this.filterRestrictedFields(changes);
+        
+        const flattenedChanges = this.flattenChangesForDatabase(filteredChanges);
         
         await this.database.updateDocument(
           environment.appwriteDatabaseId,
@@ -310,6 +314,37 @@ export class ResidentUpdateService extends BaseAppwriteService {
     }
     
     return fieldLabels[category] as string || category;
+  }
+
+  /**
+   * Filter out restricted fields that should not be changed (name fields)
+   */
+  private filterRestrictedFields(changes: any): any {
+    const filteredChanges = { ...changes };
+    
+    // Define fields that cannot be changed
+    const restrictedFields = ['firstName', 'lastName', 'middleName', 'suffix'];
+    
+    // Filter personalInfo changes
+    if (filteredChanges.personalInfo && typeof filteredChanges.personalInfo === 'object') {
+      const filteredPersonalInfo = { ...filteredChanges.personalInfo };
+      
+      restrictedFields.forEach(field => {
+        if (filteredPersonalInfo.hasOwnProperty(field)) {
+          console.warn(`Attempted to change restricted field: ${field}. Change ignored.`);
+          delete filteredPersonalInfo[field];
+        }
+      });
+      
+      // Only keep personalInfo if there are still valid changes
+      if (Object.keys(filteredPersonalInfo).length > 0) {
+        filteredChanges.personalInfo = filteredPersonalInfo;
+      } else {
+        delete filteredChanges.personalInfo;
+      }
+    }
+    
+    return filteredChanges;
   }
 
   /**

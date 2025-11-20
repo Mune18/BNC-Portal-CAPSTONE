@@ -110,7 +110,7 @@ import Swal from 'sweetalert2';
                 </div>
                 <button
                   class="px-4 py-2 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-semibold transition shadow-md hover:shadow-lg w-full sm:w-auto flex items-center justify-center gap-2 min-h-[44px]"
-                  (click)="showEdit = true"
+                  (click)="openEditModal()"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -441,7 +441,7 @@ import Swal from 'sweetalert2';
           <div class="bg-white rounded-lg sm:rounded-xl shadow-lg p-3 sm:p-4 lg:p-6 w-full max-w-4xl relative overflow-y-auto max-h-[95vh] sm:max-h-[90vh] z-10">
             <button
               class="absolute top-2 right-2 sm:top-3 sm:right-3 text-gray-600 hover:text-gray-900 text-lg sm:text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px]"
-              (click)="showEdit = false"
+              (click)="closeEditModal()"
               [disabled]="saveLoading"
             >✕</button>
             <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 pr-10">Request Information Update</h2>
@@ -455,6 +455,7 @@ import Swal from 'sweetalert2';
                 <div class="flex-1">
                   <p class="font-medium mb-1">Information Update Process</p>
                   <p class="leading-relaxed">Your changes will be submitted for approval by the Barangay Admin. You will be notified once your request has been reviewed.</p>
+                  <p class="mt-2 text-blue-600 font-medium">Note: Name fields (First Name, Middle Name, Last Name, Suffix, Gender, and Birth Date) cannot be changed and are displayed for reference only.</p>
                 </div>
               </div>
             </div>
@@ -476,27 +477,32 @@ import Swal from 'sweetalert2';
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.lastName" name="lastName" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" required />
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base bg-gray-100 text-gray-600 cursor-not-allowed min-h-[44px]" 
+                           disabled readonly title="Name cannot be changed" />
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">First Name</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.firstName" name="firstName" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" required />
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base bg-gray-100 text-gray-600 cursor-not-allowed min-h-[44px]" 
+                           disabled readonly title="Name cannot be changed" />
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Middle Name</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.middleName" name="middleName" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base bg-gray-100 text-gray-600 cursor-not-allowed min-h-[44px]" 
+                           disabled readonly title="Name cannot be changed" />
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Suffix</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.suffix" name="suffix" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base bg-gray-100 text-gray-600 cursor-not-allowed min-h-[44px]" 
+                           disabled readonly title="Name cannot be changed" />
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Gender</label>
                     <select [(ngModel)]="editInfo.personalInfo.gender" name="gender" 
-                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base bg-gray-100 text-gray-600 cursor-not-allowed min-h-[44px]"
+                            disabled title="Gender cannot be changed">
                       <option value="">Select</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
@@ -505,7 +511,8 @@ import Swal from 'sweetalert2';
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Birth Date</label>
                     <input type="date" [(ngModel)]="editInfo.personalInfo.birthDate" name="birthDate" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base bg-gray-100 text-gray-600 cursor-not-allowed min-h-[44px]" 
+                           disabled readonly title="Birth date cannot be changed" />
                   </div>
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Birth Place</label>
@@ -810,6 +817,13 @@ export class ProfileComponent implements OnInit {
         // Create a deep copy for editing
         this.editInfo = JSON.parse(JSON.stringify(userDoc));
         
+        // Format birth date for HTML5 date input (ensure YYYY-MM-DD format)
+        if (this.editInfo.personalInfo.birthDate) {
+          console.log('Initial birth date from database:', this.editInfo.personalInfo.birthDate);
+          this.editInfo.personalInfo.birthDate = this.formatDateForInput(this.editInfo.personalInfo.birthDate);
+          console.log('Formatted birth date for input (initial):', this.editInfo.personalInfo.birthDate);
+        }
+        
         // Load update requests for this user
         this.updateRequests = await this.residentUpdateService.getUserUpdateRequests(account.$id);
       } else {
@@ -822,6 +836,34 @@ export class ProfileComponent implements OnInit {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  openEditModal() {
+    // Create a fresh copy of the resident info for editing
+    this.editInfo = JSON.parse(JSON.stringify(this.residentInfo));
+    
+    // Format birth date for HTML5 date input (ensure YYYY-MM-DD format)
+    if (this.editInfo.personalInfo.birthDate) {
+      console.log('Original birth date:', this.editInfo.personalInfo.birthDate);
+      this.editInfo.personalInfo.birthDate = this.formatDateForInput(this.editInfo.personalInfo.birthDate);
+      console.log('Formatted birth date for input:', this.editInfo.personalInfo.birthDate);
+    }
+    
+    // Reset any previous error messages
+    this.errorMessage = '';
+    this.saveSuccess = false;
+    
+    // Show the modal
+    this.showEdit = true;
+  }
+
+  closeEditModal() {
+    // Clear any error or success messages
+    this.errorMessage = '';
+    this.saveSuccess = false;
+    
+    // Close the modal
+    this.showEdit = false;
   }
 
   async saveEdit() {
@@ -894,8 +936,7 @@ export class ProfileComponent implements OnInit {
         
         // Close the modal after 2 seconds
         setTimeout(() => {
-          this.showEdit = false;
-          this.saveSuccess = false;
+          this.closeEditModal();
         }, 2000);
       } else {
         this.errorMessage = 'Unable to submit update request: User document not found.';
@@ -972,6 +1013,47 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  // Format date for HTML5 date input (YYYY-MM-DD format)
+  formatDateForInput(dateString: string | number | Date): string {
+    if (!dateString) return '';
+    
+    // Handle different date formats
+    let date: Date;
+    
+    if (typeof dateString === 'string') {
+      // Try to handle various string formats
+      if (dateString.includes('/')) {
+        // Handle MM/DD/YYYY or DD/MM/YYYY formats
+        const parts = dateString.split('/');
+        if (parts.length === 3) {
+          // Assume MM/DD/YYYY format (adjust if needed)
+          date = new Date(parseInt(parts[2]), parseInt(parts[0]) - 1, parseInt(parts[1]));
+        } else {
+          date = new Date(dateString);
+        }
+      } else if (dateString.includes('-')) {
+        // Handle YYYY-MM-DD or DD-MM-YYYY formats
+        date = new Date(dateString);
+      } else {
+        // Try direct conversion
+        date = new Date(dateString);
+      }
+    } else {
+      date = new Date(dateString);
+    }
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date format:', dateString);
+      return '';
+    }
+    
+    // Format date as YYYY-MM-DD for HTML5 date input
+    const formatted = date.toISOString().split('T')[0];
+    console.log('Date conversion:', dateString, '->', formatted);
+    return formatted;
+  }
+
   calculateAge(birthDate: string): number | string {
     if (!birthDate) return '-';
     const today = new Date();
@@ -1003,13 +1085,45 @@ export class ProfileComponent implements OnInit {
   private getChanges(original: ResidentInfo, edited: ResidentInfo): Partial<ResidentInfo> {
     const changes: any = {};
     
+    // Define fields that cannot be changed (name-related fields)
+    const restrictedFields = ['firstName', 'lastName', 'middleName', 'suffix'];
+    
     // Compare personalInfo
     const personalChanges: any = {};
     Object.keys(edited.personalInfo).forEach(key => {
+      // Skip restricted name fields
+      if (restrictedFields.includes(key)) {
+        return;
+      }
+      
       const originalValue = (original.personalInfo as any)[key];
       const editedValue = (edited.personalInfo as any)[key];
-      if (originalValue !== editedValue) {
-        personalChanges[key] = editedValue;
+      
+      // Special handling for date fields (birthDate)
+      if (key === 'birthDate') {
+        // Convert both dates to YYYY-MM-DD format for comparison
+        const originalDateFormatted = this.formatDateForInput(originalValue);
+        const editedDateFormatted = this.formatDateForInput(editedValue);
+        
+        console.log('Date comparison:', {
+          key,
+          originalValue,
+          editedValue,
+          originalFormatted: originalDateFormatted,
+          editedFormatted: editedDateFormatted,
+          isEqual: originalDateFormatted === editedDateFormatted
+        });
+        
+        // Only consider it a change if the formatted dates are different and both are valid
+        if (originalDateFormatted !== editedDateFormatted && 
+            (originalDateFormatted !== '' || editedDateFormatted !== '')) {
+          personalChanges[key] = editedValue;
+        }
+      } else {
+        // Regular comparison for non-date fields
+        if (originalValue !== editedValue) {
+          personalChanges[key] = editedValue;
+        }
       }
     });
     if (Object.keys(personalChanges).length > 0) {

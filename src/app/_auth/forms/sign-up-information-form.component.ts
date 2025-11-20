@@ -204,8 +204,20 @@ import Swal from 'sweetalert2';
                   </svg>
                   {{ getFieldError('username') }}
                 </div>
-                <div *ngIf="!hasFieldError('username') && formData.account.username && isValidUsername(formData.account.username)" class="text-green-600 text-xs mt-1">
-                  ✓ Valid username (4-20 characters, letters, numbers, and underscores only)
+                <!-- Real-time username validation -->
+                <div *ngIf="formData.account.username && !isValidUsername(formData.account.username)" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span *ngIf="getInvalidUsernameCharacters(formData.account.username).length > 0">
+                    Invalid characters: {{ getInvalidUsernameCharacters(formData.account.username).join(', ') }}. Only letters, numbers, underscores (_), and dots (.) allowed.
+                  </span>
+                  <span *ngIf="getInvalidUsernameCharacters(formData.account.username).length === 0">
+                    Username must be 4-20 characters
+                  </span>
+                </div>
+                <div *ngIf="formData.account.username && isValidUsername(formData.account.username)" class="text-green-600 text-xs mt-1">
+                  ✓ Valid username
                 </div>
               </div>
               
@@ -221,8 +233,9 @@ import Swal from 'sweetalert2';
                     name="password" 
                     placeholder="Create a strong password"
                     [class.border-red-300]="hasFieldError('password')"
-                    [class.border-green-300]="!hasFieldError('password') && getPasswordStrength() >= 4"
+                    [class.border-green-300]="!hasFieldError('password') && getPasswordStrength() >= 3"
                     class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                    (input)="onFieldInput('password', formData.account.password)"
                     required
                     minlength="8"
                     autocomplete="new-password"
@@ -261,6 +274,24 @@ import Swal from 'sweetalert2';
                   </p>
                 </div>
                 
+                <!-- Real-time password validation -->
+                <div *ngIf="formData.account.password && formData.account.password.length < 8" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  Password must be at least 8 characters long (currently {{ formData.account.password.length }})
+                </div>
+                <div *ngIf="formData.account.password && formData.account.password.length >= 8 && getPasswordStrength() < 3" class="text-red-500 text-xs mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  Password is too weak. Add uppercase, lowercase, numbers, or special characters.
+                </div>
+                <div *ngIf="formData.account.password && formData.account.password.length >= 8 && getPasswordStrength() >= 3" class="text-green-600 text-xs mt-1">
+                  ✓ Password meets requirements
+                </div>
+                
+                <!-- Form validation errors (on submit) -->
                 <div *ngIf="hasFieldError('password')" class="text-red-500 text-xs mt-1 flex items-center">
                   <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
@@ -320,14 +351,14 @@ import Swal from 'sweetalert2';
                     [class.border-red-300]="hasFieldError('acceptedTerms')"
                     class="mt-1 mr-3 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                   />
-                  <label for="acceptTerms" class="text-sm text-gray-700 leading-relaxed flex-1">
-                    I agree to the 
+                  <label for="acceptTerms" class="text-sm text-gray-700 leading-tight flex-1">
+                    I am 18+ and agree to the 
                     <button 
                       type="button"
                       (click)="showTermsModal = true"
                       class="text-blue-600 hover:text-blue-800 underline font-semibold"
                     >
-                      Terms and Conditions
+                      Terms
                     </button>
                     and 
                     <button 
@@ -370,6 +401,16 @@ import Swal from 'sweetalert2';
                   Processing...
                 </span>
               </button>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="text-center mt-4">
+              <p class="text-sm text-gray-600">
+                Already have an account? 
+                <a href="/sign-in" class="text-blue-600 hover:text-blue-800 font-semibold hover:underline transition-colors duration-200">
+                  Log in
+                </a>
+              </p>
             </div>
           </div>
 
@@ -433,6 +474,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter last name"
                       [class.border-red-300]="hasFieldError('lastName')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('lastName', formData.personalInfo.lastName)"
                       required
                       autocomplete="family-name"
                     >
@@ -455,6 +497,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter first name"
                       [class.border-red-300]="hasFieldError('firstName')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('firstName', formData.personalInfo.firstName)"
                       required
                       autocomplete="given-name"
                     >
@@ -477,6 +520,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter middle name"
                       [class.border-red-300]="hasFieldError('middleName')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('middleName', formData.personalInfo.middleName)"
                       autocomplete="additional-name"
                     >
                     <div *ngIf="hasFieldError('middleName')" class="text-red-500 text-xs mt-1 flex items-center">
@@ -518,6 +562,7 @@ import Swal from 'sweetalert2';
                       name="gender" 
                       [class.border-red-300]="hasFieldError('gender')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (change)="onFieldChange('gender', formData.personalInfo.gender)"
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
@@ -541,7 +586,9 @@ import Swal from 'sweetalert2';
                       name="birthDate" 
                       [class.border-red-300]="hasFieldError('birthDate')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (change)="onFieldChange('birthDate', formData.personalInfo.birthDate)"
                       [max]="maxDate"
+                      required
                     >
                     <div *ngIf="hasFieldError('birthDate')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -562,6 +609,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter birth place"
                       [class.border-red-300]="hasFieldError('birthPlace')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('birthPlace', formData.personalInfo.birthPlace)"
                     >
                     <div *ngIf="hasFieldError('birthPlace')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -580,6 +628,8 @@ import Swal from 'sweetalert2';
                       name="civilStatus" 
                       [class.border-red-300]="hasFieldError('civilStatus')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (change)="onFieldChange('civilStatus', formData.personalInfo.civilStatus)"
+                      required
                     >
                       <option value="">Select Status</option>
                       <option value="Single">Single</option>
@@ -648,6 +698,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter your religion"
                       [class.border-red-300]="hasFieldError('religion')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('religion', formData.personalInfo.religion)"
                     >
                     <div *ngIf="hasFieldError('religion')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -670,15 +721,16 @@ import Swal from 'sweetalert2';
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
-                      Occupation <span class="text-red-500">*</span>
+                      Occupation <span class="text-gray-500 text-xs">(Optional)</span>
                     </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.occupation" 
                       name="occupation" 
-                      placeholder="Enter your occupation"
+                      placeholder="Enter your occupation (optional for unemployed/students)"
                       [class.border-red-300]="hasFieldError('occupation')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('occupation', formData.personalInfo.occupation)"
                       autocomplete="organization-title"
                     >
                     <div *ngIf="hasFieldError('occupation')" class="text-red-500 text-xs mt-1 flex items-center">
@@ -691,7 +743,7 @@ import Swal from 'sweetalert2';
                   
                   <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
-                      Monthly Income <span class="text-red-500">*</span>
+                      Monthly Income <span class="text-gray-500 text-xs">(Optional)</span>
                     </label>
                     <div class="relative">
                       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -701,11 +753,12 @@ import Swal from 'sweetalert2';
                         type="number" 
                         [(ngModel)]="formData.personalInfo.monthlyIncome" 
                         name="monthlyIncome" 
-                        placeholder="0.00"
+                        placeholder="0.00 (optional for unemployed/students)"
                         min="0"
                         step="0.01"
                         [class.border-red-300]="hasFieldError('monthlyIncome')"
                         class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        (input)="onFieldInput('monthlyIncome', formData.personalInfo.monthlyIncome)"
                       >
                     </div>
                     <div *ngIf="hasFieldError('monthlyIncome')" class="text-red-500 text-xs mt-1 flex items-center">
@@ -727,6 +780,7 @@ import Swal from 'sweetalert2';
                         name="email" 
                         placeholder="Enter your email address"
                         [class.border-red-300]="hasFieldError('email')"
+                        (input)="onFieldInput('email', formData.personalInfo.email)"
                         [class.border-green-300]="!hasFieldError('email') && formData.personalInfo.email && isValidEmail(formData.personalInfo.email)"
                         class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                         required
@@ -804,6 +858,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter purok number"
                       [class.border-red-300]="hasFieldError('purokNo')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('purokNo', formData.personalInfo.purokNo)"
                     >
                     <div *ngIf="hasFieldError('purokNo')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -824,6 +879,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter house number"
                       [class.border-red-300]="hasFieldError('houseNo')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('houseNo', formData.personalInfo.houseNo)"
                     >
                     <div *ngIf="hasFieldError('houseNo')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -844,6 +900,7 @@ import Swal from 'sweetalert2';
                       placeholder="Enter street name"
                       [class.border-red-300]="hasFieldError('street')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (input)="onFieldInput('street', formData.personalInfo.street)"
                     >
                     <div *ngIf="hasFieldError('street')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -1002,6 +1059,7 @@ import Swal from 'sweetalert2';
                       name="indigent" 
                       [class.border-red-300]="hasFieldError('indigent')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (change)="onFieldChange('indigent', formData.personalInfo.indigent)"
                     >
                       <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
@@ -1023,7 +1081,8 @@ import Swal from 'sweetalert2';
                       [(ngModel)]="formData.personalInfo.fourPsMember" 
                       name="fourPsMember" 
                       [class.border-red-300]="hasFieldError('fourPsMember')"
-                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (change)="onFieldChange('fourPsMember', formData.personalInfo.fourPsMember)"
                     >
                       <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
@@ -1046,6 +1105,7 @@ import Swal from 'sweetalert2';
                       name="registeredVoter" 
                       [class.border-red-300]="hasFieldError('registeredVoter')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                      (change)="onFieldChange('registeredVoter', formData.personalInfo.registeredVoter)"
                     >
                       <option value="">Select Status</option>
                       <option value="Yes">Yes</option>
@@ -1061,15 +1121,15 @@ import Swal from 'sweetalert2';
                 </div>
               </div>
 
-              <!-- Optional Government IDs -->
+              <!-- Required Government IDs -->
               <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-4 sm:p-6 border border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                   <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                   </svg>
-                  Optional Government IDs
+                  Government IDs
                 </h3>
-                <p class="text-sm text-gray-600 mb-4">These fields are optional but recommended for faster document processing</p>
+                <p class="text-sm text-gray-600 mb-4">Please provide at least one valid government ID for verification</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">National ID Number</label>
@@ -1077,9 +1137,17 @@ import Swal from 'sweetalert2';
                       type="text" 
                       [(ngModel)]="formData.otherDetails.nationalIdNo" 
                       name="nationalIdNo" 
-                      placeholder="Enter National ID Number (optional)"
+                      placeholder="Enter National ID Number"
+                      [class.border-red-300]="hasFieldError('nationalIdNo')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      (input)="onFieldInput('nationalIdNo', formData.otherDetails.nationalIdNo)"
                     >
+                    <div *ngIf="hasFieldError('nationalIdNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('nationalIdNo') }}
+                    </div>
                   </div>
                   
                   <div>
@@ -1088,9 +1156,17 @@ import Swal from 'sweetalert2';
                       type="text" 
                       [(ngModel)]="formData.otherDetails.votersIdNo" 
                       name="votersIdNo" 
-                      placeholder="Enter Voter's ID Number (optional)"
+                      placeholder="Enter Voter's ID Number"
+                      [class.border-red-300]="hasFieldError('votersIdNo')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-white text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      (input)="onFieldInput('votersIdNo', formData.otherDetails.votersIdNo)"
                     >
+                    <div *ngIf="hasFieldError('votersIdNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('votersIdNo') }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1165,6 +1241,7 @@ import Swal from 'sweetalert2';
                         placeholder="Enter full name of emergency contact"
                         [class.border-red-300]="hasFieldError('ecFullName')"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        (input)="onFieldInput('ecFullName', formData.emergencyContact.fullName)"
                         required
                       >
                       <div *ngIf="hasFieldError('ecFullName')" class="text-red-500 text-xs mt-1 flex items-center">
@@ -1184,6 +1261,7 @@ import Swal from 'sweetalert2';
                         name="emergencyRelationship"
                         [class.border-red-300]="hasFieldError('ecRelationship')"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        (change)="onFieldChange('ecRelationship', formData.emergencyContact.relationship)"
                         required
                       >
                         <option value="">Select relationship</option>
@@ -1220,7 +1298,7 @@ import Swal from 'sweetalert2';
                           maxlength="10"
                           [class.border-red-300]="hasFieldError('ecContactNo')"
                           class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
-                          (input)="onPhoneInput($event, 'ecContactNo')"
+                          (input)="onPhoneInput($event, 'ecContactNo'); onFieldInput('ecContactNo', formData.emergencyContact.contactNo)"
                           (keypress)="onPhoneKeypress($event)"
                           autocomplete="tel"
                         >
@@ -1245,6 +1323,7 @@ import Swal from 'sweetalert2';
                         rows="3"
                         [class.border-red-300]="hasFieldError('ecAddress')"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all resize-none"
+                        (input)="onFieldInput('ecAddress', formData.emergencyContact.address)"
                       ></textarea>
                       <div *ngIf="hasFieldError('ecAddress')" class="text-red-500 text-xs mt-1 flex items-center">
                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -1413,7 +1492,10 @@ import Swal from 'sweetalert2';
         <div class="bg-white rounded-xl shadow-lg max-w-4xl w-full mx-4 max-h-[90vh] flex flex-col">
           <!-- Modal Header -->
           <div class="flex justify-between items-center p-6 border-b">
-            <h2 class="text-2xl font-bold text-gray-800">Terms and Conditions & Privacy Policy</h2>
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800">Terms and Conditions & Privacy Policy</h2>
+              <p class="text-sm text-red-600 font-medium mt-1">⚠️ Registration restricted to residents 18 years and older</p>
+            </div>
             <button 
               (click)="showTermsModal = false"
               class="text-gray-400 hover:text-gray-600 text-2xl font-bold"
@@ -1431,28 +1513,38 @@ import Swal from 'sweetalert2';
                 
                 <div class="space-y-4 text-gray-700">
                   <div>
-                    <h4 class="font-semibold mb-2">1. Acceptance of Terms</h4>
-                    <p>By creating an account and using the Barangay New Cabalan Portal, you agree to comply with and be bound by these terms and conditions.</p>
+                    <h4 class="font-semibold mb-2">1. Acceptance and Eligibility</h4>
+                    <p>By registering for the Barangay New Cabalan Digital Portal, you acknowledge that you are at least 18 years old and are a legal resident of Barangay New Cabalan, Olongapo City. You agree to be bound by these terms, applicable local ordinances, and Philippine laws.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">2. Registration Requirements</h4>
-                    <p>You must provide accurate, complete, and current information during registration. You are responsible for maintaining the confidentiality of your account credentials.</p>
+                    <h4 class="font-semibold mb-2">2. Purpose and Scope of Service</h4>
+                    <p>This portal provides digital access to barangay services including: complaint filing, announcement viewing, profile management, and official communications. Services are available to verified residents only.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">3. Acceptable Use</h4>
-                    <p>You agree to use the portal only for lawful purposes and in accordance with barangay policies. You must not misuse the system or provide false information.</p>
+                    <h4 class="font-semibold mb-2">3. Registration and Data Accuracy</h4>
+                    <p>You must provide complete, accurate, and truthful information during registration. All personal data must match official government records. Falsification of information may result in criminal charges under Philippine law and permanent ban from barangay services.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">4. Data Accuracy</h4>
-                    <p>All information provided must be truthful and accurate. False information may result in account suspension and legal consequences.</p>
+                    <h4 class="font-semibold mb-2">4. Account Security and Responsibility</h4>
+                    <p>You are solely responsible for maintaining the confidentiality of your login credentials. Any activity under your account is your responsibility. Immediately report suspected unauthorized access to the Barangay Office. Sharing accounts is strictly prohibited.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">5. Account Security</h4>
-                    <p>You are responsible for all activities that occur under your account. Notify the barangay office immediately of any unauthorized use.</p>
+                    <h4 class="font-semibold mb-2">5. Acceptable Use Policy</h4>
+                    <p>Use this portal only for legitimate barangay business. Prohibited activities include: submitting false complaints, harassment of officials, system abuse, and any illegal activities. Violations may result in legal action.</p>
+                  </div>
+                  
+                  <div>
+                    <h4 class="font-semibold mb-2">6. Service Availability and Modifications</h4>
+                    <p>The Barangay reserves the right to modify, suspend, or discontinue services with reasonable notice. System maintenance may cause temporary unavailability. Alternative service channels remain available at the Barangay Office during system downtime.</p>
+                  </div>
+                  
+                  <div>
+                    <h4 class="font-semibold mb-2">7. Compliance with Local Ordinances</h4>
+                    <p>All users must comply with Barangay New Cabalan ordinances, Olongapo City regulations, and national laws.</p>
                   </div>
                 </div>
               </section>
@@ -1463,33 +1555,43 @@ import Swal from 'sweetalert2';
                 
                 <div class="space-y-4 text-gray-700">
                   <div>
-                    <h4 class="font-semibold mb-2">1. Information Collection</h4>
-                    <p>We collect personal information necessary for barangay services including name, address, contact details, and emergency contact information.</p>
+                    <h4 class="font-semibold mb-2">1. Data Collection and Legal Basis</h4>
+                    <p>We collect personal information under the authority of the Local Government Code (RA 7160) and Data Privacy Act (RA 10173). Information includes: full name, address, birth details, contact information, emergency contacts, civil status, occupation, income level, and special categories (PWD, Senior, 4Ps, etc.) necessary for proper barangay services and population data management.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">2. Use of Information</h4>
-                    <p>Your information is used to provide barangay services, process documents, send announcements, and maintain resident records as required by law.</p>
+                    <h4 class="font-semibold mb-2">2. Purpose and Use of Information</h4>
+                    <p>Your data enables us to: verify residency, maintain accurate population records, provide emergency services, distribute social services and benefits, send official announcements and alerts, process complaints and requests, generate community reports, and comply with national statistical and reporting requirements.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">3. Data Protection</h4>
-                    <p>We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.</p>
+                    <h4 class="font-semibold mb-2">3. Data Security and Protection</h4>
+                    <p>We implement industry-standard security measures including encrypted data transmission, secure database storage, regular security audits, access controls for authorized personnel only, and backup systems for data integrity. Physical and digital safeguards protect against unauthorized access, theft, or disclosure.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">4. Information Sharing</h4>
-                    <p>Your information may be shared with authorized government agencies as required by law for official purposes.</p>
+                    <h4 class="font-semibold mb-2">4. Information Sharing and Disclosure</h4>
+                    <p>Your information may be shared only with: Olongapo City Government for city-wide programs, Department of Interior and Local Government (DILG) for reporting, Philippine Statistics Authority (PSA) for census purposes, other government agencies as required by law, and emergency responders during disasters or public health emergencies. We never sell or share data for commercial purposes.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">5. Data Retention</h4>
-                    <p>Personal information is retained as long as necessary to provide services and comply with legal obligations.</p>
+                    <h4 class="font-semibold mb-2">5. Data Retention and Disposal</h4>
+                    <p>Records are retained per National Archives guidelines: active resident records for the duration of residency plus 5 years, complaint records for 5 years, and statistical data permanently (in anonymized form). Secure disposal protocols ensure complete data destruction when retention periods expire.</p>
                   </div>
                   
                   <div>
-                    <h4 class="font-semibold mb-2">6. Your Rights</h4>
-                    <p>You have the right to access, update, or request deletion of your personal information in accordance with applicable laws.</p>
+                    <h4 class="font-semibold mb-2">6. Your Privacy Rights</h4>
+                    <p>Under the Data Privacy Act, you have the right to: access your personal data, request corrections to inaccurate information, request data portability for compatible systems, object to processing (where legally permissible), and file complaints with the National Privacy Commission. Contact the Barangay Data Protection Officer for assistance with privacy concerns.</p>
+                  </div>
+                  
+                  <div>
+                    <h4 class="font-semibold mb-2">7. Minors and Dependent Information</h4>
+                    <p>Information about minors and dependents is collected only when necessary for family-based services or emergency contact purposes. Parents/guardians are responsible for the accuracy of dependent information and may update it through their accounts or by visiting the Barangay Office.</p>
+                  </div>
+                  
+                  <div>
+                    <h4 class="font-semibold mb-2">8. System Monitoring and Logs</h4>
+                    <p>For security purposes, we log system access, and user activities. These logs are used solely for security monitoring, troubleshooting, and compliance auditing. Access logs are retained for 1 year and are accessible only to authorized IT and administrative personnel.</p>
                   </div>
                 </div>
               </section>
@@ -1498,11 +1600,33 @@ import Swal from 'sweetalert2';
               <section>
                 <h3 class="text-xl font-semibold text-blue-800 mb-4">Contact Information</h3>
                 <div class="bg-gray-50 p-4 rounded-lg">
-                  <p class="text-gray-700">For questions about these terms or your privacy, contact:</p>
-                  <p class="font-semibold mt-2">Barangay New Cabalan Office</p>
-                  <p class="text-gray-600">Address: [Barangay Address]</p>
-                  <p class="text-gray-600">Phone: [Contact Number]</p>
-                  <p class="text-gray-600">Email: [Official Email]</p>
+                  <p class="text-gray-700">For questions about these terms, privacy concerns, or technical support:</p>
+                  
+                  <div class="mt-3 space-y-2">
+                    <div>
+                      <p class="font-semibold text-blue-800">Barangay New Cabalan Office</p>
+                      <p class="text-gray-600 text-sm">Corner Mabini St., Purok 2, New Cabalan, Olongapo City, Zambales</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-3 mt-3">
+                      <div>
+                        <p class="font-medium text-gray-700">Office Hours:</p>
+                        <p class="text-gray-600 text-sm">Monday - Friday: 8:00 AM - 5:00 PM</p>
+                        <p class="text-gray-600 text-sm">Saturday: 8:00 AM - 12:00 PM</p>
+                      </div>
+                      
+                      <div>
+                        <p class="font-medium text-gray-700">Emergency Contact:</p>
+                        <p class="text-gray-600 text-sm">Barangay Hotline: 047-224-5414</p>
+                        <p class="text-gray-600 text-sm">Text/Call: 0910 484 5635</p>
+                      </div>
+                    </div>
+                    
+                    <div class="border-t pt-3 mt-3">
+                      <p class="text-xs text-gray-500"><strong>Data Protection Officer:</strong> Contact the Barangay Secretary for privacy-related concerns and data subject rights requests.</p>
+                      <p class="text-xs text-gray-500 mt-1"><strong>Technical Support:</strong> Visit the office during business hours for portal assistance.</p>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -1843,8 +1967,16 @@ export class SignUpInformationFormComponent implements OnInit {
     // Update the appropriate field
     if (fieldType === 'contactNo') {
       this.formData.personalInfo.contactNo = value;
+      // Clear validation error when user starts typing
+      if (value) {
+        this.clearFieldError('contactNo');
+      }
     } else if (fieldType === 'ecContactNo') {
       this.formData.emergencyContact.contactNo = value;
+      // Clear validation error when user starts typing
+      if (value) {
+        this.clearFieldError('ecContactNo');
+      }
     }
     
     // Update the input field value
@@ -1861,7 +1993,12 @@ export class SignUpInformationFormComponent implements OnInit {
       this.validationErrors['username'] = 'Username is required';
       isValid = false;
     } else if (!this.isValidUsername(this.formData.account.username)) {
-      this.validationErrors['username'] = 'Username must be 4-20 characters and contain only letters, numbers, and underscores';
+      const invalidChars = this.getInvalidUsernameCharacters(this.formData.account.username);
+      if (invalidChars.length > 0) {
+        this.validationErrors['username'] = `Invalid characters found: ${invalidChars.join(', ')}. Only letters, numbers, underscores (_), and dots (.) are allowed`;
+      } else {
+        this.validationErrors['username'] = 'Username must be 4-20 characters and contain only letters, numbers, underscores, and dots';
+      }
       isValid = false;
     }
 
@@ -1871,6 +2008,9 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     } else if (this.formData.account.password.length < 8) {
       this.validationErrors['password'] = 'Password must be at least 8 characters long';
+      isValid = false;
+    } else if (this.getPasswordStrength() < 3) {
+      this.validationErrors['password'] = 'Password is too weak. Please create a stronger password to proceed to the next step';
       isValid = false;
     }
 
@@ -1953,10 +2093,11 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     }
 
-    if (!personalInfo.occupation || personalInfo.occupation.trim() === '') {
-      this.validationErrors['occupation'] = 'Occupation is required';
-      isValid = false;
-    }
+    // Occupation is optional (for unemployed/students)
+    // if (!personalInfo.occupation || personalInfo.occupation.trim() === '') {
+    //   this.validationErrors['occupation'] = 'Occupation is required';
+    //   isValid = false;
+    // }
 
     // Email validation in personal info
     if (!personalInfo.email || personalInfo.email.trim() === '') {
@@ -1990,10 +2131,8 @@ export class SignUpInformationFormComponent implements OnInit {
       }
     }
 
-    if (personalInfo.monthlyIncome === null || personalInfo.monthlyIncome === undefined || personalInfo.monthlyIncome === 0) {
-      this.validationErrors['monthlyIncome'] = 'Monthly income is required';
-      isValid = false;
-    } else if (personalInfo.monthlyIncome < 0) {
+    // Monthly income is optional (for unemployed/students)
+    if (personalInfo.monthlyIncome !== null && personalInfo.monthlyIncome !== undefined && personalInfo.monthlyIncome < 0) {
       this.validationErrors['monthlyIncome'] = 'Monthly income cannot be negative';
       isValid = false;
     }
@@ -2050,16 +2189,36 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     }
 
-    // Date validation
+    // Date validation with age restriction
     if (personalInfo.birthDate) {
       const birthDate = new Date(personalInfo.birthDate);
       const today = new Date();
-      const age = today.getFullYear() - birthDate.getFullYear();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      // Adjust age if birthday hasn't occurred this year
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
       
       if (age < 0 || age > 150) {
         this.validationErrors['birthDate'] = 'Please enter a valid birth date';
         isValid = false;
+      } else if (age < 18) {
+        this.validationErrors['birthDate'] = 'You must be at least 18 years old to register. Only legal adults can create accounts for barangay services.';
+        isValid = false;
       }
+    }
+
+    // Government ID validation - at least one is required
+    const otherDetails = this.formData.otherDetails;
+    const hasNationalId = otherDetails.nationalIdNo && otherDetails.nationalIdNo.trim() !== '';
+    const hasVotersId = otherDetails.votersIdNo && otherDetails.votersIdNo.trim() !== '';
+    
+    if (!hasNationalId && !hasVotersId) {
+      this.validationErrors['nationalIdNo'] = 'Please provide at least one government ID (National ID or Voter\'s ID)';
+      this.validationErrors['votersIdNo'] = 'Please provide at least one government ID (National ID or Voter\'s ID)';
+      isValid = false;
     }
 
     return isValid;
@@ -2252,7 +2411,6 @@ export class SignUpInformationFormComponent implements OnInit {
         { field: this.formData.personalInfo.civilStatus, name: 'Civil Status' },
         { field: this.formData.personalInfo.nationality, name: 'Nationality' },
         { field: this.formData.personalInfo.religion, name: 'Religion' },
-        { field: this.formData.personalInfo.occupation, name: 'Occupation' },
         { field: this.formData.personalInfo.contactNo, name: 'Contact Number' },
         { field: this.formData.personalInfo.purokNo, name: 'Purok Number' },
         { field: this.formData.personalInfo.houseNo, name: 'House Number' },
@@ -2269,9 +2427,9 @@ export class SignUpInformationFormComponent implements OnInit {
         }
       }
 
-      // Check numeric fields
-      if (!this.formData.personalInfo.monthlyIncome || this.formData.personalInfo.monthlyIncome <= 0) {
-        throw new Error('Monthly income must be a positive number.');
+      // Check numeric fields (monthly income is now optional)
+      if (this.formData.personalInfo.monthlyIncome && this.formData.personalInfo.monthlyIncome <= 0) {
+        throw new Error('Monthly income must be a positive number if provided.');
       }
 
       // Check dropdown selections
@@ -2316,7 +2474,7 @@ export class SignUpInformationFormComponent implements OnInit {
 
       // Validate username format one more time
       if (!this.isValidUsername(this.formData.account.username)) {
-        throw new Error('Please enter a valid username (4-20 characters, letters, numbers, and underscores only).');
+        throw new Error('Please enter a valid username (4-20 characters, letters, numbers, underscores, and dots only).');
       }
 
       // Validate password requirements
@@ -2350,12 +2508,27 @@ export class SignUpInformationFormComponent implements OnInit {
         this.isLoading = false;
         this.loadingStatus = 'Creating Account';
         
-        let title = 'Duplicate Registration Detected';
-        let message = 'A resident with similar information is already registered:';
+        let title = 'Registration Not Allowed';
+        let message = '';
+        let duplicatedField = '';
         
+        // Determine which field is duplicated and create appropriate message
         if (duplicateCheck.duplicateType === 'email') {
-          title = 'User Already Registered';
-          message = 'This email address is already registered to another resident:';
+          title = 'Email Already Registered';
+          duplicatedField = 'email address';
+          message = 'This email address is already registered to another resident.';
+        } else if (duplicateCheck.duplicateType === 'contact') {
+          title = 'Contact Number Already Registered';
+          duplicatedField = 'contact number';
+          message = 'This contact number is already registered to another resident.';
+        } else if (duplicateCheck.duplicateType === 'name') {
+          title = 'Name Already Registered';
+          duplicatedField = 'full name';
+          message = 'This full name is already registered to another resident.';
+        } else {
+          title = 'Duplicate Information Detected';
+          duplicatedField = 'information';
+          message = 'Some of your information is already registered to another resident.';
         }
         
         await Swal.fire({
@@ -2363,19 +2536,29 @@ export class SignUpInformationFormComponent implements OnInit {
           title: title,
           html: `
             <div style="text-align: left;">
-              <p style="margin-bottom: 12px; color: #374151;">${message}</p>
-              <div style="background-color: #f3f4f6; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 12px;">
-                <strong>Name:</strong> ${existing.name}<br>
-                <strong>Contact:</strong> ${existing.contactNo}<br>
-                <strong>Email:</strong> ${existing.email}<br>
-                <strong>Registered:</strong> ${registrationDate}
+              <p style="margin-bottom: 16px; color: #374151; font-size: 15px;">${message}</p>
+              <div style="background-color: #fef3cd; border: 1px solid #f6cc47; padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                  <svg style="width: 20px; height: 20px; color: #92400e; margin-right: 8px;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  </svg>
+                  <strong style="color: #92400e;">Duplicate ${duplicatedField} detected</strong>
+                </div>
+                <p style="color: #92400e; font-size: 13px; margin: 0;">
+                  For privacy and security reasons, we cannot show existing resident details.
+                </p>
               </div>
               <p style="margin-top: 12px; font-size: 14px; color: #6b7280;">
-                If this is you, please try logging in instead or contact the administrator for assistance.
+                <strong>If this is you:</strong> Please try logging in with your existing account.<br>
+                <strong>Need help?</strong> Contact the Barangay New Cabalan office for assistance.
               </p>
+              <div style="background-color: #e0f2fe; border-left: 4px solid #0288d1; padding: 10px; margin-top: 12px; font-size: 13px;">
+                <strong>Office Contact:</strong> (047) 224-2176<br>
+                <strong>Location:</strong> Corner Mabini St., Purok 2, New Cabalan, Olongapo City
+              </div>
             </div>
           `,
-          confirmButtonText: 'Understood',
+          confirmButtonText: 'I Understand',
           confirmButtonColor: '#3b82f6',
           backdrop: `rgba(0, 0, 0, 0.4)`,
           allowOutsideClick: false,
@@ -2620,9 +2803,32 @@ export class SignUpInformationFormComponent implements OnInit {
   }
 
   isValidUsername(username: string): boolean {
-    // Username must be 4-20 characters, containing only letters, numbers, and underscores
-    const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
+    // Username must be 4-20 characters, containing only letters, numbers, underscores, and dots
+    const usernameRegex = /^[a-zA-Z0-9_.]{4,20}$/;
     return usernameRegex.test(username);
+  }
+
+  getInvalidUsernameCharacters(username: string): string[] {
+    if (!username) return [];
+    
+    const validChars = /[a-zA-Z0-9_.]/;
+    const invalidChars: string[] = [];
+    
+    for (let i = 0; i < username.length; i++) {
+      const char = username[i];
+      if (!validChars.test(char) && !invalidChars.includes(char)) {
+        invalidChars.push(char);
+      }
+    }
+    
+    return invalidChars;
+  }
+
+  // Real-time validation clearing method
+  clearFieldError(fieldName: string) {
+    if (this.validationErrors && this.validationErrors[fieldName]) {
+      delete this.validationErrors[fieldName];
+    }
   }
 
   canProceedToStep2(): boolean {
@@ -2632,6 +2838,35 @@ export class SignUpInformationFormComponent implements OnInit {
               this.acceptedTerms &&
               !this.passwordMismatch() &&
               this.isValidUsername(this.formData.account.username) &&
-              this.formData.account.password.length >= 8);
+              this.formData.account.password.length >= 8 &&
+              this.getPasswordStrength() >= 3);
+  }
+
+  // Method to handle real-time validation clearing on input
+  onFieldInput(fieldName: string, value: any) {
+    // Clear error when user starts typing in a field
+    if (value && value.toString().trim() !== '') {
+      this.clearFieldError(fieldName);
+      
+      // Special handling for government IDs - clear both errors if one is filled
+      if (fieldName === 'nationalIdNo' || fieldName === 'votersIdNo') {
+        const hasNationalId = this.formData.otherDetails.nationalIdNo && this.formData.otherDetails.nationalIdNo.trim() !== '';
+        const hasVotersId = this.formData.otherDetails.votersIdNo && this.formData.otherDetails.votersIdNo.trim() !== '';
+        
+        // If at least one government ID is filled, clear both errors
+        if (hasNationalId || hasVotersId) {
+          this.clearFieldError('nationalIdNo');
+          this.clearFieldError('votersIdNo');
+        }
+      }
+    }
+  }
+
+  // Method to handle real-time validation clearing for dropdowns/selects
+  onFieldChange(fieldName: string, value: any) {
+    // Clear error when user selects a value in dropdown
+    if (value && value.toString().trim() !== '') {
+      this.clearFieldError(fieldName);
+    }
   }
 }

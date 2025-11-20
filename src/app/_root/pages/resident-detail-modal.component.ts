@@ -359,23 +359,7 @@ import { ResidentInfo } from '../../shared/types/resident';
 
           <!-- Regular Actions (shown when showApprovalActions is false) -->
           <div *ngIf="!showApprovalActions" class="flex flex-col sm:flex-row gap-3 justify-end">
-            <button 
-              type="button"
-              class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all font-medium sm:w-auto"
-              (click)="close.emit()"
-            >
-              Close
-            </button>
-            <button 
-              type="button"
-              class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium flex items-center justify-center gap-2 sm:w-auto"
-              (click)="onEdit()"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-              </svg>
-              Edit Resident
-            </button>
+            <!-- Action buttons removed -->
           </div>
         </div>
       </div>

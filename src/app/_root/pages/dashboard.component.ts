@@ -54,7 +54,7 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 
       <div *ngIf="!loading">
         <!-- Analytics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
           <!-- Total Residents -->
           <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/residents']">
             <div class="flex items-center">
@@ -111,21 +111,6 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
               <div class="ml-4">
                 <h2 class="text-lg font-semibold text-gray-800">Pending Complaints</h2>
                 <p class="text-gray-600 text-2xl font-bold">{{ pendingComplaints }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Last 30 Days Registrations -->
-          <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition cursor-pointer" [routerLink]="['/admin/residents']">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-green-100 text-green-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div class="ml-4">
-                <h2 class="text-lg font-semibold text-gray-800">New Residents (30d)</h2>
-                <p class="text-gray-600 text-2xl font-bold">{{ newResidentsLastMonth }}</p>
               </div>
             </div>
           </div>
