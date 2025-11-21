@@ -326,28 +326,7 @@ import Swal from 'sweetalert2';
               <p class="text-xs text-gray-500 mt-1">Please provide as much detail as possible</p>
             </div>
 
-            <!-- Anonymous Option -->
-            <div>
-              <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <div class="flex items-center h-5">
-                  <input 
-                    id="anonymous" 
-                    [(ngModel)]="newComplaint.isAnonymous" 
-                    name="anonymous" 
-                    type="checkbox" 
-                    class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                  >
-                </div>
-                <div class="flex-1">
-                  <label for="anonymous" class="cursor-pointer block text-sm font-medium text-blue-800 mb-1">
-                    Submit as Anonymous
-                  </label>
-                  <p class="text-xs text-blue-700">
-                    Your identity will be kept confidential. Only the Barangay officials will know who submitted this complaint for administrative purposes, but your name will not be visible in any reports or public records.
-                  </p>
-                </div>
-              </div>
-            </div>
+
 
             <!-- Attachment Field -->
             <div>
@@ -850,8 +829,7 @@ export class ComplaintsComponent implements OnInit {
   newComplaint: NewComplaint = {
     subject: '',
     description: '',
-    category: 'complaint',
-    isAnonymous: false
+    category: 'complaint'
   };
 
   attachmentFile: File | null = null;
@@ -896,8 +874,7 @@ export class ComplaintsComponent implements OnInit {
     this.newComplaint = {
       subject: '',
       description: '',
-      category: 'complaint',
-      isAnonymous: false
+      category: 'complaint'
     };
     this.attachmentFile = null;
     this.attachmentFileName = '';
@@ -939,7 +916,6 @@ export class ComplaintsComponent implements OnInit {
             <div class="mb-2"><strong>Category:</strong> ${this.newComplaint.category}</div>
             <div class="mb-2"><strong>Description:</strong> ${this.newComplaint.description.length > 100 ? this.newComplaint.description.substring(0, 100) + '...' : this.newComplaint.description}</div>
             ${this.attachmentFile ? `<div class="mb-2"><strong>Attachment:</strong> ${this.attachmentFileName}</div>` : ''}
-            ${this.newComplaint.isAnonymous ? '<div class="mb-2"><strong>Anonymous:</strong> Yes</div>' : ''}
           </div>
           <p class="mt-3 text-sm text-gray-600">
             <strong>Note:</strong> Once submitted, your complaint will be reviewed by the Barangay officials. 
@@ -969,8 +945,7 @@ export class ComplaintsComponent implements OnInit {
       const complaintData: NewComplaint = {
         subject: this.newComplaint.subject,
         description: this.newComplaint.description,
-        category: this.newComplaint.category,
-        isAnonymous: this.newComplaint.isAnonymous || false
+        category: this.newComplaint.category
       };
       
       if (this.attachmentFile) {
@@ -984,8 +959,7 @@ export class ComplaintsComponent implements OnInit {
         this.newComplaint = {
           subject: '',
           description: '',
-          category: 'complaint',
-          isAnonymous: false
+          category: 'complaint'
         };
         this.attachmentFile = null;
         this.attachmentFileName = '';

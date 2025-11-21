@@ -107,15 +107,7 @@ import Swal from 'sweetalert2';
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="text-sm text-gray-900">{{ complaint.isAnonymous ? '' : getComplainantName(complaint) }}</div>
-                        <span *ngIf="complaint.isAnonymous" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                          </svg>
-                          Anonymous
-                        </span>
-                      </div>
+                      <div class="text-sm text-gray-900">{{ getComplainantName(complaint) }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900 capitalize">{{ complaint.category }}</div>
@@ -240,15 +232,7 @@ import Swal from 'sweetalert2';
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <p class="text-sm text-gray-500">Submitted by</p>
-                <div class="flex items-center">
-                  <p class="font-medium">{{ selectedComplaint.isAnonymous ? '' : getComplainantName(selectedComplaint) }}</p>
-                  <span *ngIf="selectedComplaint.isAnonymous" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Anonymous Report
-                  </span>
-                </div>
+                <p class="font-medium">{{ getComplainantName(selectedComplaint) }}</p>
               </div>
               <div>
                 <p class="text-sm text-gray-500">Date Submitted</p>
@@ -261,6 +245,12 @@ import Swal from 'sweetalert2';
               <div>
                 <p class="text-sm text-gray-500">Last Updated</p>
                 <p class="font-medium">{{ selectedComplaint.updatedAt ? (selectedComplaint.updatedAt | date:'medium') : 'Not updated yet' }}</p>
+              </div>
+              <div class="md:col-span-2">
+                <p class="text-sm text-gray-500">Complainant Address</p>
+                <div class="flex items-start gap-2 mt-1">
+                  <p class="font-medium text-gray-700 leading-relaxed">{{ getComplainantAddress(selectedComplaint) }}</p>
+                </div>
               </div>
             </div>
             
@@ -309,66 +299,99 @@ import Swal from 'sweetalert2';
           </div>
           
           <div class="border-t pt-4">
-            <h3 class="font-semibold text-gray-900 mb-3">Update Status & Reply</h3>
-            <form (submit)="replyToComplaint($event)" class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
-                <div class="flex flex-wrap gap-3">
-                  <label 
-                    *ngFor="let status of statusOptions" 
-                    class="flex items-center p-2 border rounded-lg cursor-pointer transition"
-                    [class.bg-blue-50]="statusToUpdate === status.value"
-                    [class.border-blue-300]="statusToUpdate === status.value"
-                    [class.border-gray-200]="statusToUpdate !== status.value"
-                  >
-                    <input 
-                      type="radio" 
-                      [value]="status.value" 
-                      [(ngModel)]="statusToUpdate" 
-                      name="status" 
-                      class="mr-2"
-                    >
-                    <span>{{ status.label }}</span>
-                  </label>
+            <!-- Check if complaint is finalized (resolved or rejected) -->
+            <div *ngIf="isComplaintFinalized(selectedComplaint); else updateForm">
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
+                <div class="flex items-center justify-center mb-4">
+                  <div class="p-3 rounded-full" 
+                       [ngClass]="{
+                         'bg-green-100': selectedComplaint.status === 'resolved',
+                         'bg-red-100': selectedComplaint.status === 'rejected'
+                       }">
+                    <svg *ngIf="selectedComplaint.status === 'resolved'" class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <svg *ngIf="selectedComplaint.status === 'rejected'" class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                  Complaint {{ selectedComplaint.status === 'resolved' ? 'Resolved' : 'Declined' }}
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  This complaint has been {{ selectedComplaint.status === 'resolved' ? 'resolved' : 'declined' }} and can no longer be modified.
+                </p>
+                <div *ngIf="selectedComplaint.barangayResponse" class="bg-white border border-gray-200 rounded-lg p-4 text-left">
+                  <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Final Response</p>
+                  <p class="text-gray-700 leading-relaxed">{{ selectedComplaint.barangayResponse }}</p>
                 </div>
               </div>
-              
-              <div>
-                <label for="reply" class="block text-sm font-medium text-gray-700 mb-2">Reply</label>
-                <textarea 
-                  id="reply" 
-                  [(ngModel)]="replyMessage" 
-                  name="reply" 
-                  rows="4" 
-                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your reply to the resident"
-                ></textarea>
-              </div>
-              
-              <div class="flex justify-end gap-2">
-                <button 
-                  type="button"
-                  class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-                  (click)="selectedComplaint = null"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                  [disabled]="isSubmitting"
-                >
-                  <span *ngIf="!isSubmitting">Update & Send Reply</span>
-                  <span *ngIf="isSubmitting" class="flex items-center">
-                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Updating...
-                  </span>
-                </button>
-              </div>
-            </form>
+            </div>
+
+            <!-- Update Form (shown only for pending or in_review complaints) -->
+            <ng-template #updateForm>
+              <h3 class="font-semibold text-gray-900 mb-3">Update Status & Reply</h3>
+              <form (submit)="replyToComplaint($event)" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
+                  <div class="flex flex-wrap gap-3">
+                    <label 
+                      *ngFor="let status of getAvailableStatusOptions(selectedComplaint.status)" 
+                      class="flex items-center p-2 border rounded-lg cursor-pointer transition"
+                      [class.bg-blue-50]="statusToUpdate === status.value"
+                      [class.border-blue-300]="statusToUpdate === status.value"
+                      [class.border-gray-200]="statusToUpdate !== status.value"
+                    >
+                      <input 
+                        type="radio" 
+                        [value]="status.value" 
+                        [(ngModel)]="statusToUpdate" 
+                        name="status" 
+                        class="mr-2"
+                      >
+                      <span>{{ status.label }}</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div>
+                  <label for="reply" class="block text-sm font-medium text-gray-700 mb-2">Reply</label>
+                  <textarea 
+                    id="reply" 
+                    [(ngModel)]="replyMessage" 
+                    name="reply" 
+                    rows="4" 
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your reply to the resident"
+                  ></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                  <button 
+                    type="button"
+                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                    (click)="selectedComplaint = null"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    [disabled]="isSubmitting"
+                  >
+                    <span *ngIf="!isSubmitting">Update & Send Reply</span>
+                    <span *ngIf="isSubmitting" class="flex items-center">
+                      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </span>
+                  </button>
+                </div>
+              </form>
+            </ng-template>
           </div>
         </div>
       </div>
@@ -429,7 +452,7 @@ import Swal from 'sweetalert2';
 export class ReportsComponent implements OnInit {
   complaints: Complaint[] = [];
   filteredComplaints: Complaint[] = [];
-  residentMap: { [key: string]: string } = {}; // Maps userId to resident name
+  residentMap: { [key: string]: ResidentInfo } = {}; // Maps userId to full resident info
   
   loading = true;
   isSubmitting = false;
@@ -478,13 +501,10 @@ export class ReportsComponent implements OnInit {
           try {
             const residentInfo = await this.userService.getUserInformation(complaint.userId);
             if (residentInfo) {
-              this.residentMap[complaint.userId] = `${residentInfo.personalInfo.firstName} ${residentInfo.personalInfo.lastName}`;
-            } else {
-              this.residentMap[complaint.userId] = 'Unknown Resident';
+              this.residentMap[complaint.userId] = residentInfo;
             }
           } catch (error) {
             console.error('Error fetching resident info:', error);
-            this.residentMap[complaint.userId] = 'Unknown Resident';
           }
         }
       }
@@ -738,14 +758,58 @@ export class ReportsComponent implements OnInit {
   }
   
   getComplainantName(complaint: Complaint): string {
-    if (complaint.isAnonymous) {
-      return 'Anonymous';
-    }
-    return this.residentMap[complaint.userId] || 'Unknown Resident';
+    const resident = this.residentMap[complaint.userId];
+    return resident ? `${resident.personalInfo.firstName} ${resident.personalInfo.lastName}` : 'Unknown Resident';
   }
 
   getResidentName(userId: string): string {
-    return this.residentMap[userId] || 'Unknown Resident';
+    const resident = this.residentMap[userId];
+    return resident ? `${resident.personalInfo.firstName} ${resident.personalInfo.lastName}` : 'Unknown Resident';
+  }
+
+  getComplainantAddress(complaint: Complaint): string {
+    const resident = this.residentMap[complaint.userId];
+    if (!resident) return 'Address not available';
+    
+    const { houseNo, street, purokNo } = resident.personalInfo;
+    const parts = [];
+    
+    if (houseNo && houseNo.trim()) {
+      parts.push(houseNo.trim());
+    }
+    if (street && street.trim()) {
+      parts.push(street.trim());
+    }
+    
+    const addressLine1 = parts.length > 0 ? parts.join(' ') : '';
+    const purokLine = purokNo && purokNo.trim() ? `Purok ${purokNo.trim()}` : '';
+    const location = 'New Cabalan, Olongapo City';
+    
+    const fullAddress = [addressLine1, purokLine, location].filter(part => part).join(', ');
+    return fullAddress || 'Address not available';
+  }
+
+  isComplaintFinalized(complaint: Complaint | null): boolean {
+    if (!complaint) return false;
+    return complaint.status === 'resolved' || complaint.status === 'rejected';
+  }
+
+  getAvailableStatusOptions(currentStatus: ComplaintStatus) {
+    // Define the status progression hierarchy
+    const statusHierarchy: { [key: string]: number } = {
+      'pending': 0,
+      'in_review': 1,
+      'resolved': 2,
+      'rejected': 2
+    };
+
+    const currentLevel = statusHierarchy[currentStatus] || 0;
+    
+    // Only allow status options that are at the same level or higher
+    return this.statusOptions.filter(option => {
+      const optionLevel = statusHierarchy[option.value] || 0;
+      return optionLevel >= currentLevel;
+    });
   }
 
   getAttachmentUrl(fileId: string): string {

@@ -12,7 +12,6 @@ export interface Complaint {
   attachments?: string;
   createdAt: string;
   updatedAt?: string;
-  isAnonymous?: boolean;
 }
 
 export interface NewComplaint {
@@ -20,7 +19,6 @@ export interface NewComplaint {
   description: string;
   category: 'complaint' | 'report' | 'other';
   attachments?: File;
-  isAnonymous?: boolean;
 }
 
 // Add this for convenience
