@@ -131,6 +131,14 @@ export class AnnouncementService extends BaseAppwriteService {
       // Trigger refresh for all components listening to announcements
       this.dataRefreshService.triggerMultipleRefresh(['announcements', 'dashboard-stats']);
       
+      // Create notification for new announcement
+      try {
+        await this.createAnnouncementNotification(response as unknown as Announcement);
+      } catch (notificationError) {
+        console.warn('Failed to create announcement notification:', notificationError);
+        // Don't fail the announcement creation if notification fails
+      }
+      
       return response as unknown as Announcement;
     } catch (error) {
       console.error('Error creating announcement:', error);
@@ -221,7 +229,24 @@ export class AnnouncementService extends BaseAppwriteService {
     }
   }
 
-  // Delete an announcement
+  // Mark new announcement for notification system
+  private async createAnnouncementNotification(announcement: Announcement): Promise<void> {
+    try {
+      // Since notifications are generated dynamically from existing data,
+      // we just need to trigger a refresh of notification data
+      // The notification service will pick up new announcements automatically
+      
+      // Store the timestamp of the last announcement creation to help
+      // the notification system identify truly new announcements
+      localStorage.setItem('bnc_last_announcement_created', new Date().toISOString());
+      
+      console.log('Announcement notification marker created for:', announcement.title);
+    } catch (error) {
+      console.error('Error marking announcement for notifications:', error);
+      throw error;
+    }
+  }
+
   async deleteAnnouncement(id: string): Promise<boolean> {
     try {
       await this.database.deleteDocument(

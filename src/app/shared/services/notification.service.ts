@@ -63,15 +63,16 @@ export class NotificationService extends BaseAppwriteService {
         ...recentAnnouncements
       );
 
-      // Sort by timestamp (newest first) and priority
+      // Sort by timestamp (newest first), then by priority
         return notifications.sort((a, b) => {
-          // First sort by priority (high, medium, low)
-          const priorityOrder = { high: 3, medium: 2, low: 1 };
-          if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-            return priorityOrder[b.priority] - priorityOrder[a.priority];
+          // First sort by timestamp (newest first)
+          const timeDiff = b.timestamp.getTime() - a.timestamp.getTime();
+          if (timeDiff !== 0) {
+            return timeDiff;
           }
-          // Then by timestamp (newest first)
-          return b.timestamp.getTime() - a.timestamp.getTime();
+          // Then by priority (high, medium, low) as secondary sort
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
+          return priorityOrder[b.priority] - priorityOrder[a.priority];
         }).map(notification => {
           // Apply read status from localStorage
           notification.isRead = this.readNotifications.has(notification.id);
@@ -230,6 +231,38 @@ export class NotificationService extends BaseAppwriteService {
     }
   }
 
+  private async getUserAnnouncementNotifications(): Promise<Notification[]> {
+    try {
+      const announcements = await this.announcementService.getActiveAnnouncements();
+      const recentAnnouncements = announcements
+        .filter(announcement => {
+          const createdAt = new Date(announcement.createdAt);
+          const daysAgo = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+          return daysAgo <= 7 && announcement.status === 'active'; // Last 7 days for users
+        })
+        .slice(0, 5); // Show up to 5 recent announcements for users
+
+      return recentAnnouncements.map(announcement => {
+        const createdAt = new Date(announcement.createdAt);
+
+        return {
+          id: `user_announcement_${announcement.$id}`,
+          type: 'announcement' as const,
+          title: 'New Announcement',
+          message: `"${announcement.title}" - Tap to read more`,
+          timestamp: createdAt,
+          isRead: false,
+          actionUrl: `/user/home?highlight=${announcement.$id}`,
+          priority: 'medium' as const, // Higher priority for users
+          relatedId: announcement.$id
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching user announcement notifications:', error);
+      return [];
+    }
+  }
+
   async getUnreadCount(): Promise<number> {
     const notifications = await this.getAllNotifications();
     return notifications.filter(n => !n.isRead).length;
@@ -330,7 +363,7 @@ export class NotificationService extends BaseAppwriteService {
       ] = await Promise.all([
         this.getUserComplaintNotifications(userId),
         this.getUserUpdateRequestNotifications(userId),
-        this.getAnnouncementNotifications()
+        this.getUserAnnouncementNotifications()
       ]);
 
       notifications.push(
@@ -339,15 +372,16 @@ export class NotificationService extends BaseAppwriteService {
         ...recentAnnouncements
       );
 
-      // Sort by timestamp (newest first) and priority
+      // Sort by timestamp (newest first), then by priority
       return notifications.sort((a, b) => {
-        // First sort by priority (high, medium, low)
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
-        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-          return priorityOrder[b.priority] - priorityOrder[a.priority];
+        // First sort by timestamp (newest first)
+        const timeDiff = b.timestamp.getTime() - a.timestamp.getTime();
+        if (timeDiff !== 0) {
+          return timeDiff;
         }
-        // Then by timestamp (newest first)
-        return b.timestamp.getTime() - a.timestamp.getTime();
+        // Then by priority (high, medium, low) as secondary sort
+        const priorityOrder = { high: 3, medium: 2, low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
       }).map(notification => {
         // Apply read status from localStorage
         notification.isRead = this.readNotifications.has(notification.id);

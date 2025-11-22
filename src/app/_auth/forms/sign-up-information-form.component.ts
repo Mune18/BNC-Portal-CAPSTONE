@@ -691,15 +691,51 @@ import Swal from 'sweetalert2';
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
                       Religion <span class="text-red-500">*</span>
                     </label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="formData.personalInfo.religion" 
-                      name="religion" 
-                      placeholder="Enter your religion"
-                      [class.border-red-300]="hasFieldError('religion')"
-                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
-                      (input)="onFieldInput('religion', formData.personalInfo.religion)"
-                    >
+                    <div class="space-y-3">
+                      <!-- Religion Dropdown -->
+                      <div class="relative">
+                        <select
+                          [(ngModel)]="formData.personalInfo.religion" 
+                          name="religion" 
+                          [class.border-red-300]="hasFieldError('religion')"
+                          class="w-full px-3 py-3 pr-10 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all appearance-none cursor-pointer"
+                          (change)="onReligionChange($event)"
+                        >
+                          <option value="" disabled>Select your religion</option>
+                          <option value="Roman Catholic">Roman Catholic</option>
+                          <option value="Protestant">Protestant</option>
+                          <option value="Iglesia ni Cristo">Iglesia ni Cristo</option>
+                          <option value="Islam">Islam</option>
+                          <option value="Buddhism">Buddhism</option>
+                          <option value="Seventh-day Adventist">Seventh-day Adventist</option>
+                          <option value="Jehovah's Witnesses">Jehovah's Witnesses</option>
+                          <option value="Born Again Christian">Born Again Christian</option>
+                          <option value="Methodist">Methodist</option>
+                          <option value="Baptist">Baptist</option>
+                          <option value="Pentecostal">Pentecostal</option>
+                          <option value="Anglican">Anglican</option>
+                          <option value="Others">Others (Please specify)</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                          </svg>
+                        </div>
+                      </div>
+                      
+                      <!-- Custom Religion Input (shown when Others is selected) -->
+                      <div *ngIf="religionType === 'others'" class="mt-3">
+                        <input 
+                          type="text" 
+                          [(ngModel)]="formData.personalInfo.religion" 
+                          name="customReligion" 
+                          placeholder="Please specify your religion"
+                          [class.border-red-300]="hasFieldError('religion')"
+                          class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                          (input)="onFieldInput('religion', formData.personalInfo.religion)"
+                        >
+                      </div>
+                    </div>
                     <div *ngIf="hasFieldError('religion')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
@@ -851,15 +887,29 @@ import Swal from 'sweetalert2';
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
                       Purok Number <span class="text-red-500">*</span>
                     </label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="formData.personalInfo.purokNo" 
-                      name="purokNo" 
-                      placeholder="Enter purok number"
-                      [class.border-red-300]="hasFieldError('purokNo')"
-                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
-                      (input)="onFieldInput('purokNo', formData.personalInfo.purokNo)"
-                    >
+                    <div class="relative">
+                      <select
+                        [(ngModel)]="formData.personalInfo.purokNo" 
+                        name="purokNo" 
+                        [class.border-red-300]="hasFieldError('purokNo')"
+                        class="w-full px-3 py-3 pr-10 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all appearance-none cursor-pointer"
+                        (change)="onFieldInput('purokNo', formData.personalInfo.purokNo)"
+                      >
+                        <option value="" disabled>Select purok number</option>
+                        <option value="1">Purok 1</option>
+                        <option value="2">Purok 2</option>
+                        <option value="3">Purok 3</option>
+                        <option value="4">Purok 4</option>
+                        <option value="5">Purok 5</option>
+                        <option value="6">Purok 6</option>
+                        <option value="7">Purok 7</option>
+                      </select>
+                      <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                      </div>
+                    </div>
                     <div *ngIf="hasFieldError('purokNo')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
@@ -1806,6 +1856,7 @@ export class SignUpInformationFormComponent implements OnInit {
   acceptedTerms = false;
   maxDate = '';
   currentYear = new Date().getFullYear();
+  religionType: 'predefined' | 'others' = 'predefined';
 
   formData = {
     account: {
@@ -2867,6 +2918,23 @@ export class SignUpInformationFormComponent implements OnInit {
     // Clear error when user selects a value in dropdown
     if (value && value.toString().trim() !== '') {
       this.clearFieldError(fieldName);
+    }
+  }
+
+  // Method to handle religion selection changes
+  onReligionChange(event: any) {
+    const selectedValue = event.target.value;
+    
+    if (selectedValue === 'Others') {
+      this.religionType = 'others';
+      this.formData.personalInfo.religion = ''; // Clear the field for custom input
+    } else {
+      this.religionType = 'predefined';
+      this.formData.personalInfo.religion = selectedValue;
+      // Clear error when a predefined religion is selected
+      if (selectedValue && selectedValue.trim() !== '') {
+        this.clearFieldError('religion');
+      }
     }
   }
 }

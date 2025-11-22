@@ -148,17 +148,17 @@ import { Subscription } from 'rxjs';
                     </div>
                   </div>
 
-                  <!-- Recent Announcements Section -->
-                  <div *ngIf="getRecentAnnouncements().length > 0">
+                  <!-- All Announcements Section -->
+                  <div *ngIf="announcements.length > 1">
                     <div class="flex items-center justify-between mb-6">
-                      <h3 class="text-2xl font-bold text-gray-900">Recent Announcements</h3>
+                      <h3 class="text-2xl font-bold text-gray-900">More Announcements</h3>
                       <div class="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">
-                        This Week ({{ getRecentAnnouncements().length }})
+                        Total ({{ announcements.length - 1 }})
                       </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div
-                        *ngFor="let announcement of getRecentAnnouncements()"
+                        *ngFor="let announcement of getOtherAnnouncements()"
                         class="group bg-white rounded-2xl shadow-lg hover:shadow-xl overflow-hidden transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
                         (click)="openAnnouncement(announcement)"
                       >
@@ -234,43 +234,12 @@ import { Subscription } from 'rxjs';
                       </div>
                       <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
                         <span class="text-sm font-medium text-orange-900">Recent Posts</span>
-                        <span class="text-lg font-bold text-orange-600">{{ getRecentAnnouncements().length }}</span>
+                        <span class="text-lg font-bold text-orange-600">{{ getRecentCount() }}</span>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Old Announcements List -->
-                  <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <div class="flex items-center justify-between mb-4">
-                      <h4 class="font-semibold text-gray-900">Old Announcements</h4>
-                      <div class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                        {{ getAllOldAnnouncements().length }}
-                      </div>
-                    </div>
-                    <div>
-                      <div
-                        *ngFor="let announcement of getOldAnnouncements()"
-                        class="p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group"
-                        (click)="openAnnouncement(announcement)"
-                      >
-                        <h5 class="font-medium text-gray-900 text-sm mb-1 group-hover:text-blue-600 line-clamp-2">
-                          {{ announcement.title }}
-                        </h5>
-                        <p class="text-xs text-gray-500">{{ announcement.createdAt | date:'mediumDate' }}</p>
-                      </div>
-                      <div *ngIf="getAllOldAnnouncements().length === 0" class="text-center py-4">
-                        <p class="text-gray-500 text-sm">No old announcements</p>
-                      </div>
-                      <div *ngIf="getAllOldAnnouncements().length > 5" class="pt-3 border-t border-gray-100">
-                        <button
-                          (click)="openOldAnnouncementsModal()"
-                          class="w-full px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center space-x-2"
-                        >
-                          <span>View All Old Announcements</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             </div>
@@ -323,14 +292,14 @@ import { Subscription } from 'rxjs';
                 </div>
               </div>
 
-              <!-- Recent Announcements Mobile -->
-              <div *ngIf="getRecentAnnouncements().length > 0" class="space-y-4">
+              <!-- More Announcements Mobile -->
+              <div *ngIf="announcements.length > 1" class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <h3 class="text-xl font-bold text-gray-900">Recent This Week</h3>
-                  <span class="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">{{ getRecentAnnouncements().length }}</span>
+                  <h3 class="text-xl font-bold text-gray-900">More Announcements</h3>
+                  <span class="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">{{ announcements.length - 1 }}</span>
                 </div>
                 <div
-                  *ngFor="let announcement of getRecentAnnouncements()"
+                  *ngFor="let announcement of getOtherAnnouncements()"
                   class="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 cursor-pointer transform active:scale-95"
                   (click)="openAnnouncement(announcement)"
                 >
@@ -553,179 +522,7 @@ import { Subscription } from 'rxjs';
         </div>
       </div>
 
-      <!-- Old Announcements Modal -->
-      <div
-        *ngIf="showOldAnnouncementsModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-      >
-        <div class="absolute inset-0 backdrop-blur-md bg-black/40" (click)="closeOldAnnouncementsModal()"></div>
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl z-10 max-h-[90vh] flex flex-col">
-          <!-- Modal Header -->
-          <div class="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 z-10">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="p-2 bg-blue-100 rounded-lg">
-                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                  </svg>
-                </div>
-                <div>
-                  <h2 class="text-xl font-bold text-gray-900">Old Announcements Archive</h2>
-                  <p class="text-sm text-gray-500">Browse all past announcements</p>
-                </div>
-              </div>
-              <button
-                class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100 flex-shrink-0"
-                (click)="closeOldAnnouncementsModal()"
-              >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
-          </div>
 
-          <!-- Date Filter Section -->
-          <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-            <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                  <label for="dateFilter" class="text-sm font-medium text-gray-700">Filter by date:</label>
-                  <div class="flex gap-2">
-                    <input
-                      id="dateFilter"
-                      type="date"
-                      [(ngModel)]="selectedDate"
-                      (ngModelChange)="onDateFilterChange()"
-                      class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                    >
-                    <button
-                      *ngIf="selectedDate"
-                      (click)="clearDateFilter()"
-                      class="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-1"
-                      title="Clear date filter"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                      </svg>
-                      <span>Clear</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center text-sm text-gray-500 bg-white px-3 py-2 rounded-lg border">
-                <span class="font-medium">{{ filteredOldAnnouncements.length }}</span>
-                <span class="ml-1">announcement{{ filteredOldAnnouncements.length !== 1 ? 's' : '' }}</span>
-                <span *ngIf="selectedDate" class="ml-1">on {{ selectedDate | date:'mediumDate' }}</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Modal Body -->
-          <div class="flex-1 overflow-y-auto p-6">
-            <!-- Announcements Grid -->
-            <div *ngIf="filteredOldAnnouncements.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div
-                *ngFor="let announcement of filteredOldAnnouncements"
-                class="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg overflow-hidden transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                (click)="openAnnouncement(announcement); closeOldAnnouncementsModal()"
-              >
-                <!-- Card Image -->
-                <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
-                  <img 
-                    *ngIf="announcement.image" 
-                    [src]="getImageUrl(announcement.image)" 
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
-                    alt="Announcement image"
-                  >
-                  <div *ngIf="!announcement.image" class="text-center p-6">
-                    <svg class="w-16 h-16 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                    </svg>
-                    <p class="text-gray-400 font-medium text-sm">Archive</p>
-                  </div>
-                </div>
-                
-                <!-- Card Content -->
-                <div class="p-6">
-                  <div class="flex items-center space-x-2 mb-3">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
-                      ARCHIVED
-                    </span>
-                    <span class="text-xs text-gray-500">{{ announcement.createdAt | date:'MMM d, y' }}</span>
-                  </div>
-                  
-                  <h4 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {{ announcement.title }}
-                  </h4>
-                  
-                  <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ announcement.content }}</p>
-                  
-                  <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div class="flex items-center text-xs text-gray-500">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      {{ announcement.createdAt | date:'shortTime' }}
-                    </div>
-                    <div class="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700">
-                      <span class="mr-1">Read</span>
-                      <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Empty State -->
-            <div *ngIf="filteredOldAnnouncements.length === 0" class="text-center py-16">
-              <div class="max-w-md mx-auto">
-                <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                  </svg>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">
-                  {{ selectedDate ? 'No announcements found for this date' : 'No old announcements yet' }}
-                </h3>
-                <p class="text-gray-600 mb-6">
-                  {{ selectedDate 
-                    ? 'Try selecting a different date to find announcements.' 
-                    : 'Old announcements will appear here as new ones are published.' 
-                  }}
-                </p>
-                <button
-                  *ngIf="selectedDate"
-                  (click)="clearDateFilter()"
-                  class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors font-medium"
-                >
-                  Clear Date Filter
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Footer -->
-          <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-2xl">
-            <div class="flex justify-between items-center">
-              <div class="text-sm text-gray-500">
-                <span class="font-medium">{{ getAllOldAnnouncements().length }}</span> total old announcements
-              </div>
-              <button
-                (click)="closeOldAnnouncementsModal()"
-                class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-medium"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   `,
   styles: [`
@@ -751,10 +548,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loading = true;
   selectedAnnouncement: Announcement | null = null;
   showEmergencyContact = false;
-  showAllOldAnnouncements = false;
-  showOldAnnouncementsModal = false;
-  selectedDate: string = '';
-  filteredOldAnnouncements: Announcement[] = [];
+
   private refreshSubscription?: Subscription;
 
   constructor(
@@ -834,83 +628,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     return sorted[0];
   }
 
-  getRecentAnnouncements(): Announcement[] {
-    const startOfWeek = this.getStartOfWeek();
-    const endOfWeek = this.getEndOfWeek();
+  getOtherAnnouncements(): Announcement[] {
     const latestAnnouncement = this.getLatestAnnouncement();
     
     return this.announcements.filter(announcement => {
-      const announcementDate = new Date(announcement.createdAt);
-      const isThisWeek = announcementDate >= startOfWeek && announcementDate <= endOfWeek;
       const isNotLatest = latestAnnouncement ? announcement.$id !== latestAnnouncement.$id : true;
-      return isThisWeek && isNotLatest;
-    }).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ).slice(0, 9); // Show up to 9 recent announcements
-  }
-
-  getOldAnnouncements(): Announcement[] {
-    const startOfWeek = this.getStartOfWeek();
-    
-    const oldAnnouncements = this.announcements.filter(announcement => {
-      const announcementDate = new Date(announcement.createdAt);
-      return announcementDate < startOfWeek;
+      return isNotLatest;
     }).sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-
-    // Return all if showAllOldAnnouncements is true, otherwise limit to 5
-    return this.showAllOldAnnouncements ? oldAnnouncements : oldAnnouncements.slice(0, 5);
   }
 
-  getAllOldAnnouncements(): Announcement[] {
-    const startOfWeek = this.getStartOfWeek();
+  getRecentCount(): number {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     
     return this.announcements.filter(announcement => {
       const announcementDate = new Date(announcement.createdAt);
-      return announcementDate < startOfWeek;
-    }).sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-  }
-
-  toggleShowAllOldAnnouncements(): void {
-    this.showAllOldAnnouncements = !this.showAllOldAnnouncements;
-  }
-
-  openOldAnnouncementsModal(): void {
-    this.showOldAnnouncementsModal = true;
-    this.filteredOldAnnouncements = this.getAllOldAnnouncements();
-    this.selectedDate = '';
-  }
-
-  closeOldAnnouncementsModal(): void {
-    this.showOldAnnouncementsModal = false;
-    this.selectedDate = '';
-    this.filteredOldAnnouncements = [];
-  }
-
-  onDateFilterChange(): void {
-    if (!this.selectedDate) {
-      this.filteredOldAnnouncements = this.getAllOldAnnouncements();
-      return;
-    }
-
-    const selectedDateObj = new Date(this.selectedDate);
-    const startOfDay = new Date(selectedDateObj);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(selectedDateObj);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    this.filteredOldAnnouncements = this.getAllOldAnnouncements().filter(announcement => {
-      const announcementDate = new Date(announcement.createdAt);
-      return announcementDate >= startOfDay && announcementDate <= endOfDay;
-    });
-  }
-
-  clearDateFilter(): void {
-    this.selectedDate = '';
-    this.filteredOldAnnouncements = this.getAllOldAnnouncements();
+      return announcementDate >= threeDaysAgo;
+    }).length;
   }
 
   private getStartOfWeek(): Date {
