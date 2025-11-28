@@ -12,11 +12,12 @@ import { Complaint } from '../../shared/types/complaint';
 import { Subscription } from 'rxjs';
 import Chart from 'chart.js/auto';
 import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, StatusFormatPipe],
+  imports: [CommonModule, RouterModule, StatusFormatPipe, LoadingComponent],
   template: `
     <div class="container mx-auto px-4 py-6">
       <!-- Header Section -->
@@ -25,31 +26,9 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
         <p class="text-gray-600">Overview of the barangay's analytics and management tools</p>
       </div>
 
-      <!-- Loading Indicator -->
-      <div *ngIf="loading" class="space-y-6">
-        <!-- Skeleton Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          <div *ngFor="let i of [1,2,3,4,5]" class="bg-white shadow rounded-lg p-6 animate-pulse">
-            <div class="flex items-center">
-              <div class="p-3 rounded-full bg-gray-200 w-12 h-12"></div>
-              <div class="ml-4 flex-1">
-                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div class="h-6 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Skeleton Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="bg-white shadow rounded-lg p-6 animate-pulse">
-            <div class="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-            <div class="h-32 bg-gray-200 rounded"></div>
-          </div>
-          <div class="lg:col-span-2 bg-white shadow rounded-lg p-6 animate-pulse">
-            <div class="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div class="h-48 bg-gray-200 rounded"></div>
-          </div>
-        </div>
+      <!-- Unified Loading Indicator -->
+      <div *ngIf="loading" class="w-full">
+        <app-loading type="spinner" [fullScreen]="true" message="Loading dashboard data..."></app-loading>
       </div>
 
       <div *ngIf="!loading">

@@ -6,11 +6,12 @@ import { ResidentInfo } from '../../shared/types/resident';
 import { ResidentDetailModalComponent } from './resident-detail-modal.component';
 import { ResidentEditModalComponent } from './resident-edit-modal.component';
 import Swal from 'sweetalert2';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   selector: 'app-residents',
   standalone: true,
-  imports: [CommonModule, FormsModule, ResidentDetailModalComponent, ResidentEditModalComponent],
+  imports: [CommonModule, FormsModule, ResidentDetailModalComponent, ResidentEditModalComponent, LoadingComponent],
   template: `
     <div class="container mx-auto px-4 py-6">
       <!-- Header Section -->
@@ -227,12 +228,9 @@ import Swal from 'sweetalert2';
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div *ngIf="isLoading" class="bg-white rounded-xl shadow-sm p-8 flex justify-center">
-        <div class="flex flex-col items-center">
-          <div class="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p class="text-gray-600">Loading residents data...</p>
-        </div>
+      <!-- Unified Loading State -->
+      <div *ngIf="isLoading" class="w-full">
+        <app-loading type="spinner" [fullScreen]="true" message="Loading residents data..."></app-loading>
       </div>
 
       <!-- Error State -->
@@ -1751,9 +1749,9 @@ export class ResidentsComponent implements OnInit {
                  <div class="text-left bg-green-50 p-3 rounded-lg border border-green-200">
                    <p class="text-green-700 text-sm">
                      <strong>Actions completed:</strong><br>
-                     ✅ Account activated and user can now log in<br>
-                     ✅ User added to residents list<br>
-                     📧 Email notification sent to ${resident.personalInfo.email}<br><br>
+                     Account activated and user can now log in<br>
+                     User added to residents list<br>
+                     Email notification sent to ${resident.personalInfo.email}<br><br>
                      <strong>What's next:</strong><br>
                      • User will receive approval email notification<br>
                      • User can access all barangay services<br>
@@ -1873,11 +1871,11 @@ export class ResidentsComponent implements OnInit {
                  <div class="text-left bg-red-50 p-3 rounded-lg border border-red-200">
                    <p class="text-red-700 text-sm">
                      <strong>Actions completed:</strong><br>
-                     ❌ Registration completely rejected<br>
-                     �️ User account deleted from system<br>
-                     🗑️ Resident record deleted from database<br>
-                     📧 Email notification sent to ${resident.personalInfo.email}<br>
-                     📝 Rejection reason: ${reason || 'No reason provided'}<br><br>
+                     Registration completely rejected<br>
+                     User account deleted from system<br>
+                     Resident record deleted from database<br>
+                     Email notification sent to ${resident.personalInfo.email}<br>
+                     Rejection reason: ${reason || 'No reason provided'}<br><br>
                      <strong>Status:</strong><br>
                      • User has been notified via email<br>
                      • All user data removed from system<br>

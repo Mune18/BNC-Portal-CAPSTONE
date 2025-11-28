@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { LandingComponent } from './_public/landing.component';
 import { AuthLayoutComponent } from './_auth/auth-layout.component';
 import { SignInFormComponent } from './_auth/forms/sign-in-form.component';
 import { SignUpInformationFormComponent } from './_auth/forms/sign-up-information-form.component';
@@ -15,15 +16,17 @@ import { ComplaintsComponent } from './_root/userPages/complaints.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AdminGuard } from './shared/guards/admin.guard';
 import { ResidentGuard } from './shared/guards/resident.guard';
-import { EmailConfigComponent } from './_root/pages/email-config.component';
 
 export const routes: Routes = [
     {
-        path: '',
+        path: 'landing',
+        component: LandingComponent
+    },
+    {
+        path: 'sign-in',
         component: AuthLayoutComponent,
         children: [
-            {path: '', redirectTo: 'sign-in', pathMatch: 'full'},
-            {path: 'sign-in', component: SignInFormComponent},
+            {path: '', component: SignInFormComponent},
         ]
     },
     {
@@ -57,6 +60,6 @@ export const routes: Routes = [
     // Add a catch-all route that redirects to sign-in
     {
         path: '**',
-        redirectTo: 'sign-in'
+        redirectTo: 'landing'
     }
 ];

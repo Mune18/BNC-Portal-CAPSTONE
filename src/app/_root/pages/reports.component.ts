@@ -7,16 +7,17 @@ import { Complaint, ComplaintStatus } from '../../shared/types/complaint';
 import { UserService } from '../../shared/services/user.service';
 import { ResidentInfo } from '../../shared/types/resident';
 import Swal from 'sweetalert2';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, StatusFormatPipe],
+  imports: [CommonModule, FormsModule, StatusFormatPipe, LoadingComponent],
   template: `
     <div class="container mx-auto px-4 py-6">
-      <!-- Loading Indicator -->
-      <div *ngIf="loading" class="flex justify-center items-center my-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <!-- Unified Loading Indicator -->
+      <div *ngIf="loading" class="w-full">
+        <app-loading type="spinner" [fullScreen]="true" message="Loading complaints & reports..."></app-loading>
       </div>
 
       <div *ngIf="!loading" class="mb-8">

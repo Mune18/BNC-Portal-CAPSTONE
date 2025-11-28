@@ -5,19 +5,17 @@ import { AnnouncementService } from '../../shared/services/announcement.service'
 import { DataRefreshService } from '../../shared/services/data-refresh.service';
 import { Announcement } from '../../shared/types/announcement';
 import { Subscription } from 'rxjs';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingComponent],
   selector: 'app-home',
   template: `
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <!-- Loading Indicator -->
-      <div *ngIf="loading" class="flex justify-center items-center min-h-screen">
-        <div class="flex flex-col items-center space-y-4">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
-          <p class="text-gray-600 font-medium">Loading announcements...</p>
-        </div>
+      <!-- Unified Loading Indicator -->
+      <div *ngIf="loading" class="w-full">
+        <app-loading type="spinner" [fullScreen]="true" message="Loading announcements..."></app-loading>
       </div>
 
       <div *ngIf="!loading">

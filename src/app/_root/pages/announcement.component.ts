@@ -6,16 +6,17 @@ import { DataRefreshService } from '../../shared/services/data-refresh.service';
 import { Announcement, NewAnnouncement } from '../../shared/types/announcement';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   selector: 'app-announcement',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, LoadingComponent],
   template: `
   <div class="container mx-auto px-4 py-6">
-    <!-- Loading Indicator -->
-    <div *ngIf="loading" class="flex justify-center items-center my-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <!-- Unified Loading Indicator -->
+    <div *ngIf="loading" class="w-full">
+      <app-loading type="spinner" [fullScreen]="true" message="Loading announcements..."></app-loading>
     </div>
 
     <div *ngIf="!loading" class="mb-8">

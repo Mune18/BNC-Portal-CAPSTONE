@@ -7,11 +7,12 @@ import { ResidentUpdateService } from '../../shared/services/resident-update.ser
 import { AuthService } from '../../shared/services/auth.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   selector: 'app-resident-update-requests',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingComponent],
   template: `
     <div class="container mx-auto px-4 py-6">
       <div class="max-w-7xl mx-auto">
@@ -23,12 +24,9 @@ import Swal from 'sweetalert2';
           </div>
         </div>
 
-        <!-- Loading State -->
-        <div *ngIf="isLoading" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8 flex justify-center">
-          <div class="flex flex-col items-center">
-            <div class="h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-gray-600">Loading update requests...</p>
-          </div>
+        <!-- Unified Loading State -->
+        <div *ngIf="isLoading" class="w-full mb-8">
+          <app-loading type="spinner" [fullScreen]="true" message="Loading update requests..."></app-loading>
         </div>
 
         <!-- Error State -->

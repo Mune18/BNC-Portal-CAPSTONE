@@ -8,20 +8,18 @@ import { UserService } from '../../shared/services/user.service';
 import { ResidentUpdateService } from '../../shared/services/resident-update.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { LoadingComponent } from '../../shared/components/loading.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingComponent],
   template: `
     <div class="min-h-screen py-4 sm:py-8 px-3 sm:px-4 lg:px-6">
       <div class="max-w-4xl mx-auto">
-        <!-- Loading State -->
-        <div *ngIf="isLoading" class="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-6 sm:mb-8 flex justify-center">
-          <div class="flex flex-col items-center">
-            <div class="h-10 w-10 sm:h-12 sm:w-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3 sm:mb-4"></div>
-            <p class="text-gray-600 text-sm sm:text-base text-center">Loading profile information...</p>
-          </div>
+        <!-- Unified Loading State -->
+        <div *ngIf="isLoading" class="w-full mb-6 sm:mb-8">
+          <app-loading type="spinner" [fullScreen]="true" message="Loading profile information..."></app-loading>
         </div>
 
         <!-- Error State -->
