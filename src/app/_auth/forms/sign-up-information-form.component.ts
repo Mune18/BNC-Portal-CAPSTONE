@@ -743,6 +743,31 @@ import Swal from 'sweetalert2';
                       {{ getFieldError('religion') }}
                     </div>
                   </div>
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Educational Attainment <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      [(ngModel)]="formData.personalInfo.educationalAttainment"
+                      name="educationalAttainment"
+                      [class.border-red-300]="hasFieldError('educationalAttainment')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      (change)="onFieldChange('educationalAttainment', formData.personalInfo.educationalAttainment)"
+                    >
+                      <option value="">Select Educational Attainment</option>
+                      <option value="Elementary Graduate">Elementary Graduate</option>
+                      <option value="High School Graduate">High School Graduate</option>
+                      <option value="College Graduate">College Graduate</option>
+                      <option value="Vocational">Vocational</option>
+                    </select>
+                    <div *ngIf="hasFieldError('educationalAttainment')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('educationalAttainment') }}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -754,16 +779,44 @@ import Swal from 'sweetalert2';
                   </svg>
                   Contact & Work
                 </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
-                      Occupation <span class="text-gray-500 text-xs">(Optional)</span>
+                      Employment Status <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      [(ngModel)]="formData.personalInfo.employmentStatus"
+                      name="employmentStatus"
+                      [class.border-red-300]="hasFieldError('employmentStatus')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      (change)="onFieldChange('employmentStatus', formData.personalInfo.employmentStatus)"
+                    >
+                      <option value="">Select Employment Status</option>
+                      <option value="Employed">Employed</option>
+                      <option value="Unemployed">Unemployed</option>
+                      <option value="SelfEmployed">Self-Employed</option>
+                      <option value="Student">Student</option>
+                      <option value="OFW">OFW</option>
+                      <option value="Retired">Retired</option>
+                      <option value="Housewife">Housewife</option>
+                    </select>
+                    <div *ngIf="hasFieldError('employmentStatus')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('employmentStatus') }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Occupation 
                     </label>
                     <input 
                       type="text" 
                       [(ngModel)]="formData.personalInfo.occupation" 
                       name="occupation" 
-                      placeholder="Enter your occupation (optional for unemployed/students)"
+                      placeholder="Enter your occupation"
                       [class.border-red-300]="hasFieldError('occupation')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                       (input)="onFieldInput('occupation', formData.personalInfo.occupation)"
@@ -779,7 +832,7 @@ import Swal from 'sweetalert2';
                   
                   <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
-                      Monthly Income <span class="text-gray-500 text-xs">(Optional)</span>
+                      Monthly Income 
                     </label>
                     <div class="relative">
                       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -805,7 +858,37 @@ import Swal from 'sweetalert2';
                     </div>
                   </div>
                   
-                  <div class="sm:col-span-2">
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Contact Number <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 text-sm">+63</span>
+                      </div>
+                      <input 
+                        type="tel" 
+                        [(ngModel)]="formData.personalInfo.contactNo" 
+                        name="contactNo" 
+                        placeholder="9XXXXXXXXX"
+                        maxlength="10"
+                        [class.border-red-300]="hasFieldError('contactNo')"
+                        class="w-full pl-12 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
+                        (input)="onPhoneInput($event, 'contactNo')"
+                        (keypress)="onPhoneKeypress($event)"
+                        autocomplete="tel"
+                      >
+                    </div>
+                    <div *ngIf="hasFieldError('contactNo')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('contactNo') }}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Enter 10-digit mobile number without +63</p>
+                  </div>
+                  
+                  <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">
                       Email Address <span class="text-red-500">*</span>
                     </label>
@@ -841,46 +924,16 @@ import Swal from 'sweetalert2';
                       ✓ Valid email address
                     </div>
                   </div>
-                  
-                  <div class="sm:col-span-2">
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">
-                      Contact Number <span class="text-red-500">*</span>
-                    </label>
-                    <div class="relative">
-                      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span class="text-gray-500 text-sm">+63</span>
-                      </div>
-                      <input 
-                        type="tel" 
-                        [(ngModel)]="formData.personalInfo.contactNo" 
-                        name="contactNo" 
-                        placeholder="9XXXXXXXXX"
-                        maxlength="10"
-                        [class.border-red-300]="hasFieldError('contactNo')"
-                        class="w-full pl-12 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
-                        (input)="onPhoneInput($event, 'contactNo')"
-                        (keypress)="onPhoneKeypress($event)"
-                        autocomplete="tel"
-                      >
-                    </div>
-                    <div *ngIf="hasFieldError('contactNo')" class="text-red-500 text-xs mt-1 flex items-center">
-                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                      </svg>
-                      {{ getFieldError('contactNo') }}
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">Enter 10-digit mobile number without +63</p>
-                  </div>
                 </div>
               </div>
 
-              <!-- Address Information -->
+              <!-- Address & Housing Information -->
               <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-100">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                   <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                   </svg>
-                  Address Information
+                  Address & Housing Information
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
@@ -957,6 +1010,54 @@ import Swal from 'sweetalert2';
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                       </svg>
                       {{ getFieldError('street') }}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Housing Ownership <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      [(ngModel)]="formData.personalInfo.housingOwnership"
+                      name="housingOwnership"
+                      [class.border-red-300]="hasFieldError('housingOwnership')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      (change)="onFieldChange('housingOwnership', formData.personalInfo.housingOwnership)"
+                    >
+                      <option value="">Select Housing Ownership</option>
+                      <option value="Owned">Owned</option>
+                      <option value="Rented">Rented</option>
+                      <option value="LivingwithRelatives">Living with Relatives</option>
+                      <option value="GovernmentHousing">Government Housing</option>
+                      <option value="InformalSettler">Informal Settler</option>
+                    </select>
+                    <div *ngIf="hasFieldError('housingOwnership')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('housingOwnership') }}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-gray-700 text-sm font-semibold mb-2">
+                      Years in Barangay <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      [(ngModel)]="formData.personalInfo.yearsInBarangay"
+                      name="yearsInBarangay"
+                      min="0"
+                      placeholder="Number of years"
+                      [class.border-red-300]="hasFieldError('yearsInBarangay')"
+                      class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      (input)="onFieldInput('yearsInBarangay', formData.personalInfo.yearsInBarangay)"
+                    />
+                    <div *ngIf="hasFieldError('yearsInBarangay')" class="text-red-500 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                      {{ getFieldError('yearsInBarangay') }}
                     </div>
                   </div>
                 </div>
@@ -1880,6 +1981,10 @@ export class SignUpInformationFormComponent implements OnInit {
       nationalityType: 'Filipino', // 'Filipino' or 'Others'
       religion: '',
       occupation: '',
+      educationalAttainment: '',
+      employmentStatus: '',
+      housingOwnership: '',
+      yearsInBarangay: null,
       contactNo: '',
       pwd: '',
       pwdIdNo: '',
@@ -2144,11 +2249,21 @@ export class SignUpInformationFormComponent implements OnInit {
       isValid = false;
     }
 
+    if (!personalInfo.educationalAttainment || personalInfo.educationalAttainment.trim() === '') {
+      this.validationErrors['educationalAttainment'] = 'Educational attainment is required';
+      isValid = false;
+    }
+
     // Occupation is optional (for unemployed/students)
     // if (!personalInfo.occupation || personalInfo.occupation.trim() === '') {
     //   this.validationErrors['occupation'] = 'Occupation is required';
     //   isValid = false;
     // }
+
+    if (!personalInfo.employmentStatus || personalInfo.employmentStatus.trim() === '') {
+      this.validationErrors['employmentStatus'] = 'Employment status is required';
+      isValid = false;
+    }
 
     // Email validation in personal info
     if (!personalInfo.email || personalInfo.email.trim() === '') {
@@ -2238,6 +2353,22 @@ export class SignUpInformationFormComponent implements OnInit {
     if (!personalInfo.street || personalInfo.street.trim() === '') {
       this.validationErrors['street'] = 'Street is required';
       isValid = false;
+    }
+
+    if (!personalInfo.housingOwnership || personalInfo.housingOwnership.trim() === '') {
+      this.validationErrors['housingOwnership'] = 'Housing ownership is required';
+      isValid = false;
+    }
+
+    if (personalInfo.yearsInBarangay === null || personalInfo.yearsInBarangay === undefined || personalInfo.yearsInBarangay === '') {
+      this.validationErrors['yearsInBarangay'] = 'Years in barangay is required';
+      isValid = false;
+    } else {
+      const y = Number(personalInfo.yearsInBarangay);
+      if (isNaN(y) || !Number.isFinite(y) || y < 0) {
+        this.validationErrors['yearsInBarangay'] = 'Please enter a valid non-negative number';
+        isValid = false;
+      }
     }
 
     // Date validation with age restriction
@@ -2675,6 +2806,10 @@ export class SignUpInformationFormComponent implements OnInit {
           nationality: this.formData.personalInfo.nationality,
           religion: this.formData.personalInfo.religion,
           occupation: this.formData.personalInfo.occupation,
+          educationalAttainment: this.formData.personalInfo.educationalAttainment || '',
+          employmentStatus: this.formData.personalInfo.employmentStatus || '',
+          housingOwnership: this.formData.personalInfo.housingOwnership || '',
+          yearsInBarangay: this.formData.personalInfo.yearsInBarangay || null,
           contactNo: '+63' + this.formData.personalInfo.contactNo,
           pwd: this.formData.personalInfo.pwd,
           pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '',

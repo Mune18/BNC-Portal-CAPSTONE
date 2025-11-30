@@ -22,6 +22,10 @@ export interface ResidentInfo {
     nationality: string;
     religion: string;
     occupation: string;
+    educationalAttainment?: string;
+    employmentStatus?: string;
+    housingOwnership?: string;
+    yearsInBarangay?: number | null;
     email: string;
     contactNo: string;
     pwd: string;
