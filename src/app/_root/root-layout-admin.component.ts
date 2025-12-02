@@ -182,7 +182,7 @@ import Swal from 'sweetalert2';
           </div>
         </nav>
 
-        <div class="flex-1 overflow-y-auto p-4">
+        <div class="flex-1 overflow-y-auto">
           <!-- Main content goes here -->
           <router-outlet/>
         </div>

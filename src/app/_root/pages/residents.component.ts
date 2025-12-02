@@ -13,16 +13,17 @@ import { LoadingComponent } from '../../shared/components/loading.component';
   standalone: true,
   imports: [CommonModule, FormsModule, ResidentDetailModalComponent, ResidentEditModalComponent, LoadingComponent],
   template: `
-    <div class="container mx-auto px-4 py-6">
-      <!-- Header Section -->
-      <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">Residents Management</h1>
-        <p class="text-gray-600">Manage and view all registered residents in Barangay New Cabalan</p>
-      </div>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="mb-8">
+          <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">Residents Management</h1>
+          <p class="text-gray-600 text-lg">Manage and view all registered residents in Barangay New Cabalan</p>
+        </div>
 
       <!-- Tab Navigation -->
-      <div class="mb-6">
-        <div class="border-b border-gray-200">
+      <div class="mb-8">
+        <div class="border-b-2 border-gray-200">
           <nav class="-mb-px flex space-x-8">
             <button 
               (click)="setActiveTab('residents')"
@@ -59,7 +60,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
         <!-- All Residents Tab -->
         <div *ngSwitchCase="'residents'">
           <!-- Actions and Search Bar -->
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
         <!-- Search and Filter -->
         <div class="flex items-center gap-4 flex-1">
           <div class="relative flex-1 max-w-md">
@@ -67,7 +68,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               type="text" 
               [(ngModel)]="searchTerm"
               placeholder="Search residents..." 
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
             >
             <span class="absolute left-3 top-2.5 text-gray-400">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,13 +78,24 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           </div>
           <select 
             [(ngModel)]="statusFilter"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+            class="px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none shadow-sm font-medium"
           >
             <option value="all">All Status</option>
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
             <option value="Deceased">Deceased</option>
             <option value="Archived">Archived</option>
+          </select>
+          <select 
+            [(ngModel)]="categoryFilter"
+            class="px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 appearance-none shadow-sm font-medium"
+          >
+            <option value="all">All Categories</option>
+            <option value="pwd">PWD</option>
+            <option value="indigent">Indigent</option>
+            <option value="soloParent">Solo Parent</option>
+            <option value="seniorCitizen">Senior Citizen</option>
+            <option value="fourPs">4Ps Member</option>
           </select>
         </div>
 
@@ -95,7 +107,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           <div class="relative">
             <button 
               (click)="toggleExportDropdown()"
-              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+              class="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl hover:from-gray-200 hover:to-gray-300 transition-all duration-200 flex items-center gap-2 shadow-sm border border-gray-300 font-semibold"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -250,10 +262,14 @@ import { LoadingComponent } from '../../shared/components/loading.component';
       </div>
 
       <!-- Residents Table -->
-      <div *ngIf="!isLoading && !errorMessage && residents.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div *ngIf="!isLoading && !errorMessage && residents.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+          <h2 class="text-2xl font-bold text-gray-900">Residents</h2>
+        </div>
+        
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Resident
@@ -273,7 +289,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr *ngFor="let resident of filteredResidents" class="hover:bg-gray-50 cursor-pointer transition-colors" (click)="viewResident(resident)">
+              <tr *ngFor="let resident of filteredResidents" class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200" (click)="viewResident(resident)">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -298,7 +314,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <div class="text-sm text-gray-500">{{ resident.personalInfo.email || 'No email' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span [class]="getStatusClass(resident.otherDetails.status)">
+                  <span class="px-3 py-1.5 text-xs font-bold rounded-full shadow-sm" [class]="getStatusClass(resident.otherDetails.status)">
                     {{ resident.otherDetails.status }}
                   </span>
                 </td>
@@ -311,16 +327,16 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     <!-- Archive/Unarchive Button -->
                     <button 
                       *ngIf="resident.otherDetails.status !== 'Archived'"
-                      class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors"
+                      class="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg shadow-sm transition-all duration-200"
                       [class]="archivingResidentId === resident.$id ? 
                         'text-gray-400 bg-gray-100 cursor-not-allowed' : 
-                        'text-orange-600 bg-orange-50 hover:bg-orange-100 hover:text-orange-700'"
+                        'text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 hover:shadow-md'"
                       (click)="archiveResident(resident); $event.stopPropagation()"
                       title="Archive resident"
                       [disabled]="archivingResidentId === resident.$id"
                     >
-                      <div *ngIf="archivingResidentId === resident.$id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-gray-400 mr-1"></div>
-                      <svg *ngIf="archivingResidentId !== resident.$id" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <div *ngIf="archivingResidentId === resident.$id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-gray-400 mr-1.5"></div>
+                      <svg *ngIf="archivingResidentId !== resident.$id" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l4-4h6l4 4" />
                       </svg>
@@ -330,10 +346,10 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     <!-- Unarchive Button (only for archived residents) -->
                     <button 
                       *ngIf="resident.otherDetails.status === 'Archived'"
-                      class="inline-flex items-center px-3 py-1.5 text-xs font-medium transition-colors"
+                      class="inline-flex items-center px-4 py-2 text-xs font-semibold rounded-lg shadow-sm transition-all duration-200"
                       [class]="archivingResidentId === resident.$id ? 
                         'text-gray-400 bg-gray-100 cursor-not-allowed' : 
-                        'text-green-600 bg-green-50 hover:bg-green-100 hover:text-green-700'"
+                        'text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 hover:shadow-md'"
                       (click)="unarchiveResident(resident); $event.stopPropagation()"
                       title="Unarchive resident"
                       [disabled]="archivingResidentId === resident.$id"
@@ -611,6 +627,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
 export class ResidentsComponent implements OnInit {
   searchTerm: string = '';
   statusFilter: string = 'all';
+  categoryFilter: string = 'all';
   isLoading: boolean = false;
   errorMessage: string = '';
   residents: ResidentInfo[] = [];
@@ -758,9 +775,9 @@ export class ResidentsComponent implements OnInit {
 
   get filteredResidents() {
     // Use all residents for filtering if search/filter is active, otherwise use paginated results
-    const sourceData = (this.searchTerm || this.statusFilter !== 'all') ? this.allResidents : this.residents;
+    const sourceData = (this.searchTerm || this.statusFilter !== 'all' || this.categoryFilter !== 'all') ? this.allResidents : this.residents;
     
-    return sourceData.filter(resident => {
+    const filtered = sourceData.filter(resident => {
       // Search by name, address, contact number
       const fullName = `${resident.personalInfo.firstName} ${resident.personalInfo.middleName} ${resident.personalInfo.lastName}`;
       const address = this.getFullAddress(resident);
@@ -782,7 +799,38 @@ export class ResidentsComponent implements OnInit {
         matchesStatus = this.statusFilter === status;
       }
       
-      return matchesSearch && matchesStatus;
+      // Category filter
+      let matchesCategory = true;
+      if (this.categoryFilter !== 'all') {
+        switch (this.categoryFilter) {
+          case 'pwd':
+            matchesCategory = resident.personalInfo.pwd === 'Yes';
+            break;
+          case 'indigent':
+            matchesCategory = resident.personalInfo.indigent === 'Yes';
+            break;
+          case 'soloParent':
+            matchesCategory = resident.personalInfo.soloParent === 'Yes';
+            break;
+          case 'seniorCitizen':
+            matchesCategory = resident.personalInfo.seniorCitizen === 'Yes';
+            break;
+          case 'fourPs':
+            matchesCategory = resident.personalInfo.fourPsMember === 'Yes';
+            break;
+        }
+      }
+      
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+
+    // Sort alphabetically by last name, then first name
+    return filtered.sort((a, b) => {
+      const lastNameCompare = a.personalInfo.lastName.localeCompare(b.personalInfo.lastName);
+      if (lastNameCompare !== 0) {
+        return lastNameCompare;
+      }
+      return a.personalInfo.firstName.localeCompare(b.personalInfo.firstName);
     });
   }
 

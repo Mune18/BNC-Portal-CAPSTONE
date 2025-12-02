@@ -14,15 +14,16 @@ import { LoadingComponent } from '../../shared/components/loading.component';
   standalone: true,
   imports: [CommonModule, FormsModule, LoadingComponent],
   template: `
-    <div class="container mx-auto px-4 py-6">
-      <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Resident Update Requests</h1>
-            <p class="text-gray-600 mt-1">Review and manage resident information update requests</p>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+          <!-- Header -->
+          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
+            <div>
+              <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">Resident Update Requests</h1>
+              <p class="text-gray-600 text-lg mt-2">Review and manage resident information update requests</p>
+            </div>
           </div>
-        </div>
 
         <!-- Unified Loading State -->
         <div *ngIf="isLoading" class="w-full mb-8">
@@ -46,45 +47,45 @@ import { LoadingComponent } from '../../shared/components/loading.component';
         </div>
 
         <!-- Update Requests Table -->
-        <div *ngIf="!isLoading && !errorMessage && filteredRequests.length > 0" class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div *ngIf="!isLoading && !errorMessage && filteredRequests.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
           <!-- Tab Filter -->
-          <div class="border-b border-gray-200">
-            <nav class="flex">
+          <div class="px-8 py-5 border-b-2 border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            <nav class="flex gap-2">
               <button
                 (click)="setFilter('all')"
-                [class]="'px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ' + (filterStatus === 'all' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')"
+                [class]="'px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ' + (filterStatus === 'all' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md' : 'text-gray-600 hover:bg-white hover:shadow-sm')"
               >
-                All Requests ({{ getTotalCount() }})
+                All Requests <span class="ml-1 px-2 py-0.5 rounded-full text-xs" [class]="filterStatus === 'all' ? 'bg-white/20' : 'bg-gray-200'">{{ getTotalCount() }}</span>
               </button>
               <button
                 (click)="setFilter('pending')"
-                [class]="'px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200 ' + (filterStatus === 'pending' ? 'border-yellow-500 text-yellow-600 bg-yellow-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')"
+                [class]="'px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 ' + (filterStatus === 'pending' ? 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white shadow-md' : 'text-gray-600 hover:bg-white hover:shadow-sm')"
               >
-                Pending ({{ getPendingCount() }})
+                Pending <span class="ml-1 px-2 py-0.5 rounded-full text-xs" [class]="filterStatus === 'pending' ? 'bg-white/20' : 'bg-gray-200'">{{ getPendingCount() }}</span>
               </button>
             </nav>
           </div>
           
           <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Request ID
                   </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Resident
                   </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Submitted
                   </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Changes
                   </th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -92,7 +93,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               <tbody class="bg-white divide-y divide-gray-200">
                 <ng-container *ngFor="let request of filteredRequests; let i = index">
                   <!-- Main Row -->
-                  <tr class="hover:bg-gray-50">
+                  <tr class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm font-medium text-gray-900">
                         #{{ request.$id?.slice(-8) }}
@@ -120,11 +121,11 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span 
-                        class="px-2 py-1 text-xs rounded-full font-medium"
+                        class="px-3 py-1.5 text-xs font-bold rounded-full shadow-sm"
                         [ngClass]="{
-                          'bg-yellow-100 text-yellow-800': request.status === 'pending',
-                          'bg-green-100 text-green-800': request.status === 'approved',
-                          'bg-red-100 text-red-800': request.status === 'rejected'
+                          'bg-gradient-to-r from-yellow-400 to-amber-500 text-white': request.status === 'pending',
+                          'bg-gradient-to-r from-green-400 to-emerald-600 text-white': request.status === 'approved',
+                          'bg-gradient-to-r from-red-400 to-rose-600 text-white': request.status === 'rejected'
                         }"
                       >
                         {{ getStatusDisplay(request.status) }}
@@ -154,38 +155,45 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div *ngIf="request.status === 'pending'" class="flex justify-end gap-2">
+                      <div *ngIf="request.status === 'pending'" class="flex justify-end gap-3">
                         <button
                           (click)="reviewRequest(request.$id!, 'approve')"
                           [disabled]="reviewLoading[request.$id!]"
-                          class="text-green-600 hover:text-green-900 text-sm"
+                          class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <span *ngIf="reviewLoading[request.$id!]" class="h-3 w-3 border border-green-600 border-t-transparent rounded-full animate-spin inline-block mr-1"></span>
+                          <span *ngIf="reviewLoading[request.$id!]" class="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin inline-block mr-1"></span>
                           Approve
                         </button>
                         <button
                           (click)="showDeclineModal(request)"
                           [disabled]="reviewLoading[request.$id!]"
-                          class="text-red-600 hover:text-red-900 text-sm ml-3"
+                          class="px-4 py-2 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-xs font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Decline
                         </button>
                       </div>
-                      <div *ngIf="request.status !== 'pending'" class="text-gray-400 text-sm">
-                        {{ request.status === 'approved' ? 'Approved' : 'Declined' }}
+                      <div *ngIf="request.status !== 'pending'" class="text-gray-500 text-sm font-medium">
+                        <span class="px-3 py-1 bg-gray-100 rounded-lg">
+                          {{ request.status === 'approved' ? '✓ Approved' : '✗ Declined' }}
+                        </span>
                       </div>
                     </td>
                   </tr>
                   
                   <!-- Expanded Row for Changes Details -->
-                  <tr *ngIf="expandedRows[i]" class="bg-gray-50">
+                  <tr *ngIf="expandedRows[i]" class="bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
                     <td colspan="6" class="px-6 py-4">
                       <div class="space-y-4">
                         <!-- Requested Changes -->
                         <div>
-                          <h4 class="text-sm font-semibold text-gray-900 mb-3">Requested Changes:</h4>
+                          <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                            </svg>
+                            Requested Changes:
+                          </h4>
                           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div *ngFor="let change of parseChanges(request.changesJSON)" class="bg-white rounded-lg p-3 border border-gray-200">
+                            <div *ngFor="let change of parseChanges(request.changesJSON)" class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
                               <div class="font-medium text-gray-900 text-sm">{{ change.field }}</div>
                               <div class="text-gray-600 mt-1 text-sm">
                                 <span class="block text-xs text-gray-500">New Value:</span>
@@ -196,8 +204,13 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                         </div>
                         
                         <!-- Decline Reason (if declined) -->
-                        <div *ngIf="request.status === 'rejected' && request.reason" class="bg-red-50 border border-red-200 rounded-lg p-4">
-                          <h4 class="text-sm font-semibold text-red-900 mb-2">Decline Reason:</h4>
+                        <div *ngIf="request.status === 'rejected' && request.reason" class="bg-gradient-to-r from-red-50 to-rose-50 border-2 border-red-200 rounded-xl p-4 shadow-sm">
+                          <h4 class="text-sm font-bold text-red-900 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            Decline Reason:
+                          </h4>
                           <p class="text-sm text-red-700">{{ request.reason }}</p>
                         </div>
                       </div>

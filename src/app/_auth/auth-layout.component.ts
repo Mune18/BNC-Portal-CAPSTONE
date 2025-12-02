@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-layout',
@@ -30,7 +30,7 @@ import { RouterOutlet } from '@angular/router';
           <div class="relative w-full pt-full rounded-r-full bg-blue-800">
             <!-- Barangay Logo -->
             <div class="absolute inset-1 flex items-center justify-center">
-              <div class="w-3/4 h-3/4">
+              <div class="w-3/4 h-3/4 cursor-pointer hover:scale-105 transition-transform duration-200" (click)="navigateToLanding()">
                 <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
               </div>
             </div>
@@ -48,16 +48,16 @@ import { RouterOutlet } from '@angular/router';
       </div>
       
       <!-- City seal in top right corner - Hidden on mobile, visible on larger screens only -->
-      <div class="hidden lg:block absolute top-2 right-2 z-20">
+      <div class="hidden lg:block absolute top-2 right-2 z-20 cursor-pointer hover:scale-110 transition-transform duration-200" (click)="navigateToLanding()">
         <div class="w-25 h-25">
           <img src="/assets/Olongapo_City_Logo.png" alt="Olongapo City Seal" class="w-full h-full">
         </div>
       </div>
       
       <!-- Mobile logo at top center - Only visible on mobile, bigger size -->
-      <div class="lg:hidden absolute top-6 left-1/2 transform -translate-x-1/2 z-20">
+      <div class="lg:hidden absolute top-6 left-1/2 transform -translate-x-1/2 z-0 cursor-pointer" (click)="navigateToLanding()">
         <div class="flex flex-col items-center">
-          <div class="w-32 h-32 sm:w-36 sm:h-36 mb-2">
+          <div class="w-32 h-32 sm:w-36 sm:h-36 mb-2 hover:scale-105 transition-transform duration-200">
             <img src="/assets/BNC_Portal_Logo.png" alt="Barangay New Cabalan Logo" class="w-full h-full">
           </div>
           <h1 class="text-center text-xl font-bold text-gray-800">BNC Portal</h1>
@@ -66,7 +66,7 @@ import { RouterOutlet } from '@angular/router';
       </div>
       
       <!-- Content area - Full width on mobile, positioned properly on desktop -->
-      <div class="relative w-full h-screen z-10 lg:absolute lg:right-0 lg:top-0 lg:w-1/2">
+      <div class="relative w-full h-screen z-20 lg:absolute lg:right-0 lg:top-0 lg:w-1/2 lg:z-10">
         <router-outlet/>
       </div>
     </div>
@@ -201,4 +201,10 @@ import { RouterOutlet } from '@angular/router';
     /*-- End BackGround Animation --*/
   `]
 })
-export class AuthLayoutComponent {}
+export class AuthLayoutComponent {
+  constructor(private router: Router) {}
+
+  navigateToLanding() {
+    this.router.navigate(['/']);
+  }
+}

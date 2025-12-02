@@ -13,12 +13,12 @@ import { ResidentInfo } from '../../shared/types/resident';
       
       <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden z-10 flex flex-col">
         <!-- Modal Header -->
-        <div class="flex-shrink-0 bg-white rounded-t-2xl border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div class="flex-shrink-0 bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-2xl border-b-2 border-gray-200 px-6 py-5 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <h2 class="text-xl font-semibold text-gray-800">
+            <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               {{ showApprovalActions ? 'Registration Review' : 'Resident Details' }}
             </h2>
-            <div *ngIf="showApprovalActions" class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full flex items-center gap-1">
+            <div *ngIf="showApprovalActions" class="px-3 py-1.5 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-sm font-bold rounded-full shadow-sm flex items-center gap-1">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -44,7 +44,7 @@ import { ResidentInfo } from '../../shared/types/resident';
             <div class="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full"></div>
             
             <!-- Approval Notice (shown when in approval mode) -->
-            <div *ngIf="showApprovalActions" class="mb-4 bg-yellow-100 border border-yellow-300 rounded-lg p-3 text-yellow-800 text-sm">
+            <div *ngIf="showApprovalActions" class="mb-4 bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 rounded-xl p-4 text-yellow-900 text-sm shadow-sm">
               <div class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -76,19 +76,19 @@ import { ResidentInfo } from '../../shared/types/resident';
                 
                 <!-- Quick Stats -->
                 <div class="flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
-                  <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                  <div class="flex items-center gap-2 bg-white/30 backdrop-blur-md rounded-full px-4 py-2 shadow-md border border-white/40">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                     <span>{{ calculateAge(resident?.personalInfo?.birthDate || '') }} years old</span>
                   </div>
-                  <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                  <div class="flex items-center gap-2 bg-white/30 backdrop-blur-md rounded-full px-4 py-2 shadow-md border border-white/40">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                     </svg>
                     <span>{{ resident?.personalInfo?.contactNo || 'No contact' }}</span>
                   </div>
-                  <div class="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                  <div class="flex items-center gap-2 bg-white/30 backdrop-blur-md rounded-full px-4 py-2 shadow-md border border-white/40">
                     <div class="w-2 h-2 rounded-full" [class]="getStatusColor()"></div>
                     <span>{{ getStatus() }}</span>
                   </div>
@@ -102,13 +102,15 @@ import { ResidentInfo } from '../../shared/types/resident';
             <nav class="flex space-x-8 -mb-px">
               <button
                 *ngFor="let tab of tabs"
-                class="px-1 py-4 text-sm font-medium transition-all border-b-2 relative group"
-                [class.border-blue-500]="activeTab === tab.id"
+                class="px-1 py-4 text-sm font-semibold transition-all border-b-3 relative group"
+                [class.border-blue-600]="activeTab === tab.id"
                 [class.text-blue-600]="activeTab === tab.id"
+                [class.bg-blue-50]="activeTab === tab.id"
                 [class.border-transparent]="activeTab !== tab.id"
                 [class.text-gray-500]="activeTab !== tab.id"
                 [class.hover:text-gray-700]="activeTab !== tab.id"
                 [class.hover:border-gray-300]="activeTab !== tab.id"
+                [class.hover:bg-gray-50]="activeTab !== tab.id"
                 (click)="activeTab = tab.id"
               >
                 <div class="flex items-center gap-2">
@@ -130,10 +132,18 @@ import { ResidentInfo } from '../../shared/types/resident';
           <div class="px-6 py-6">
             <!-- Personal Info Tab -->
             <div *ngIf="activeTab === 'personal'" class="space-y-6">
+              <!-- Basic Information Section -->
               <div>
-                <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Information</h4>
+                <h4 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 flex items-center gap-2">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  Basic Information
+                </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <div class="bg-gray-50 rounded-xl p-4">
+                  <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow duration-200">
                     <p class="text-sm font-medium text-gray-500 mb-1">Full Name</p>
                     <p class="text-gray-900 font-medium">{{ getFullName() }}</p>
                   </div>
@@ -162,8 +172,42 @@ import { ResidentInfo } from '../../shared/types/resident';
                     <p class="text-gray-900">{{ resident?.personalInfo?.religion || '-' }}</p>
                   </div>
                   <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Educational Attainment</p>
+                    <p class="text-gray-900">{{ formatEducationalAttainment(resident?.personalInfo?.educationalAttainment) }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Registered Voter</p>
+                    <div class="flex items-center gap-2">
+                      <div class="w-2 h-2 rounded-full" [class]="resident?.personalInfo?.registeredVoter === 'Yes' ? 'bg-green-500' : 'bg-gray-400'"></div>
+                      <p class="text-gray-900">{{ resident?.personalInfo?.registeredVoter || '-' }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contact & Work Information Section -->
+              <div>
+                <h4 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 border-gradient-to-r from-blue-200 to-indigo-200 flex items-center gap-2">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                    </svg>
+                  </div>
+                  Contact & Work Information
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Employment Status</p>
+                    <p class="text-gray-900">{{ resident?.personalInfo?.employmentStatus || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
                     <p class="text-sm font-medium text-gray-500 mb-1">Occupation</p>
                     <p class="text-gray-900">{{ resident?.personalInfo?.occupation || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Monthly Income</p>
+                    <p class="text-gray-900">₱{{ resident?.personalInfo?.monthlyIncome || 0 | number }}</p>
                   </div>
                   <div class="bg-gray-50 rounded-xl p-4">
                     <p class="text-sm font-medium text-gray-500 mb-1">Email Address</p>
@@ -173,15 +217,20 @@ import { ResidentInfo } from '../../shared/types/resident';
                     <p class="text-sm font-medium text-gray-500 mb-1">Contact Number</p>
                     <p class="text-gray-900">{{ resident?.personalInfo?.contactNo || '-' }}</p>
                   </div>
-                  <div class="bg-gray-50 rounded-xl p-4">
-                    <p class="text-sm font-medium text-gray-500 mb-1">Monthly Income</p>
-                    <p class="text-gray-900">₱{{ resident?.personalInfo?.monthlyIncome || 0 | number }}</p>
-                  </div>
                 </div>
               </div>
 
+              <!-- Special Status & Benefits Section -->
               <div>
-                <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Special Status & Benefits</h4>
+                <h4 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 border-gradient-to-r from-blue-200 to-indigo-200 flex items-center gap-2">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                      <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"></path>
+                    </svg>
+                  </div>
+                  Special Status & Benefits
+                </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div class="bg-gray-50 rounded-xl p-4">
                     <p class="text-sm font-medium text-gray-500 mb-1">PWD Status</p>
@@ -227,25 +276,28 @@ import { ResidentInfo } from '../../shared/types/resident';
                       <p class="text-gray-900">{{ resident?.personalInfo?.fourPsMember || '-' }}</p>
                     </div>
                   </div>
-                  <div class="bg-gray-50 rounded-xl p-4">
-                    <p class="text-sm font-medium text-gray-500 mb-1">Registered Voter</p>
-                    <div class="flex items-center gap-2">
-                      <div class="w-2 h-2 rounded-full" [class]="resident?.personalInfo?.registeredVoter === 'Yes' ? 'bg-green-500' : 'bg-gray-400'"></div>
-                      <p class="text-gray-900">{{ resident?.personalInfo?.registeredVoter || '-' }}</p>
-                    </div>
-                    <p *ngIf="resident?.personalInfo?.registeredVoter === 'Yes' && resident?.otherDetails?.votersIdNo" class="text-sm text-gray-600 mt-1">
-                      Voter ID: {{ resident!.otherDetails!.votersIdNo }}
-                    </p>
-                  </div>
                 </div>
               </div>
 
-              <div *ngIf="resident?.otherDetails?.nationalIdNo">
-                <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Government IDs</h4>
+              <!-- Government IDs Section -->
+              <div *ngIf="resident?.otherDetails?.nationalIdNo || resident?.otherDetails?.votersIdNo">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 border-gradient-to-r from-blue-200 to-indigo-200 flex items-center gap-2">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+                      <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  Government IDs
+                </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div class="bg-gray-50 rounded-xl p-4">
-                    <p class="text-sm font-medium text-gray-500 mb-1">National ID</p>
+                  <div *ngIf="resident?.otherDetails?.nationalIdNo" class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">National ID Number</p>
                     <p class="text-gray-900">{{ resident!.otherDetails!.nationalIdNo }}</p>
+                  </div>
+                  <div *ngIf="resident?.otherDetails?.votersIdNo" class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Voter's ID Number</p>
+                    <p class="text-gray-900">{{ resident!.otherDetails!.votersIdNo }}</p>
                   </div>
                 </div>
               </div>
@@ -253,9 +305,29 @@ import { ResidentInfo } from '../../shared/types/resident';
             
             <!-- Address Tab -->
             <div *ngIf="activeTab === 'address'" class="space-y-6">
+              <!-- Address & Housing Information Section -->
               <div>
-                <h4 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Address Information</h4>
+                <h4 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b-2 border-gradient-to-r from-blue-200 to-indigo-200 flex items-center gap-2">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  Address & Housing Information
+                </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Housing Ownership</p>
+                    <p class="text-gray-900">{{ resident?.personalInfo?.housingOwnership || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Years in Barangay</p>
+                    <p class="text-gray-900">{{ resident?.personalInfo?.yearsInBarangay ? resident?.personalInfo?.yearsInBarangay + ' years' : '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 rounded-xl p-4">
+                    <p class="text-sm font-medium text-gray-500 mb-1">Purok Number</p>
+                    <p class="text-gray-900">{{ resident?.personalInfo?.purokNo || '-' }}</p>
+                  </div>
                   <div class="bg-gray-50 rounded-xl p-4">
                     <p class="text-sm font-medium text-gray-500 mb-1">House Number</p>
                     <p class="text-gray-900">{{ resident?.personalInfo?.houseNo || '-' }}</p>
@@ -264,13 +336,9 @@ import { ResidentInfo } from '../../shared/types/resident';
                     <p class="text-sm font-medium text-gray-500 mb-1">Street</p>
                     <p class="text-gray-900">{{ resident?.personalInfo?.street || '-' }}</p>
                   </div>
-                  <div class="bg-gray-50 rounded-xl p-4">
-                    <p class="text-sm font-medium text-gray-500 mb-1">Purok Number</p>
-                    <p class="text-gray-900">{{ resident?.personalInfo?.purokNo || '-' }}</p>
-                  </div>
                 </div>
                 
-                <div class="mt-6 bg-blue-50 rounded-xl p-6 border border-blue-200">
+                <div class="mt-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 shadow-md">
                   <div class="flex items-start gap-3">
                     <svg class="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -337,7 +405,7 @@ import { ResidentInfo } from '../../shared/types/resident';
           <div *ngIf="showApprovalActions" class="flex flex-col sm:flex-row gap-3 justify-end">
             <button 
               type="button"
-              class="px-6 py-3 bg-red-100 text-red-700 rounded-xl hover:bg-red-200 transition-all font-medium flex items-center justify-center gap-2 sm:w-auto"
+              class="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2 sm:w-auto"
               (click)="onReject()"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,7 +415,7 @@ import { ResidentInfo } from '../../shared/types/resident';
             </button>
             <button 
               type="button"
-              class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-medium flex items-center justify-center gap-2 sm:w-auto"
+              class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2 sm:w-auto"
               (click)="onApprove()"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,7 +448,7 @@ export class ResidentDetailModalComponent {
   
   tabs = [
     { id: 'personal', name: 'Personal Information' },
-    { id: 'address', name: 'Address' },
+    { id: 'address', name: 'Address & Housing' },
     { id: 'emergency', name: 'Emergency Contact' },
     { id: 'other', name: 'Other Details' }
   ];
@@ -475,5 +543,18 @@ export class ResidentDetailModalComponent {
       age--;
     }
     return age >= 0 ? age : '-';
+  }
+
+  formatEducationalAttainment(value?: string): string {
+    if (!value) return '-';
+    
+    const formatMap: { [key: string]: string } = {
+      'ElementaryGraduate': 'Elementary Graduate',
+      'HighSchoolGraduate': 'High School Graduate',
+      'CollegeGraduate': 'College Graduate',
+      'Vocational': 'Vocational'
+    };
+    
+    return formatMap[value] || value;
   }
 }

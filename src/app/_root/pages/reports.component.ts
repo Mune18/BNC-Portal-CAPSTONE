@@ -14,20 +14,21 @@ import { LoadingComponent } from '../../shared/components/loading.component';
   standalone: true,
   imports: [CommonModule, FormsModule, StatusFormatPipe, LoadingComponent],
   template: `
-    <div class="container mx-auto px-4 py-6">
-      <!-- Unified Loading Indicator -->
-      <div *ngIf="loading" class="w-full">
-        <app-loading type="spinner" [fullScreen]="true" message="Loading complaints & reports..."></app-loading>
-      </div>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div class="container mx-auto px-4 py-8">
+        <!-- Unified Loading Indicator -->
+        <div *ngIf="loading" class="w-full">
+          <app-loading type="spinner" [fullScreen]="true" message="Loading complaints & reports..."></app-loading>
+        </div>
 
-      <div *ngIf="!loading" class="mb-8">
-        <!-- Header Section -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 class="text-3xl font-bold text-gray-900 mb-2 sm:mb-0">Complaints and Reports</h1>
-              <p class="text-gray-500">Manage and respond to complaints submitted by residents</p>
-            </div>
+        <div *ngIf="!loading" class="mb-8">
+          <!-- Header Section -->
+          <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">Complaints and Reports</h1>
+                <p class="text-gray-600 text-lg">Manage and respond to complaints submitted by residents</p>
+              </div>
             <!-- Filter Controls -->
             <div class="mt-4 sm:mt-0 flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div class="flex items-center space-x-2">
@@ -62,15 +63,15 @@ import { LoadingComponent } from '../../shared/components/loading.component';
         </div>
 
         <!-- Complaints Table -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-xl font-bold text-gray-900">Complaints</h2>
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <div class="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+            <h2 class="text-2xl font-bold text-gray-900">Complaints</h2>
           </div>
           
           <div *ngIf="filteredComplaints.length > 0; else noComplaints">
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+                <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                   <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Subject
@@ -115,12 +116,12 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span 
-                        class="px-2 py-1 text-xs font-medium rounded-full" 
+                        class="px-3 py-1.5 text-xs font-bold rounded-full shadow-sm" 
                         [ngClass]="{
-                          'bg-yellow-100 text-yellow-800': complaint.status === 'pending',
-                          'bg-blue-100 text-blue-800': complaint.status === 'in_review',
-                          'bg-green-100 text-green-800': complaint.status === 'resolved',
-                          'bg-red-100 text-red-800': complaint.status === 'rejected'
+                          'bg-gradient-to-r from-yellow-400 to-amber-500 text-white': complaint.status === 'pending',
+                          'bg-gradient-to-r from-blue-400 to-blue-600 text-white': complaint.status === 'in_review',
+                          'bg-gradient-to-r from-green-400 to-emerald-600 text-white': complaint.status === 'resolved',
+                          'bg-gradient-to-r from-red-400 to-rose-600 text-white': complaint.status === 'rejected'
                         }"
                       >
                         {{ complaint.status | statusFormat }}

@@ -756,9 +756,9 @@ import Swal from 'sweetalert2';
                       (change)="onFieldChange('educationalAttainment', formData.personalInfo.educationalAttainment)"
                     >
                       <option value="">Select Educational Attainment</option>
-                      <option value="Elementary Graduate">Elementary Graduate</option>
-                      <option value="High School Graduate">High School Graduate</option>
-                      <option value="College Graduate">College Graduate</option>
+                      <option value="ElementaryGraduate">Elementary Graduate</option>
+                      <option value="HighSchoolGraduate">High School Graduate</option>
+                      <option value="CollegeGraduate">College Graduate</option>
                       <option value="Vocational">Vocational</option>
                     </select>
                     <div *ngIf="hasFieldError('educationalAttainment')" class="text-red-500 text-xs mt-1 flex items-center">
@@ -789,7 +789,7 @@ import Swal from 'sweetalert2';
                       name="employmentStatus"
                       [class.border-red-300]="hasFieldError('employmentStatus')"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                      (change)="onFieldChange('employmentStatus', formData.personalInfo.employmentStatus)"
+                      (change)="onEmploymentStatusChange()"
                     >
                       <option value="">Select Employment Status</option>
                       <option value="Employed">Employed</option>
@@ -818,10 +818,19 @@ import Swal from 'sweetalert2';
                       name="occupation" 
                       placeholder="Enter your occupation"
                       [class.border-red-300]="hasFieldError('occupation')"
+                      [disabled]="isOccupationDisabled()"
+                      [class.bg-gray-200]="isOccupationDisabled()"
+                      [class.cursor-not-allowed]="isOccupationDisabled()"
                       class="w-full px-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                       (input)="onFieldInput('occupation', formData.personalInfo.occupation)"
                       autocomplete="organization-title"
                     >
+                    <div *ngIf="isOccupationDisabled()" class="text-blue-600 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                      </svg>
+                      Occupation automatically set based on employment status
+                    </div>
                     <div *ngIf="hasFieldError('occupation')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
@@ -842,13 +851,22 @@ import Swal from 'sweetalert2';
                         type="number" 
                         [(ngModel)]="formData.personalInfo.monthlyIncome" 
                         name="monthlyIncome" 
-                        placeholder="0.00 (optional for unemployed/students)"
+                        placeholder="0.00"
                         min="0"
                         step="0.01"
                         [class.border-red-300]="hasFieldError('monthlyIncome')"
+                        [disabled]="isMonthlyIncomeDisabled()"
+                        [class.bg-gray-200]="isMonthlyIncomeDisabled()"
+                        [class.cursor-not-allowed]="isMonthlyIncomeDisabled()"
                         class="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
                         (input)="onFieldInput('monthlyIncome', formData.personalInfo.monthlyIncome)"
                       >
+                    </div>
+                    <div *ngIf="isMonthlyIncomeDisabled()" class="text-blue-600 text-xs mt-1 flex items-center">
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                      </svg>
+                      Monthly income automatically set based on employment status
                     </div>
                     <div *ngIf="hasFieldError('monthlyIncome')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -3054,6 +3072,45 @@ export class SignUpInformationFormComponent implements OnInit {
     if (value && value.toString().trim() !== '') {
       this.clearFieldError(fieldName);
     }
+  }
+
+  // Method to handle employment status changes and auto-set occupation and monthly income
+  onEmploymentStatusChange() {
+    const status = this.formData.personalInfo.employmentStatus;
+    
+    // Clear error when employment status is selected
+    if (status && status.trim() !== '') {
+      this.clearFieldError('employmentStatus');
+    }
+    
+    // Auto-set occupation to "None" and monthly income to 0 for statuses that don't require them
+    const noOccupationStatuses = ['Unemployed', 'Student', 'Retired', 'Housewife'];
+    if (noOccupationStatuses.includes(status)) {
+      this.formData.personalInfo.occupation = 'None';
+      this.formData.personalInfo.monthlyIncome = 0;
+      this.clearFieldError('occupation');
+      this.clearFieldError('monthlyIncome');
+    } else if (this.formData.personalInfo.occupation === 'None') {
+      // Clear the occupation and monthly income if user switches to a status that requires them
+      this.formData.personalInfo.occupation = '';
+      if (this.formData.personalInfo.monthlyIncome === 0) {
+        this.formData.personalInfo.monthlyIncome = 0;
+      }
+    }
+  }
+
+  // Method to check if occupation field should be disabled
+  isOccupationDisabled(): boolean {
+    const status = this.formData.personalInfo.employmentStatus;
+    const noOccupationStatuses = ['Unemployed', 'Student', 'Retired', 'Housewife'];
+    return noOccupationStatuses.includes(status);
+  }
+
+  // Method to check if monthly income field should be disabled
+  isMonthlyIncomeDisabled(): boolean {
+    const status = this.formData.personalInfo.employmentStatus;
+    const noIncomeStatuses = ['Unemployed', 'Student', 'Retired', 'Housewife'];
+    return noIncomeStatuses.includes(status);
   }
 
   // Method to handle religion selection changes

@@ -13,26 +13,30 @@ import { LoadingComponent } from '../../shared/components/loading.component';
   standalone: true,
   imports: [FormsModule, CommonModule, LoadingComponent],
   template: `
-  <div class="container mx-auto px-4 py-6">
-    <!-- Unified Loading Indicator -->
-    <div *ngIf="loading" class="w-full">
-      <app-loading type="spinner" [fullScreen]="true" message="Loading announcements..."></app-loading>
-    </div>
-
-    <div *ngIf="!loading" class="mb-8">
-      <!-- Header Section -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-2 sm:mb-0">Announcements</h1>
-          <p class="text-gray-500">Manage and create announcements for the community</p>
-        </div>
-        <button
-          class="mt-4 sm:mt-0 px-6 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition font-semibold shadow"
-          (click)="showCreate = true"
-        >
-          Add Announcement
-        </button>
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Unified Loading Indicator -->
+      <div *ngIf="loading" class="w-full">
+        <app-loading type="spinner" [fullScreen]="true" message="Loading announcements..."></app-loading>
       </div>
+
+      <div *ngIf="!loading" class="mb-8">
+        <!-- Header Section -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">Announcements</h1>
+            <p class="text-gray-600 text-lg">Manage and create announcements for the community</p>
+          </div>
+          <button
+            class="mt-4 sm:mt-0 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
+            (click)="showCreate = true"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2 -mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Announcement
+          </button>
+        </div>
 
       <!-- Create Announcement Modal -->
       <div
@@ -259,10 +263,10 @@ import { LoadingComponent } from '../../shared/components/loading.component';
       </div>
 
       <!-- Announcements Table -->
-      <div *ngIf="announcements.length > 0" class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div *ngIf="announcements.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Announcement
@@ -284,7 +288,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             <tbody class="bg-white divide-y divide-gray-200">
               <tr 
                 *ngFor="let announcement of announcements" 
-                class="hover:bg-gray-50 cursor-pointer"
+                class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 cursor-pointer transition-all duration-200"
                 (click)="openDetail(announcement)"
               >
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -310,10 +314,10 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span 
-                    class="px-2 py-1 text-xs rounded-full font-medium"
+                    class="px-3 py-1.5 text-xs rounded-full font-bold shadow-sm"
                     [ngClass]="{
-                      'bg-green-100 text-green-800': announcement.status === 'active',
-                      'bg-gray-100 text-gray-800': announcement.status === 'archived'
+                      'bg-gradient-to-r from-green-400 to-emerald-600 text-white': announcement.status === 'active',
+                      'bg-gradient-to-r from-gray-400 to-gray-600 text-white': announcement.status === 'archived'
                     }"
                   >
                     {{ announcement.status | titlecase }}
@@ -326,7 +330,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <div class="relative inline-block text-left">
                     <button 
                       (click)="toggleMenu(announcement.$id || '')" 
-                      class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      class="inline-flex items-center px-4 py-2 border border-blue-200 shadow-sm text-sm leading-4 font-semibold rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
                     >
                       Actions
                       <svg class="-mr-1 ml-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -355,18 +359,22 @@ import { LoadingComponent } from '../../shared/components/loading.component';
       </div>
 
       <!-- Empty state -->
-      <div *ngIf="announcements.length === 0" class="bg-white rounded-2xl shadow-lg p-8 text-center">
-        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-        </svg>
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">No announcements yet</h3>
-        <p class="text-gray-600 mb-6">Create your first announcement to share important information with residents.</p>
-        <button
-          (click)="showCreate = true"
-          class="px-6 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition font-semibold"
-        >
-          Create Announcement
-        </button>
+      <div *ngIf="announcements.length === 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+        <div class="max-w-md mx-auto">
+          <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">No announcements yet</h3>
+          <p class="text-gray-600 mb-8 text-lg">Create your first announcement to share important information with residents.</p>
+          <button
+            (click)="showCreate = true"
+            class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
+          >
+            Create Announcement
+          </button>
+        </div>
       </div>
 
       <!-- Announcement Detail Modal -->

@@ -123,7 +123,9 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               <!-- Basic Information Section -->
               <div class="mb-6 sm:mb-8">
                 <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
-                  <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                  </svg>
                   Basic Information
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -156,24 +158,6 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Civil Status</div>
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.civilStatus : '-' }}</div>
                   </div>
-                </div>
-              </div>
-
-              <!-- Contact & Background Section -->
-              <div class="mb-6 sm:mb-8">
-                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
-                  <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                  Contact & Background
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
-                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Email Address</div>
-                    <div class="text-gray-900 font-semibold text-sm sm:text-base break-all">{{ residentInfo ? residentInfo.personalInfo.email : '-' }}</div>
-                  </div>
-                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
-                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Contact Number</div>
-                    <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.contactNo : '-' }}</div>
-                  </div>
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Nationality</div>
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.nationality : '-' }}</div>
@@ -181,6 +165,26 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Religion</div>
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.religion : '-' }}</div>
+                  </div>
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Educational Attainment</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? formatEducationalAttainment(residentInfo.personalInfo.educationalAttainment || '') : '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contact & Work Section -->
+              <div class="mb-6 sm:mb-8">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                  Contact & Work
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Employment Status</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.employmentStatus : '-' }}</div>
                   </div>
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Occupation</div>
@@ -191,12 +195,34 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">₱{{ residentInfo ? (residentInfo.personalInfo.monthlyIncome | number:'1.2-2') : '-' }}</div>
                   </div>
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
-                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Registered Voter</div>
-                    <div class="flex items-center gap-2">
-                      <span [class]="residentInfo && residentInfo.personalInfo.registeredVoter === 'Yes' ? 'w-2 h-2 bg-green-500 rounded-full' : 'w-2 h-2 bg-red-500 rounded-full'"></span>
-                      <span class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.registeredVoter : '-' }}</span>
-                    </div>
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Contact Number</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.contactNo : '-' }}</div>
                   </div>
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Email Address</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base break-all">{{ residentInfo ? residentInfo.personalInfo.email : '-' }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Address & Housing Section -->
+              <div class="mb-6 sm:mb-8">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  Address & Housing Information
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Housing Ownership</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.housingOwnership : '-' }}</div>
+                  </div>
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Years in Barangay</div>
+                    <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo && residentInfo.personalInfo.yearsInBarangay ? residentInfo.personalInfo.yearsInBarangay + ' years' : '-' }}</div>
+                  </div>
+
                 </div>
               </div>
 
@@ -263,7 +289,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <div class="w-2 h-2 bg-indigo-500 rounded-full"></div>
                   Government IDs
                 </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">National ID Number</div>
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo && residentInfo.otherDetails.nationalIdNo || 'Not provided' }}</div>
@@ -271,6 +297,13 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
                     <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Voter's ID Number</div>
                     <div class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo && residentInfo.otherDetails.votersIdNo || 'Not provided' }}</div>
+                  </div>
+                  <div class="space-y-1 p-3 sm:p-0 bg-gray-50 sm:bg-transparent rounded-lg sm:rounded-none">
+                    <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">Registered Voter</div>
+                    <div class="flex items-center gap-2">
+                      <span [class]="residentInfo && residentInfo.personalInfo.registeredVoter === 'Yes' ? 'w-2 h-2 bg-green-500 rounded-full' : 'w-2 h-2 bg-red-500 rounded-full'"></span>
+                      <span class="text-gray-900 font-semibold text-sm sm:text-base">{{ residentInfo ? residentInfo.personalInfo.registeredVoter : '-' }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -468,9 +501,14 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
             
             <form (ngSubmit)="saveEdit()" #editForm="ngForm" class="space-y-4 sm:space-y-6">
-              <!-- Personal Information Section -->
+              <!-- Basic Information Section -->
               <div class="mb-4 sm:mb-6">
-                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Personal Information</h3>
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                  </svg>
+                  Basic Information
+                </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
@@ -539,13 +577,50 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
                   </div>
                   <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Educational Attainment</label>
+                    <select [(ngModel)]="editInfo.personalInfo.educationalAttainment" name="educationalAttainment" 
+                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                      <option value="">Select</option>
+                      <option value="ElementaryGraduate">Elementary Graduate</option>
+                      <option value="HighSchoolGraduate">High School Graduate</option>
+                      <option value="CollegeGraduate">College Graduate</option>
+                      <option value="Vocational">Vocational</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contact & Work Section -->
+              <div class="mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                  Contact & Work
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Employment Status</label>
+                    <select [(ngModel)]="editInfo.personalInfo.employmentStatus" name="employmentStatus" 
+                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                      <option value="">Select</option>
+                      <option value="Employed">Employed</option>
+                      <option value="Unemployed">Unemployed</option>
+                      <option value="SelfEmployed">Self-Employed</option>
+                      <option value="Student">Student</option>
+                      <option value="OFW">OFW</option>
+                      <option value="Retired">Retired</option>
+                      <option value="Housewife">Housewife</option>
+                    </select>
+                  </div>
+                  <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Occupation</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.occupation" name="occupation" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
                   </div>
                   <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
-                    <input type="email" [(ngModel)]="editInfo.personalInfo.email" name="email" 
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Monthly Income</label>
+                    <input type="number" [(ngModel)]="editInfo.personalInfo.monthlyIncome" name="monthlyIncome" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
                   </div>
                   <div>
@@ -553,6 +628,76 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                     <input type="tel" [(ngModel)]="editInfo.personalInfo.contactNo" name="contactNo" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
                   </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
+                    <input type="email" [(ngModel)]="editInfo.personalInfo.email" name="email" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Address & Housing Section -->
+              <div class="mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  Address & Housing Information
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Housing Ownership</label>
+                    <select [(ngModel)]="editInfo.personalInfo.housingOwnership" name="housingOwnership" 
+                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                      <option value="">Select</option>
+                      <option value="Owned">Owned</option>
+                      <option value="Rented">Rented</option>
+                      <option value="Living with Relatives">Living with Relatives</option>
+                      <option value="Others">Others</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Years in Barangay</label>
+                    <input type="number" [(ngModel)]="editInfo.personalInfo.yearsInBarangay" name="yearsInBarangay" 
+                           min="0" step="1"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Registered Voter</label>
+                    <select [(ngModel)]="editInfo.personalInfo.registeredVoter" name="registeredVoter" 
+                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
+                      <option value="">Select</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Purok No.</label>
+                    <input type="text" [(ngModel)]="editInfo.personalInfo.purokNo" name="purokNo" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">House No.</label>
+                    <input type="text" [(ngModel)]="editInfo.personalInfo.houseNo" name="houseNo" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                  </div>
+                  <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Street</label>
+                    <input type="text" [(ngModel)]="editInfo.personalInfo.street" name="street" 
+                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Special Categories Section -->
+              <div class="mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm4-3a1 1 0 00-1 1v1h2V4a1 1 0 00-1-1zM4 9h12v5H4V9z" clip-rule="evenodd"></path>
+                  </svg>
+                  Special Categories & Benefits
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">PWD</label>
                     <select [(ngModel)]="editInfo.personalInfo.pwd" name="pwd" 
@@ -565,11 +710,6 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">PWD ID No.</label>
                     <input type="text" [(ngModel)]="editInfo.personalInfo.pwdIdNo" name="pwdIdNo" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Monthly Income</label>
-                    <input type="number" [(ngModel)]="editInfo.personalInfo.monthlyIncome" name="monthlyIncome" 
                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
                   </div>
                   <div>
@@ -618,30 +758,19 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                       <option value="No">No</option>
                     </select>
                   </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Registered Voter</label>
-                    <select [(ngModel)]="editInfo.personalInfo.registeredVoter" name="registeredVoter" 
-                            class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]">
-                      <option value="">Select</option>
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Purok No.</label>
-                    <input type="text" [(ngModel)]="editInfo.personalInfo.purokNo" name="purokNo" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">House No.</label>
-                    <input type="text" [(ngModel)]="editInfo.personalInfo.houseNo" name="houseNo" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
-                  </div>
-                  <div>
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Street</label>
-                    <input type="text" [(ngModel)]="editInfo.personalInfo.street" name="street" 
-                           class="w-full border border-gray-300 rounded-lg px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]" />
-                  </div>
+                </div>
+              </div>
+
+              <!-- Government IDs Section -->
+              <div class="mb-4 sm:mb-6">
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
+                    <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path>
+                  </svg>
+                  Government IDs
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">National ID No.</label>
                     <input type="text" [(ngModel)]="editInfo.otherDetails.nationalIdNo" name="nationalIdNo" 
@@ -657,7 +786,12 @@ import { LoadingComponent } from '../../shared/components/loading.component';
 
               <!-- Emergency Contact Section -->
               <div class="mb-4 sm:mb-6">
-                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800">Emergency Contact</h3>
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                  </svg>
+                  Emergency Contact
+                </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
@@ -1009,6 +1143,20 @@ export class ProfileComponent implements OnInit {
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  // Format educational attainment for display
+  formatEducationalAttainment(value: string): string {
+    if (!value) return '-';
+    
+    const formatMap: { [key: string]: string } = {
+      'ElementaryGraduate': 'Elementary Graduate',
+      'HighSchoolGraduate': 'High School Graduate',
+      'CollegeGraduate': 'College Graduate',
+      'Vocational': 'Vocational'
+    };
+    
+    return formatMap[value] || value;
   }
 
   // Format date for HTML5 date input (YYYY-MM-DD format)
