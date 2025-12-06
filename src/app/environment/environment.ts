@@ -10,6 +10,8 @@ export const environment = {
   announcementCollectionId: '67dd9d62003e0b3730dd',
   documentsCollectionId: '67dd9d580012329950fc',
   residentUpdatesCollectionId: '68ab623a002fc1251d32',
+  householdsCollectionId: 'households',
+  householdMembersCollectionId: 'household_members',
   profileImagesBucketId: 'profile_images',
   platform: 'web'
 };

@@ -2700,6 +2700,181 @@ export class SignUpInformationFormComponent implements OnInit {
         this.formData.personalInfo.email
       );
 
+      // Handle household member placeholder - allow account claiming
+      if ((duplicateCheck as any).isHouseholdMemberPlaceholder) {
+        console.log('Detected household member placeholder, proceeding with account claiming...');
+        
+        const placeholderResidentId = (duplicateCheck as any).placeholderResidentId;
+        
+        // Reset loading state before showing dialog
+        this.isLoading = false;
+        this.loadingStatus = 'Creating Account';
+        
+        // Show confirmation to user
+        const confirmLink = await Swal.fire({
+          icon: 'info',
+          title: 'Household Member Account Found',
+          html: `
+            <div style="text-align: left;">
+              <p style="margin-bottom: 16px; color: #374151; font-size: 15px;">
+                We found an existing household member record matching your information.
+              </p>
+              <div style="background-color: #dbeafe; border: 2px solid #3b82f6; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                <div style="display: flex; align-items-center; margin-bottom: 10px;">
+                  <svg style="width: 24px; height: 24px; color: #1e40af; margin-right: 10px;" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                  </svg>
+                  <strong style="color: #1e40af; font-size: 16px;">Claiming Your Account</strong>
+                </div>
+                <p style="color: #1e40af; font-size: 14px; margin: 0; line-height: 1.5;">
+                  You were previously added as a household member. This registration will claim and complete your resident account with all the information you've provided.
+                </p>
+              </div>
+              <div style="background-color: #f0fdf4; border: 2px solid #22c55e; padding: 14px; border-radius: 10px; margin-bottom: 16px;">
+                <p style="color: #15803d; font-size: 13px; margin: 0; font-weight: 500;">
+                  ✓ Your existing household member information will be preserved<br>
+                  ✓ Your profile will be upgraded with complete details<br>
+                  ✓ You'll gain full access to all barangay services
+                </p>
+              </div>
+              <p style="margin-top: 12px; font-size: 14px; color: #6b7280;">
+                Click <strong>"Continue & Claim Account"</strong> to proceed with registration.
+              </p>
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: '<span style="font-weight: 600;">Continue & Claim Account</span>',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: '#3b82f6',
+          cancelButtonColor: '#6b7280',
+          backdrop: 'rgba(0, 0, 0, 0.4)',
+          customClass: {
+            popup: 'swal2-popup-custom',
+            confirmButton: 'swal2-confirm-custom',
+            cancelButton: 'swal2-cancel-custom'
+          }
+        });
+
+        if (!confirmLink.isConfirmed) {
+          this.isLoading = false;
+          return;
+        }
+
+        // Proceed with account claiming
+        this.isLoading = true;
+        
+        try {
+          // STEP 1: Create user in Appwrite Auth
+          console.log('Step 1: Creating user account...');
+          this.loadingStatus = 'Creating User Account';
+          const authResponse = await this.authService.register({
+            username: this.formData.account.username,
+            password: this.formData.account.password,
+            confirmPassword: this.formData.account.confirmPassword
+          });
+          console.log('Auth account created successfully with ID:', authResponse.$id);
+
+          // STEP 2: Create user document
+          console.log('Step 2: Creating user document...');
+          this.loadingStatus = 'Setting Up User Profile';
+          const userDoc = {
+            uid: authResponse.$id,
+            username: this.formData.account.username,
+            email: this.formData.personalInfo.email,
+            role: 'resident',
+            created_at: new Date().toISOString(),
+            is_active: false
+          };
+          await this.userService.createUser(userDoc);
+          console.log('User document created successfully');
+
+          // STEP 3: Update existing placeholder resident record
+          console.log('Step 3: Upgrading household member placeholder...');
+          this.loadingStatus = 'Upgrading Household Member Account';
+          
+          const residentUpdateData = {
+            profileImage: this.formData.profileImage || '',
+            userId: authResponse.$id,
+            email: this.formData.personalInfo.email,
+            lastName: this.formData.personalInfo.lastName,
+            firstName: this.formData.personalInfo.firstName,
+            middleName: this.formData.personalInfo.middleName,
+            suffix: this.formData.personalInfo.suffix,
+            gender: this.formData.personalInfo.gender,
+            birthDate: this.formData.personalInfo.birthDate,
+            birthPlace: this.formData.personalInfo.birthPlace,
+            civilStatus: this.formData.personalInfo.civilStatus,
+            nationality: this.formData.personalInfo.nationality,
+            religion: this.formData.personalInfo.religion,
+            occupation: this.formData.personalInfo.occupation,
+            educationalAttainment: this.formData.personalInfo.educationalAttainment,
+            employmentStatus: this.formData.personalInfo.employmentStatus,
+            housingOwnership: this.formData.personalInfo.housingOwnership,
+            yearsInBarangay: this.formData.personalInfo.yearsInBarangay,
+            contactNo: '+63' + this.formData.personalInfo.contactNo,
+            pwd: this.formData.personalInfo.pwd,
+            pwdIdNo: this.formData.personalInfo.pwd === 'Yes' ? this.formData.personalInfo.pwdIdNo : '',
+            monthlyIncome: this.formData.personalInfo.monthlyIncome,
+            indigent: this.formData.personalInfo.indigent,
+            soloParent: this.formData.personalInfo.soloParent,
+            soloParentIdNo: this.formData.personalInfo.soloParent === 'Yes' ? this.formData.personalInfo.soloParentIdNo : '',
+            seniorCitizen: this.formData.personalInfo.seniorCitizen,
+            seniorCitizenIdNo: this.formData.personalInfo.seniorCitizen === 'Yes' ? this.formData.personalInfo.seniorCitizenIdNo : '',
+            fourPsMember: this.formData.personalInfo.fourPsMember,
+            registeredVoter: this.formData.personalInfo.registeredVoter,
+            purokNo: this.formData.personalInfo.purokNo,
+            houseNo: this.formData.personalInfo.houseNo,
+            street: this.formData.personalInfo.street,
+            ecFullName: this.formData.emergencyContact.fullName,
+            ecRelation: this.formData.emergencyContact.relationship,
+            ecContactNo: '+63' + this.formData.emergencyContact.contactNo,
+            ecAddress: this.formData.emergencyContact.address,
+            NationalIdNo: this.formData.otherDetails.nationalIdNo,
+            votersIdNo: this.formData.otherDetails.votersIdNo,
+            status: 'Active',
+            dateOfRegistration: new Date().toISOString(),
+            approvalStatus: 'Pending',
+            approvedAt: null,
+            updatedAt: new Date().toISOString()
+          };
+
+          await this.userService.updateResident(placeholderResidentId, residentUpdateData);
+          console.log('Household member account upgraded successfully');
+
+          console.log('Account claiming completed successfully');
+          
+          // Show success modal
+          this.showPreviewModal = false;
+          this.showSuccessModal = true;
+          
+          return; // Exit after handling household member
+
+        } catch (linkError: any) {
+          console.error('Error claiming household member account:', linkError);
+          
+          // Show error message
+          await Swal.fire({
+            icon: 'error',
+            title: 'Account Claiming Failed',
+            html: `
+              <p style="color: #374151; margin-bottom: 16px;">
+                We encountered an error while claiming your household member account.
+              </p>
+              <p style="color: #6b7280; font-size: 14px;">
+                ${linkError.message || 'Please try again or contact the barangay office for assistance.'}
+              </p>
+            `,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#ef4444'
+          });
+          
+          this.isLoading = false;
+          this.loadingStatus = 'Creating Account';
+          return;
+        }
+      }
+
       if (duplicateCheck.isDuplicate) {
         const existing = duplicateCheck.existingResident!;
         const registrationDate = new Date(existing.registrationDate).toLocaleDateString();

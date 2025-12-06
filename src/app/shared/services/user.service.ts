@@ -143,6 +143,32 @@ export class UserService extends BaseAppwriteService {
     }
   }
 
+  /**
+   * Get resident information by resident document ID
+   */
+  async getResidentById(residentId: string): Promise<{ firstName: string; lastName: string; middleName?: string } | null> {
+    try {
+      const resident = await this.database.getDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId
+      );
+
+      if (resident) {
+        return {
+          firstName: resident['firstName'] || '',
+          lastName: resident['lastName'] || '',
+          middleName: resident['middleName'] || ''
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching resident by ID:', error);
+      return null;
+    }
+  }
+
   // Helper method to create empty ResidentInfo structure
   private getEmptyResidentInfo(): ResidentInfo {
     return {
@@ -325,7 +351,7 @@ export class UserService extends BaseAppwriteService {
   }
 
   // Check for duplicate resident registration based on personal information
-  async checkDuplicateResident(firstName: string, lastName: string, birthDate: string, contactNo?: string, email?: string): Promise<{ isDuplicate: boolean; existingResident?: any; duplicateType?: string }> {
+  async checkDuplicateResident(firstName: string, lastName: string, birthDate: string, contactNo?: string, email?: string): Promise<{ isDuplicate: boolean; existingResident?: any; duplicateType?: string; isHouseholdMemberPlaceholder?: boolean; placeholderResidentId?: string }> {
     try {
       console.log('Checking for duplicate resident:', { firstName, lastName, birthDate, contactNo, email });
       
@@ -368,6 +394,67 @@ export class UserService extends BaseAppwriteService {
       if (response.documents.length > 0) {
         console.log('Found potential duplicate resident(s):', response.documents.length);
         
+        const match = response.documents[0];
+        
+        // Check if this is a household member placeholder
+        const isPlaceholder = this.isHouseholdMemberPlaceholder(match['email']);
+        const isApproved = match['approvalStatus'] === 'Approved';
+        // More robust userId check - handle null, undefined, empty string, or the string 'null'
+        const userIdValue = match['userId'];
+        const hasNoUserId = !userIdValue || userIdValue === '' || userIdValue === 'null' || userIdValue === 'undefined';
+        
+        // Debug logging
+        console.log('🔍 Duplicate check details:', {
+          residentId: match.$id,
+          name: `${match['firstName']} ${match['lastName']}`,
+          email: match['email'],
+          isPlaceholder,
+          approvalStatus: match['approvalStatus'],
+          isApproved,
+          userId: match['userId'],
+          userIdType: typeof match['userId'],
+          hasNoUserId,
+          canClaim: isPlaceholder && isApproved && hasNoUserId
+        });
+        
+        if (isPlaceholder && isApproved && hasNoUserId) {
+          console.log('✅ Detected approved household member placeholder (not yet claimed) - allowing account claiming');
+          // This is an approved household member placeholder that hasn't been claimed yet - allow registration with linking
+          return {
+            isDuplicate: false, // Not a true duplicate
+            isHouseholdMemberPlaceholder: true,
+            placeholderResidentId: match.$id,
+            existingResident: {
+              name: `${match['firstName']} ${match['middleName'] || ''} ${match['lastName']}`.trim(),
+              contactNo: match['contactNo'],
+              email: match['email'],
+              registrationDate: match.$createdAt
+            }
+          };
+        }
+        
+        // If it's a placeholder but not approved, or already has a userId (claimed), treat as duplicate
+        if (isPlaceholder && (!isApproved || !hasNoUserId)) {
+          console.log('Household member placeholder found but:', {
+            isApproved,
+            hasNoUserId,
+            reason: !isApproved ? 'not yet approved by admin' : 'already claimed'
+          });
+          return {
+            isDuplicate: true,
+            duplicateType: !isApproved ? 'pending_approval' : 'already_claimed',
+            existingResident: {
+              name: `${match['firstName']} ${match['middleName'] || ''} ${match['lastName']}`.trim(),
+              contactNo: match['contactNo'],
+              email: match['email'],
+              registrationDate: match.$createdAt
+            }
+          };
+        }
+        
+        // It's a true duplicate - not a placeholder
+        console.log('True duplicate detected - blocking registration');
+        
         // If we have a contact number, do additional verification
         if (contactNo) {
           const formattedContactNo = '+63' + contactNo;
@@ -387,7 +474,6 @@ export class UserService extends BaseAppwriteService {
         }
 
         // Return the first match even without contact verification
-        const match = response.documents[0];
         return {
           isDuplicate: true,
           duplicateType: 'personal_info',
@@ -406,6 +492,53 @@ export class UserService extends BaseAppwriteService {
       console.error('Error checking duplicate resident:', error);
       // Return false on error to allow registration to proceed
       return { isDuplicate: false };
+    }
+  }
+
+  /**
+   * Check if an email is a household member placeholder
+   */
+  private isHouseholdMemberPlaceholder(email: string | null | undefined): boolean {
+    if (!email) return false;
+    const placeholderPattern = /^household_member_.*@pending\.barangay\.local$/;
+    return placeholderPattern.test(email);
+  }
+
+
+
+  /**
+   * Get the resident ID for the current user (if they have a linked resident record)
+   */
+  async getResidentIdForUser(userId: string): Promise<string | null> {
+    try {
+      const response = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [Query.equal('userId', userId)]
+      );
+
+      return response.documents.length > 0 ? response.documents[0].$id : null;
+    } catch (error) {
+      console.error('Error getting resident ID for user:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Update resident record (used for claiming household member accounts)
+   */
+  async updateResident(residentId: string, data: any): Promise<void> {
+    try {
+      await this.database.updateDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId,
+        data
+      );
+      console.log('Resident record updated successfully');
+    } catch (error) {
+      console.error('Error updating resident:', error);
+      throw error;
     }
   }
 }

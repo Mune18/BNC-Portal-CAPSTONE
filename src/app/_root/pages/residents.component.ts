@@ -96,6 +96,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             <option value="soloParent">Solo Parent</option>
             <option value="seniorCitizen">Senior Citizen</option>
             <option value="fourPs">4Ps Member</option>
+            <option value="householdMember">Household Members (Incomplete Info)</option>
           </select>
         </div>
 
@@ -297,8 +298,20 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                       <span *ngIf="!resident.profileImage" class="text-gray-600 font-medium">{{ resident.personalInfo.firstName.charAt(0) }}</span>
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ resident.personalInfo.firstName }} {{ resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '.' : '' }} {{ resident.personalInfo.lastName }}
+                      <div class="flex items-center gap-2">
+                        <div class="text-sm font-medium text-gray-900">
+                          {{ resident.personalInfo.firstName }} {{ resident.personalInfo.middleName ? resident.personalInfo.middleName[0] + '.' : '' }} {{ resident.personalInfo.lastName }}
+                        </div>
+                        <span 
+                          *ngIf="isHouseholdMemberPlaceholder(resident)"
+                          class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200"
+                          title="This resident was added as a household member and has incomplete information. They need to register to complete their profile."
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Incomplete Info
+                        </span>
                       </div>
                       <div class="text-sm text-gray-500">
                         {{ calculateAge(resident.personalInfo.birthDate) }} years old • {{ resident.personalInfo.gender }}
@@ -817,6 +830,9 @@ export class ResidentsComponent implements OnInit {
             break;
           case 'fourPs':
             matchesCategory = resident.personalInfo.fourPsMember === 'Yes';
+            break;
+          case 'householdMember':
+            matchesCategory = this.isHouseholdMemberPlaceholder(resident);
             break;
         }
       }
@@ -1972,5 +1988,14 @@ export class ResidentsComponent implements OnInit {
         this.approvingResidentId = null;
       }
     }
+  }
+
+  /**
+   * Check if a resident is a household member placeholder (incomplete info)
+   */
+  isHouseholdMemberPlaceholder(resident: ResidentInfo): boolean {
+    // Check if email matches the household member placeholder pattern
+    return resident.personalInfo.email?.includes('household_member_') && 
+           resident.personalInfo.email?.includes('@pending.barangay.local');
   }
 }

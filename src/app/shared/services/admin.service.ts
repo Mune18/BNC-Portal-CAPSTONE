@@ -6,6 +6,7 @@ import { Query } from 'appwrite';
 import { ResidentInfo } from '../types/resident';
 import { CacheService } from './cache.service';
 import { EmailService, EmailNotificationData } from './email.service';
+import { HouseholdService } from './household.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class AdminService extends BaseAppwriteService {
   constructor(
     router: Router,
     private cacheService: CacheService,
-    private emailService: EmailService
+    private emailService: EmailService,
+    private householdService: HouseholdService
   ) {
     super(router);
   }
@@ -519,6 +521,26 @@ export class AdminService extends BaseAppwriteService {
             is_active: true
           }
         );
+      }
+
+      // Create household automatically for approved resident
+      try {
+        // Check if household already exists
+        const existingHousehold = await this.householdService.getHouseholdByHeadId(residentId);
+        
+        if (!existingHousehold) {
+          // Create new household using resident's address
+          await this.householdService.createHousehold(
+            residentId,
+            residentDoc['purokNo'] || '',
+            residentDoc['houseNo'] || '',
+            residentDoc['street'] || ''
+          );
+          console.log(`Household created for resident ${residentId}`);
+        }
+      } catch (householdError) {
+        console.error('Error creating household:', householdError);
+        // Log but don't throw - household creation failure shouldn't block approval
       }
 
       // Send approval email notification

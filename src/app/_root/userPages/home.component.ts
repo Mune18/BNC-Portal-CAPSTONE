@@ -1,9 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AnnouncementService } from '../../shared/services/announcement.service';
 import { DataRefreshService } from '../../shared/services/data-refresh.service';
+import { UserService } from '../../shared/services/user.service';
+import { AuthService } from '../../shared/services/auth.service';
 import { Announcement } from '../../shared/types/announcement';
+import { ResidentInfo } from '../../shared/types/resident';
 import { Subscription } from 'rxjs';
 import { LoadingComponent } from '../../shared/components/loading.component';
 
@@ -551,7 +555,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   constructor(
     private announcementService: AnnouncementService,
-    private dataRefreshService: DataRefreshService
+    private dataRefreshService: DataRefreshService,
+    private userService: UserService,
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -564,6 +571,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.loadAnnouncements();
     });
   }
+
+
 
   ngOnDestroy() {
     this.refreshSubscription?.unsubscribe();

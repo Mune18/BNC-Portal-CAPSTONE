@@ -13,6 +13,8 @@ import { AnnouncementComponent } from './_root/pages/announcement.component';
 import { ReportsComponent } from './_root/pages/reports.component';
 import { ResidentUpdateRequestsComponent } from './_root/pages/resident-update-requests.component';
 import { ComplaintsComponent } from './_root/userPages/complaints.component';
+import { HouseholdComponent } from './_root/userPages/household.component';
+import { HouseholdRequestsComponent } from './_root/pages/household-requests.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { AdminGuard } from './shared/guards/admin.guard';
 import { ResidentGuard } from './shared/guards/resident.guard';
@@ -42,6 +44,7 @@ export const routes: Routes = [
             {path: 'dashboard', component: DashboardComponent},
             {path: 'residents', component: ResidentsComponent},
             {path: 'update-requests', component: ResidentUpdateRequestsComponent},
+            {path: 'household-requests', component: HouseholdRequestsComponent},
             {path: 'announcements', component: AnnouncementComponent},
             {path: 'reports', component: ReportsComponent},
         ]
@@ -54,6 +57,7 @@ export const routes: Routes = [
             {path: '', redirectTo: 'home', pathMatch: 'full'},
             {path: 'profile', component: ProfileComponent},
             {path: 'home', component: HomeComponent},
+            {path: 'household', component: HouseholdComponent},
             {path: 'complaints', component: ComplaintsComponent},
         ]
     },

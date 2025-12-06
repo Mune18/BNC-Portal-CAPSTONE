@@ -54,6 +54,17 @@ import { ResidentInfo } from '../../shared/types/resident';
               <p class="mt-1 text-xs">Please review the applicant's information carefully before approving or rejecting their registration.</p>
             </div>
             
+            <!-- Household Member Notice (shown for incomplete info residents) -->
+            <div *ngIf="!showApprovalActions && isHouseholdMemberPlaceholder()" class="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl p-4 text-amber-900 text-sm shadow-sm">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="font-semibold">Household Member - Incomplete Information</span>
+              </div>
+              <p class="mt-2 text-xs">This resident was added as a household member by the head of their household. They have not yet registered their own account, so some information may be incomplete or use placeholder values. Once they register, they can update their complete profile information.</p>
+            </div>
+            
             <div class="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
               <!-- Profile Image -->
               <div class="flex-shrink-0">
@@ -543,6 +554,15 @@ export class ResidentDetailModalComponent {
       age--;
     }
     return age >= 0 ? age : '-';
+  }
+
+  /**
+   * Check if this resident is a household member placeholder (incomplete info)
+   */
+  isHouseholdMemberPlaceholder(): boolean {
+    if (!this.resident?.personalInfo?.email) return false;
+    return this.resident.personalInfo.email.includes('household_member_') && 
+           this.resident.personalInfo.email.includes('@pending.barangay.local');
   }
 
   formatEducationalAttainment(value?: string): string {
