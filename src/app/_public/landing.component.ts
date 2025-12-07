@@ -30,10 +30,10 @@ interface VisitStats {
           <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900"></div>
           
           <!-- Animated Background Pattern -->
-          <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-20 left-20 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-            <div class="absolute top-40 right-20 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-            <div class="absolute bottom-20 left-40 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+          <div class="absolute inset-0 opacity-[0.08]">
+            <div class="absolute top-20 left-20 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl animate-blob will-change-transform"></div>
+            <div class="absolute top-40 right-20 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-2000 will-change-transform"></div>
+            <div class="absolute bottom-20 left-40 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-4000 will-change-transform"></div>
           </div>
           
           <!-- Floating Elements -->
@@ -51,49 +51,49 @@ interface VisitStats {
         <!-- Hero Content -->
         <div class="relative z-10 text-center text-white px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
           <!-- Logo Animation -->
-          <div class="mb-8 animate-fade-in-up">
-            <div class="inline-flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40 bg-white/10 backdrop-blur-sm rounded-full border-2 border-white/20 shadow-2xl mb-6">
-              <img src="/assets/BNC_Portal_Logo.png" alt="BNC Portal" class="w-20 h-20 sm:w-24 sm:h-24 object-contain">
+          <div class="mb-6 sm:mb-8 animate-fade-in-up">
+            <div class="inline-flex items-center justify-center w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 bg-white/10 backdrop-blur-sm rounded-full border-2 border-white/20 shadow-2xl mb-4 sm:mb-6">
+              <img src="/assets/BNC_Portal_Logo.png" alt="BNC Portal" class="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-contain">
             </div>
           </div>
           
           <!-- Main Heading -->
-          <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in-up animation-delay-300">
+          <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in-up animation-delay-300 px-2">
             Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-300">BNC Portal</span>
           </h1>
           
           <!-- Subtitle -->
-          <p class="text-xl sm:text-2xl lg:text-3xl mb-8 text-blue-100 animate-fade-in-up animation-delay-500 max-w-4xl mx-auto leading-relaxed">
+          <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 sm:mb-8 text-blue-100 animate-fade-in-up animation-delay-500 max-w-4xl mx-auto leading-relaxed px-4">
             Your Digital Gateway to <strong class="text-white">Barangay New Cabalan</strong> - Connecting Community, Simplifying Services
           </p>
           
           <!-- Description -->
-          <p class="text-lg sm:text-xl mb-12 text-blue-200 animate-fade-in-up animation-delay-700 max-w-3xl mx-auto leading-relaxed">
+          <p class="text-base sm:text-lg md:text-xl mb-8 sm:mb-12 text-blue-200 animate-fade-in-up animation-delay-700 max-w-3xl mx-auto leading-relaxed px-4">
             Access announcements, submit complaints, manage your profile, and stay connected with your community through our modern digital platform.
           </p>
           
           <!-- Action Buttons -->
-          <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center animate-fade-in-up animation-delay-900 mb-16 sm:mb-20">
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center animate-fade-in-up animation-delay-900 mb-12 sm:mb-16 lg:mb-20 px-4">
             <button
               (click)="navigateTo('/sign-in')"
-              class="group px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 min-w-[200px]">
-              <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class="group px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold text-sm sm:text-base rounded-2xl shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto sm:min-w-[200px]">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
               </svg>
               Sign In to Portal
             </button>
             <button
               (click)="navigateTo('/sign-up')"
-              class="group px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-2xl border-2 border-white/20 hover:bg-white/20 hover:border-white/40 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 min-w-[200px]">
-              <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class="group px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-semibold text-sm sm:text-base rounded-2xl border-2 border-white/20 hover:bg-white/20 hover:border-white/40 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto sm:min-w-[200px]">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
               </svg>
               Register Now
             </button>
           </div>
           
-          <!-- Scroll Indicator -->
-          <div class="absolute bottom left-1/2 transform -translate-x-1/2 animate-bounce">
+          <!-- Scroll Indicator - Hidden on mobile -->
+          <div class="hidden sm:block absolute bottom left-1/2 transform -translate-x-1/2 animate-bounce">
             <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
               <div class="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
             </div>
@@ -146,36 +146,36 @@ interface VisitStats {
         
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <!-- Section Header -->
-          <div class="text-center mb-16 lg:mb-20">
-            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          <div class="text-center mb-10 sm:mb-16 lg:mb-20">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 px-4">
               What You Can Do with <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">BNC Portal</span>
             </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p class="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
               Your one-stop digital platform for all barangay services and community engagement
             </p>
           </div>
 
           <!-- Features Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
             <!-- Feature 1: Stay Informed -->
-            <div class="group relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-3 border border-gray-200/50 hover:border-blue-300/50 overflow-hidden animate-fade-in-up">
+            <div class="group relative bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-700 transform hover:-translate-y-2 sm:hover:-translate-y-3 border border-gray-200/50 hover:border-blue-300/50 overflow-hidden animate-fade-in-up">
               <!-- Gradient Overlay on Hover -->
               <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
               
               <!-- Animated Icon Container -->
-              <div class="relative mb-6">
-                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg group-hover:shadow-blue-500/50">
-                  <svg class="w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="relative mb-4 sm:mb-6">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg group-hover:shadow-blue-500/50">
+                  <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                   </svg>
                 </div>
                 <!-- Floating Badge -->
-                <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full animate-ping opacity-75"></div>
-                <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full"></div>
+                <div class="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full animate-ping opacity-75"></div>
+                <div class="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full"></div>
               </div>
               
-              <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">Stay Informed</h3>
-              <p class="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Never miss important barangay announcements, events, and updates. Get real-time notifications delivered straight to your dashboard.</p>
+              <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 group-hover:text-blue-600 transition-colors duration-300">Stay Informed</h3>
+              <p class="text-sm sm:text-base text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">Never miss important barangay announcements, events, and updates. Get real-time notifications delivered straight to your dashboard.</p>
               
               <!-- Bottom Accent Line -->
               <div class="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 group-hover:w-full transition-all duration-500"></div>
@@ -285,67 +285,67 @@ interface VisitStats {
       </section>
 
       <!-- Stats Section -->
-      <section class="relative py-20 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
+      <section class="relative py-12 sm:py-16 lg:py-20 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
         <!-- Modern Animated Background -->
         <div class="absolute inset-0 overflow-hidden">
           <!-- Animated Gradient Waves -->
           <div class="absolute inset-0">
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/20 via-transparent to-indigo-600/20 animate-wave-1"></div>
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-tl from-purple-500/15 via-transparent to-blue-500/15 animate-wave-2"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/25 via-transparent to-indigo-600/25 animate-wave-smooth will-change-transform"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-tl from-purple-500/20 via-transparent to-blue-500/20 animate-wave-reverse will-change-transform"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-cyan-500/15 via-indigo-500/15 to-purple-500/15 animate-wave-diagonal will-change-transform"></div>
           </div>
           
-          <!-- Floating Orbs -->
-          <div class="absolute top-10 left-10 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-float-orb-1"></div>
-          <div class="absolute bottom-10 right-10 w-32 h-32 bg-yellow-300/15 rounded-full blur-2xl animate-float-orb-2"></div>
-          <div class="absolute top-1/2 left-1/4 w-24 h-24 bg-pink-300/10 rounded-full blur-xl animate-float-orb-3"></div>
-          <div class="absolute bottom-1/4 right-1/3 w-36 h-36 bg-cyan-300/10 rounded-full blur-2xl animate-float-orb-1 animation-delay-2000"></div>
+          <!-- Enhanced Floating Orbs -->
+          <div class="absolute top-10 left-[5%] w-48 h-48 bg-gradient-to-br from-white/15 to-blue-300/10 rounded-full blur-3xl animate-float-orb-smooth will-change-transform"></div>
+          <div class="absolute bottom-10 right-[8%] w-40 h-40 bg-gradient-to-tl from-yellow-300/20 to-indigo-400/10 rounded-full blur-3xl animate-float-orb-diagonal will-change-transform"></div>
+          <div class="absolute top-1/2 left-1/4 w-32 h-32 bg-gradient-to-r from-pink-300/15 to-purple-400/10 rounded-full blur-2xl animate-float-orb-slow will-change-transform"></div>
+          <div class="absolute bottom-1/4 right-1/3 w-44 h-44 bg-gradient-to-bl from-cyan-300/15 to-blue-500/10 rounded-full blur-3xl animate-float-orb-smooth animation-delay-2000 will-change-transform"></div>
+          <div class="absolute top-[15%] right-[20%] w-36 h-36 bg-gradient-to-tr from-indigo-400/15 to-purple-300/10 rounded-full blur-2xl animate-float-orb-diagonal animation-delay-3000 will-change-transform"></div>
           
-          <!-- Sparkle Particles -->
-          <div class="absolute top-[20%] left-[10%] w-2 h-2 bg-white/60 rounded-full animate-sparkle-1"></div>
-          <div class="absolute top-[40%] left-[85%] w-1.5 h-1.5 bg-white/50 rounded-full animate-sparkle-2"></div>
-          <div class="absolute top-[70%] left-[20%] w-1 h-1 bg-white/60 rounded-full animate-sparkle-3"></div>
-          <div class="absolute top-[30%] left-[50%] w-2 h-2 bg-white/50 rounded-full animate-sparkle-1 animation-delay-1000"></div>
-          <div class="absolute top-[80%] left-[70%] w-1.5 h-1.5 bg-white/60 rounded-full animate-sparkle-2 animation-delay-2000"></div>
-          
-          <!-- Geometric Lines -->
-          <div class="absolute top-1/4 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent animate-line-slide"></div>
-          <div class="absolute bottom-1/3 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/15 to-transparent animate-line-slide animation-delay-3000"></div>
+          <!-- Enhanced Sparkle Particles -->
+          <div class="absolute top-[20%] left-[10%] w-2 h-2 bg-white/70 rounded-full animate-sparkle-float"></div>
+          <div class="absolute top-[40%] left-[85%] w-1.5 h-1.5 bg-white/60 rounded-full animate-sparkle-pulse"></div>
+          <div class="absolute top-[70%] left-[20%] w-1 h-1 bg-white/70 rounded-full animate-sparkle-float animation-delay-1000"></div>
+          <div class="absolute top-[30%] left-[50%] w-2 h-2 bg-white/60 rounded-full animate-sparkle-pulse animation-delay-1000"></div>
+          <div class="absolute top-[80%] left-[70%] w-1.5 h-1.5 bg-white/70 rounded-full animate-sparkle-float animation-delay-2000"></div>
+          <div class="absolute top-[55%] left-[65%] w-1 h-1 bg-blue-200/60 rounded-full animate-sparkle-pulse animation-delay-3000"></div>
+          <div class="absolute top-[25%] left-[35%] w-1.5 h-1.5 bg-indigo-200/50 rounded-full animate-sparkle-float animation-delay-2500"></div>
         </div>
 
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div class="text-center mb-12">
-            <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
+          <div class="text-center mb-8 sm:mb-10 lg:mb-12 px-4">
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
               Join Your Neighbors Online
             </h2>
-            <p class="text-xl text-blue-100 max-w-2xl mx-auto">
+            <p class="text-base sm:text-lg lg:text-xl text-blue-100 max-w-2xl mx-auto">
               See how many residents are already enjoying the convenience of BNC Portal
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
             <!-- Total Visits -->
             <div class="text-center group">
-              <div class="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:bg-white/15 animate-fade-in-up">
+              <div class="relative bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:bg-white/15 animate-fade-in-up">
                 <!-- Glow Effect -->
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-blue-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div class="relative z-10">
-                  <div class="text-4xl lg:text-6xl font-bold text-white mb-2 animate-counter animate-number-glow" 
+                  <div class="text-3xl sm:text-4xl lg:text-6xl font-bold text-white mb-2 animate-counter animate-number-glow" 
                        [attr.data-target]="visitStats.totalVisits">{{ displayedStats.totalVisits | number }}</div>
-                  <div class="text-blue-200 text-lg font-medium">Total Visits</div>
-                  <div class="text-blue-300 text-sm mt-2">Since launch</div>
+                  <div class="text-blue-200 text-base sm:text-lg font-medium">Total Visits</div>
+                  <div class="text-blue-300 text-xs sm:text-sm mt-1 sm:mt-2">Since launch</div>
                 </div>
                 
                 <!-- Decorative Element -->
-                <div class="absolute -top-2 -right-2 w-4 h-4 bg-blue-400 rounded-full animate-ping"></div>
+                <div class="absolute -top-2 -right-2 w-3 h-3 sm:w-4 sm:h-4 bg-blue-400 rounded-full animate-ping"></div>
               </div>
             </div>
 
             <!-- Today's Visits -->
             <div class="text-center group">
-              <div class="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:bg-white/15 animate-fade-in-up animation-delay-300">
+              <div class="relative bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:bg-white/15 animate-fade-in-up animation-delay-300">
                 <!-- Glow Effect -->
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-indigo-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div class="relative z-10">
                   <div class="text-4xl lg:text-6xl font-bold text-white mb-2 animate-counter animate-number-glow"
@@ -490,7 +490,7 @@ interface VisitStats {
                 </div>
               </div>
 
-              <div class="pt-6">
+              <div class="pt-6 flex justify-center lg:justify-start">
                 <button
                   (click)="navigateTo('/sign-up')"
                   class="group relative inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-500 overflow-hidden">
@@ -510,8 +510,8 @@ interface VisitStats {
 
             <!-- Visual -->
             <div class="relative animate-fade-in-up animation-delay-300">
-              <!-- Main Card -->
-              <div class="relative z-10 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl p-8 lg:p-12 shadow-2xl">
+              <!-- Main Card - Hidden on mobile, visible on lg and up -->
+              <div class="hidden lg:block relative z-10 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-3xl p-8 lg:p-12 shadow-2xl">
                 <div class="space-y-6">
                   <!-- Mock Dashboard Preview with Animation -->
                   <div class="bg-white rounded-2xl shadow-xl p-6 transform hover:scale-105 transition-all duration-500 animate-slide-in-right">
@@ -553,7 +553,7 @@ interface VisitStats {
       </section>
 
       <!-- CTA Section -->
-      <section class="relative py-20 lg:py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 overflow-hidden">
+      <section class="relative py-12 sm:py-16 lg:py-20 xl:py-32 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 overflow-hidden">
         <!-- Modern Animated Background -->
         <div class="absolute inset-0">
           <!-- Radial Gradient Orbs -->
@@ -586,26 +586,26 @@ interface VisitStats {
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div class="text-center max-w-4xl mx-auto">
             <!-- Main Heading with Glow Effect -->
-            <div class="relative inline-block mb-8">
+            <div class="relative inline-block mb-6 sm:mb-8 px-4">
               <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-indigo-400/20 to-purple-400/20 blur-2xl animate-pulse-glow"></div>
-              <h2 class="relative text-4xl lg:text-6xl font-bold text-white leading-tight animate-fade-in-up">
+              <h2 class="relative text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight animate-fade-in-up">
                 Ready to Make Your Life Easier?
               </h2>
             </div>
             
-            <p class="text-xl lg:text-2xl text-blue-200 mb-12 leading-relaxed animate-fade-in-up animation-delay-300">
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-200 mb-8 sm:mb-10 lg:mb-12 leading-relaxed animate-fade-in-up animation-delay-300 px-4">
               Join your neighbors and start enjoying convenient access to barangay services today!
             </p>
             
             <!-- Enhanced CTA Buttons -->
-            <div class="flex flex-col sm:flex-row gap-6 justify-center mb-12 animate-fade-in-up animation-delay-500">
+            <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-8 sm:mb-10 lg:mb-12 animate-fade-in-up animation-delay-500 px-4">
               <button
                 (click)="navigateTo('/sign-up')"
-                class="group relative px-10 py-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden">
+                class="group relative px-8 py-4 sm:px-10 sm:py-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-base sm:text-lg rounded-2xl shadow-2xl hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 overflow-hidden w-full sm:w-auto">
                 <!-- Shimmer Effect -->
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 animate-shimmer"></div>
                 
-                <svg class="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-12 transition-transform duration-300 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                 </svg>
                 <span class="relative z-10">Register as Resident</span>
@@ -616,11 +616,11 @@ interface VisitStats {
               
               <button
                 (click)="navigateTo('/sign-in')"
-                class="group relative px-10 py-5 bg-white/10 backdrop-blur-sm text-white font-bold text-lg rounded-2xl border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 overflow-hidden">
+                class="group relative px-8 py-4 sm:px-10 sm:py-5 bg-white/10 backdrop-blur-sm text-white font-bold text-base sm:text-lg rounded-2xl border-2 border-white/30 hover:bg-white/20 hover:border-white/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 overflow-hidden w-full sm:w-auto">
                 <!-- Shimmer Effect -->
                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 
-                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-300 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                 </svg>
                 <span class="relative z-10">Sign In Existing Account</span>
@@ -631,16 +631,16 @@ interface VisitStats {
             </div>
 
             <!-- Enhanced Stats Display -->
-            <div class="relative inline-block animate-fade-in-up animation-delay-700">
+            <div class="relative inline-block animate-fade-in-up animation-delay-700 px-4">
               <div class="absolute -inset-2 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 rounded-2xl blur-xl animate-pulse-glow"></div>
-              <div class="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-8 py-4">
-                <div class="flex items-center gap-3">
+              <div class="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl px-6 py-3 sm:px-8 sm:py-4">
+                <div class="flex items-center gap-2 sm:gap-3">
                   <div class="relative">
                     <div class="absolute inset-0 bg-blue-400/30 rounded-full blur-md animate-ping"></div>
-                    <div class="relative w-3 h-3 bg-blue-400 rounded-full"></div>
+                    <div class="relative w-2.5 h-2.5 sm:w-3 sm:h-3 bg-blue-400 rounded-full"></div>
                   </div>
-                  <p class="text-lg font-semibold text-blue-200">
-                    Join <span class="text-white font-bold text-xl">{{ visitStats.onlineUsers | number }}+</span> satisfied residents
+                  <p class="text-base sm:text-lg font-semibold text-blue-200">
+                    Join <span class="text-white font-bold text-lg sm:text-xl">{{ visitStats.onlineUsers | number }}+</span> satisfied residents
                   </p>
                 </div>
               </div>
@@ -650,33 +650,33 @@ interface VisitStats {
       </section>
 
       <!-- Footer -->
-      <footer class="bg-gray-900 text-white py-12">
+      <footer class="bg-gray-900 text-white py-8 sm:py-12">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             <!-- Logo and Description -->
             <div>
-              <div class="flex items-center gap-3 mb-4">
-                <img src="/assets/BNC_Portal_Logo.png" alt="BNC Portal" class="w-10 h-10">
-                <span class="text-xl font-bold">BNC Portal</span>
+              <div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <img src="/assets/BNC_Portal_Logo.png" alt="BNC Portal" class="w-8 h-8 sm:w-10 sm:h-10">
+                <span class="text-lg sm:text-xl font-bold">BNC Portal</span>
               </div>
-              <p class="text-gray-400 leading-relaxed">
+              <p class="text-sm sm:text-base text-gray-400 leading-relaxed">
                 Connecting Barangay New Cabalan through modern digital solutions. Your gateway to community services and engagement.
               </p>
             </div>
 
             <!-- Quick Links -->
             <div>
-              <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+              <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Quick Links</h3>
               <div class="space-y-2">
-                <button (click)="navigateTo('/sign-in')" class="block text-gray-400 hover:text-white transition-colors">Sign In</button>
-                <button (click)="navigateTo('/sign-up')" class="block text-gray-400 hover:text-white transition-colors">Register</button>
+                <button (click)="navigateTo('/sign-in')" class="block text-sm sm:text-base text-gray-400 hover:text-white transition-colors">Sign In</button>
+                <button (click)="navigateTo('/sign-up')" class="block text-sm sm:text-base text-gray-400 hover:text-white transition-colors">Register</button>
               </div>
             </div>
 
             <!-- Contact Info -->
             <div>
-              <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
-              <div class="space-y-2 text-gray-400">
+              <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Contact Information</h3>
+              <div class="space-y-2 text-sm sm:text-base text-gray-400">
                 <p>Corner Mabini St., Purok 2, New Cabalan, Olongapo City, Zambales, Philippines</p>
                 <p>Barangay Hotline: 047-224-5414</p>
                 <p>Text/Call: 0910 484 5635</p>
@@ -684,8 +684,8 @@ interface VisitStats {
             </div>
           </div>
 
-          <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; {{ currentYear }} BNC Portal. All rights reserved. | Built by Muni</p>
+          <div class="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-400">
+            <p class="text-xs sm:text-sm">&copy; {{ currentYear }} BNC Portal. All rights reserved. | Built by Muni</p>
           </div>
         </div>
       </footer>
@@ -696,11 +696,8 @@ interface VisitStats {
       0% {
         transform: translate(0px, 0px) scale(1);
       }
-      33% {
-        transform: translate(30px, -50px) scale(1.1);
-      }
-      66% {
-        transform: translate(-20px, 20px) scale(0.9);
+      50% {
+        transform: translate(25px, -30px) scale(1.05);
       }
       100% {
         transform: translate(0px, 0px) scale(1);
@@ -918,6 +915,96 @@ interface VisitStats {
       }
     }
 
+    @keyframes wave-smooth {
+      0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+      }
+      25% {
+        transform: translateX(30px) translateY(-20px) rotate(2deg);
+      }
+      50% {
+        transform: translateX(60px) translateY(0) rotate(0deg);
+      }
+      75% {
+        transform: translateX(30px) translateY(20px) rotate(-2deg);
+      }
+      100% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+      }
+    }
+
+    @keyframes wave-reverse {
+      0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+      }
+      25% {
+        transform: translateX(-35px) translateY(25px) rotate(-3deg);
+      }
+      50% {
+        transform: translateX(-70px) translateY(0) rotate(0deg);
+      }
+      75% {
+        transform: translateX(-35px) translateY(-25px) rotate(3deg);
+      }
+      100% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+      }
+    }
+
+    @keyframes wave-diagonal {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        transform: translate(40px, -40px) scale(1.05);
+      }
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes float-orb-smooth {
+      0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translate(30px, -30px) scale(1.1) rotate(5deg);
+      }
+      50% {
+        transform: translate(60px, 0) scale(1.15) rotate(10deg);
+      }
+      75% {
+        transform: translate(30px, 30px) scale(1.05) rotate(5deg);
+      }
+      100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes float-orb-diagonal {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(-40px, 40px) scale(1.2);
+      }
+      66% {
+        transform: translate(20px, -20px) scale(0.95);
+      }
+      100% {
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes float-orb-slow {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      50% {
+        transform: translate(25px, -35px) scale(1.12);
+      }
+    }
+
     @keyframes float-orb-1 {
       0%, 100% {
         transform: translate(0, 0) scale(1);
@@ -959,6 +1046,88 @@ interface VisitStats {
       50% {
         opacity: 1;
         transform: scale(1);
+      }
+    }
+
+    @keyframes sparkle-float {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(0);
+      }
+      25% {
+        opacity: 1;
+        transform: translateY(-15px) scale(1.2);
+      }
+      50% {
+        opacity: 0.8;
+        transform: translateY(-30px) scale(1);
+      }
+      75% {
+        opacity: 0.5;
+        transform: translateY(-45px) scale(0.8);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(0);
+      }
+    }
+
+    @keyframes sparkle-pulse {
+      0%, 100% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+      }
+      25% {
+        opacity: 1;
+        transform: scale(1.5) rotate(90deg);
+      }
+      50% {
+        opacity: 0.6;
+        transform: scale(1) rotate(180deg);
+      }
+      75% {
+        opacity: 0.3;
+        transform: scale(1.2) rotate(270deg);
+      }
+    }
+
+    @keyframes line-slide-slow {
+      0% {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      25% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+      75% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    @keyframes line-slide-reverse {
+      0% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      25% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      75% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateX(-100%);
+        opacity: 0;
       }
     }
 
@@ -1064,7 +1233,7 @@ interface VisitStats {
     @keyframes fade-in-up {
       0% {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
       }
       100% {
         opacity: 1;
@@ -1073,7 +1242,8 @@ interface VisitStats {
     }
 
     .animate-blob {
-      animation: blob 7s infinite;
+      animation: blob 5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      will-change: transform;
     }
 
     .animate-blob-slow {
@@ -1140,6 +1310,21 @@ interface VisitStats {
       animation: wave-2 25s ease-in-out infinite;
     }
 
+    .animate-wave-smooth {
+      animation: wave-smooth 15s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      will-change: transform;
+    }
+
+    .animate-wave-reverse {
+      animation: wave-reverse 18s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      will-change: transform;
+    }
+
+    .animate-wave-diagonal {
+      animation: wave-diagonal 20s ease-in-out infinite;
+      will-change: transform;
+    }
+
     .animate-float-orb-1 {
       animation: float-orb-1 18s ease-in-out infinite;
     }
@@ -1150,6 +1335,21 @@ interface VisitStats {
 
     .animate-float-orb-3 {
       animation: float-orb-3 20s ease-in-out infinite;
+    }
+
+    .animate-float-orb-smooth {
+      animation: float-orb-smooth 20s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      will-change: transform;
+    }
+
+    .animate-float-orb-diagonal {
+      animation: float-orb-diagonal 16s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    .animate-float-orb-slow {
+      animation: float-orb-slow 24s ease-in-out infinite;
+      will-change: transform;
     }
 
     .animate-sparkle-1 {
@@ -1164,8 +1364,24 @@ interface VisitStats {
       animation: sparkle-3 3.5s ease-in-out infinite;
     }
 
+    .animate-sparkle-float {
+      animation: sparkle-float 5s ease-in-out infinite;
+    }
+
+    .animate-sparkle-pulse {
+      animation: sparkle-pulse 4s ease-in-out infinite;
+    }
+
     .animate-line-slide {
       animation: line-slide 8s linear infinite;
+    }
+
+    .animate-line-slide-slow {
+      animation: line-slide-slow 12s linear infinite;
+    }
+
+    .animate-line-slide-reverse {
+      animation: line-slide-reverse 10s linear infinite;
     }
 
     .animate-number-glow {
@@ -1199,19 +1415,19 @@ interface VisitStats {
     }
 
     .animation-delay-300 {
-      animation-delay: 0.3s;
+      animation-delay: 0.15s;
     }
 
     .animation-delay-500 {
-      animation-delay: 0.5s;
+      animation-delay: 0.25s;
     }
 
     .animation-delay-700 {
-      animation-delay: 0.7s;
+      animation-delay: 0.35s;
     }
 
     .animation-delay-900 {
-      animation-delay: 0.9s;
+      animation-delay: 0.45s;
     }
 
     .animation-delay-1000 {
