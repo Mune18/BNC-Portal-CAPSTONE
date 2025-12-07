@@ -261,6 +261,38 @@ export class AdminService extends BaseAppwriteService {
     }
   }
 
+  // Get a single resident by ID
+  async getResidentById(residentId: string): Promise<ResidentInfo | null> {
+    try {
+      // Fetch the resident document
+      const doc = await this.database.getDocument(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        residentId
+      );
+
+      // Fetch user document to get role
+      let role = 'resident';
+      if (doc['userId']) {
+        try {
+          const userDoc = await this.database.getDocument(
+            environment.appwriteDatabaseId,
+            environment.userCollectionId,
+            doc['userId']
+          );
+          role = userDoc['role'] || 'resident';
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+        }
+      }
+
+      return this.mapToResidentInfo(doc, role);
+    } catch (error) {
+      console.error('Error fetching resident by ID:', error);
+      return null;
+    }
+  }
+
   // Helper method to map document to ResidentInfo type
   private mapToResidentInfo(doc: any, role: string): ResidentInfo {
     return {
@@ -523,25 +555,9 @@ export class AdminService extends BaseAppwriteService {
         );
       }
 
-      // Create household automatically for approved resident
-      try {
-        // Check if household already exists
-        const existingHousehold = await this.householdService.getHouseholdByHeadId(residentId);
-        
-        if (!existingHousehold) {
-          // Create new household using resident's address
-          await this.householdService.createHousehold(
-            residentId,
-            residentDoc['purokNo'] || '',
-            residentDoc['houseNo'] || '',
-            residentDoc['street'] || ''
-          );
-          console.log(`Household created for resident ${residentId}`);
-        }
-      } catch (householdError) {
-        console.error('Error creating household:', householdError);
-        // Log but don't throw - household creation failure shouldn't block approval
-      }
+      // Note: Household is NOT created automatically.
+      // Users can create their own household or be added as members by existing household heads
+      // via the household management page.
 
       // Send approval email notification
       const emailData: EmailNotificationData = {

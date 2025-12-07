@@ -2,7 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../shared/services/admin.service';
+import { HouseholdService } from '../../shared/services/household.service';
 import { ResidentInfo } from '../../shared/types/resident';
+import { Household, HouseholdMemberWithResident } from '../../shared/types/household';
 import { ResidentDetailModalComponent } from './resident-detail-modal.component';
 import { ResidentEditModalComponent } from './resident-edit-modal.component';
 import Swal from 'sweetalert2';
@@ -48,6 +50,17 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               </span>
               <span class="ml-2 bg-gray-100 text-gray-500 py-0.5 px-2.5 rounded-full text-xs font-medium" *ngIf="pendingResidents.length === 0">
                 0
+              </span>
+            </button>
+            <button 
+              (click)="setActiveTab('households')"
+              [class]="activeTab === 'households' 
+                ? 'border-purple-500 text-purple-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'"
+            >
+              Households
+              <span class="ml-2 bg-purple-100 text-purple-800 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                {{ households.length }}
               </span>
             </button>
           </nav>
@@ -603,6 +616,198 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           </div>
         </div> <!-- End Pending Approvals Tab -->
 
+        <!-- Households Tab -->
+        <div *ngSwitchCase="'households'">
+          <!-- Households Header -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold text-gray-800">Registered Households</h2>
+                <p class="text-sm text-gray-600 mt-1">View all households and their members in Barangay New Cabalan</p>
+              </div>
+              <button 
+                (click)="loadHouseholds()"
+                class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                [disabled]="isLoadingHouseholds"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                {{ isLoadingHouseholds ? 'Loading...' : 'Refresh' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State for Households -->
+          <div *ngIf="isLoadingHouseholds" class="bg-white rounded-xl shadow-sm p-8 flex justify-center">
+            <div class="flex flex-col items-center">
+              <div class="h-12 w-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p class="text-gray-600">Loading households...</p>
+            </div>
+          </div>
+
+          <!-- Error State for Households -->
+          <div *ngIf="householdsErrorMessage && !isLoadingHouseholds" class="bg-red-50 rounded-xl shadow-sm border border-red-200 p-6 mb-6">
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-red-600">{{ householdsErrorMessage }}</p>
+            </div>
+            <button 
+              (click)="loadHouseholds()" 
+              class="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm transition"
+            >
+              Try Again
+            </button>
+          </div>
+
+          <!-- Households List -->
+          <div *ngIf="!isLoadingHouseholds && !householdsErrorMessage && households.length > 0" class="space-y-4">
+            <div *ngFor="let household of households" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              <!-- Household Header -->
+              <div 
+                class="px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                (click)="toggleHouseholdExpanded(household.$id!)"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                      <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ household.householdCode }}</h3>
+                        <p class="text-sm text-gray-600">{{ getHouseholdAddress(household) }}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            {{ getHouseholdMembers(household.$id!).length }} members
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      class="h-5 w-5 text-gray-400 transition-transform duration-200"
+                      [class.rotate-180]="isHouseholdExpanded(household.$id!)"
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Household Members (Expandable) -->
+              <div *ngIf="isHouseholdExpanded(household.$id!)" class="border-t border-gray-200 bg-gray-50">
+                <div class="px-6 py-4">
+                  <h4 class="text-sm font-semibold text-gray-700 mb-3">Household Members</h4>
+                  
+                  <div *ngIf="getHouseholdMembers(household.$id!).length === 0" class="text-center py-4 text-gray-500 text-sm">
+                    No members found
+                  </div>
+
+                  <div class="space-y-3">
+                    <div 
+                      *ngFor="let member of getHouseholdMembers(household.$id!)" 
+                      class="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-sm transition-shadow cursor-pointer hover:border-purple-300"
+                      (click)="viewHouseholdMember(member); $event.stopPropagation()"
+                      [title]="member.memberType === 'linked' ? 'Click to view resident details' : 'This member has not registered yet'"
+                    >
+                      <div class="flex items-start justify-between">
+                        <div class="flex items-start gap-3 flex-1">
+                          <!-- Member Avatar -->
+                          <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            <img 
+                              *ngIf="member.residentInfo?.profileImage" 
+                              [src]="member.residentInfo?.profileImage" 
+                              alt="Profile" 
+                              class="w-full h-full object-cover"
+                            >
+                            <span *ngIf="!member.residentInfo?.profileImage" class="text-gray-600 font-medium text-sm">
+                              {{ getMemberDisplayName(member).charAt(0) }}
+                            </span>
+                          </div>
+
+                          <!-- Member Info -->
+                          <div class="flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                              <h5 class="font-medium text-gray-900">{{ getMemberDisplayName(member) }}</h5>
+                              <span [class]="getRelationshipBadgeClass(member.relationship)">
+                                {{ member.relationship }}
+                              </span>
+                            </div>
+                            
+                            <div class="mt-1 space-y-1">
+                              <p class="text-xs text-gray-600" *ngIf="member.residentInfo?.age || member.birthDate">
+                                <span class="font-medium">Age:</span> {{ calculateMemberAge(member) }} years old
+                              </p>
+                              <p class="text-xs text-gray-600" *ngIf="member.residentInfo?.gender">
+                                <span class="font-medium">Gender:</span> {{ member.residentInfo?.gender }}
+                              </p>
+                              <p class="text-xs text-gray-600" *ngIf="member.residentInfo?.contactNo">
+                                <span class="font-medium">Contact:</span> {{ member.residentInfo?.contactNo }}
+                              </p>
+                            </div>
+
+                            <!-- Member Status Badge -->
+                            <div class="mt-2">
+                              <span 
+                                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                [class]="getMemberStatusBadge(member).class"
+                              >
+                                <svg 
+                                  *ngIf="member.memberType === 'linked'" 
+                                  xmlns="http://www.w3.org/2000/svg" 
+                                  class="h-3 w-3 mr-1" 
+                                  fill="none" 
+                                  viewBox="0 0 24 24" 
+                                  stroke="currentColor"
+                                >
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <svg 
+                                  *ngIf="member.memberType === 'pending_registration'" 
+                                  xmlns="http://www.w3.org/2000/svg" 
+                                  class="h-3 w-3 mr-1" 
+                                  fill="none" 
+                                  viewBox="0 0 24 24" 
+                                  stroke="currentColor"
+                                >
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ getMemberStatusBadge(member).text }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Households State -->
+          <div *ngIf="!isLoadingHouseholds && !householdsErrorMessage && households.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <p class="text-gray-600 text-lg">No households registered</p>
+            <p class="text-gray-500 text-sm mt-1">There are currently no households in the system</p>
+          </div>
+        </div> <!-- End Households Tab -->
+
       </div> <!-- End Tab Content -->
 
       <!-- Resident Detail Modal (hidden by default) -->
@@ -649,13 +854,20 @@ export class ResidentsComponent implements OnInit {
   archivingResidentId: string | null = null; // Track which resident is being archived
 
   // Tab management
-  activeTab: 'residents' | 'pending' = 'residents';
+  activeTab: 'residents' | 'pending' | 'households' = 'residents';
   
   // Pending residents properties
   pendingResidents: ResidentInfo[] = [];
   isLoadingPending: boolean = false;
   pendingErrorMessage: string = '';
   approvingResidentId: string | null = null; // Track which resident is being approved/rejected
+  
+  // Households properties
+  households: Household[] = [];
+  householdsWithMembers: Map<string, HouseholdMemberWithResident[]> = new Map();
+  expandedHouseholds: Set<string> = new Set();
+  isLoadingHouseholds: boolean = false;
+  householdsErrorMessage: string = '';
 
   // Pagination properties
   currentPage: number = 1;
@@ -695,21 +907,30 @@ export class ResidentsComponent implements OnInit {
   
   showColumnSelection: boolean = false;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private householdService: HouseholdService
+  ) {}
 
   ngOnInit() {
     this.loadResidentsOptimized();
     this.loadPendingResidents();
+    this.loadHouseholdsCount();
   }
 
   // Tab management
-  setActiveTab(tab: 'residents' | 'pending') {
+  setActiveTab(tab: 'residents' | 'pending' | 'households') {
     this.activeTab = tab;
     if (tab === 'pending' && this.pendingResidents.length === 0) {
       this.loadPendingResidents();
     } else if (tab === 'residents') {
       // Refresh residents data when switching back to ensure newly approved residents appear
       this.loadResidentsOptimized();
+    } else if (tab === 'households') {
+      // Load full household data with members if not already loaded
+      if (this.householdsWithMembers.size === 0) {
+        this.loadHouseholds();
+      }
     }
   }
 
@@ -1997,5 +2218,133 @@ export class ResidentsComponent implements OnInit {
     // Check if email matches the household member placeholder pattern
     return resident.personalInfo.email?.includes('household_member_') && 
            resident.personalInfo.email?.includes('@pending.barangay.local');
+  }
+
+  // Households tab methods
+  async loadHouseholdsCount() {
+    try {
+      this.households = await this.householdService.getAllHouseholds();
+    } catch (error) {
+      console.error('Failed to load households count:', error);
+    }
+  }
+
+  async loadHouseholds() {
+    this.isLoadingHouseholds = true;
+    this.householdsErrorMessage = '';
+    try {
+      this.households = await this.householdService.getAllHouseholds();
+      
+      // Load members for each household
+      for (const household of this.households) {
+        if (household.$id) {
+          const members = await this.householdService.getHouseholdMembers(household.$id);
+          this.householdsWithMembers.set(household.$id, members);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load households:', error);
+      this.householdsErrorMessage = 'Failed to load households. Please try again.';
+    } finally {
+      this.isLoadingHouseholds = false;
+    }
+  }
+
+  toggleHouseholdExpanded(householdId: string) {
+    if (this.expandedHouseholds.has(householdId)) {
+      this.expandedHouseholds.delete(householdId);
+    } else {
+      this.expandedHouseholds.add(householdId);
+    }
+  }
+
+  isHouseholdExpanded(householdId: string): boolean {
+    return this.expandedHouseholds.has(householdId);
+  }
+
+  getHouseholdMembers(householdId: string): HouseholdMemberWithResident[] {
+    return this.householdsWithMembers.get(householdId) || [];
+  }
+
+  getHouseholdAddress(household: Household): string {
+    const parts = [];
+    if (household.houseNo) parts.push(household.houseNo);
+    if (household.street) parts.push(household.street);
+    if (household.purokNo) parts.push(`Purok ${household.purokNo}`);
+    return parts.join(', ') + ', New Cabalan';
+  }
+
+  getMemberDisplayName(member: HouseholdMemberWithResident): string {
+    if (member.residentInfo) {
+      const middleInitial = member.residentInfo.middleName ? member.residentInfo.middleName[0] + '.' : '';
+      return `${member.residentInfo.firstName} ${middleInitial} ${member.residentInfo.lastName}`.trim();
+    }
+    // For pending members
+    return `${member.firstName || ''} ${member.lastName || ''}`.trim() || 'Unnamed Member';
+  }
+
+  getRelationshipBadgeClass(relationship: string): string {
+    const baseClasses = 'px-2 py-1 text-xs font-semibold rounded-full ';
+    switch (relationship) {
+      case 'Head':
+        return baseClasses + 'bg-blue-100 text-blue-800';
+      case 'Spouse':
+        return baseClasses + 'bg-pink-100 text-pink-800';
+      case 'Child':
+        return baseClasses + 'bg-green-100 text-green-800';
+      case 'Parent':
+        return baseClasses + 'bg-purple-100 text-purple-800';
+      case 'Sibling':
+        return baseClasses + 'bg-yellow-100 text-yellow-800';
+      default:
+        return baseClasses + 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  getMemberStatusBadge(member: HouseholdMemberWithResident): { text: string, class: string } {
+    if (member.memberType === 'linked' && member.residentInfo) {
+      return {
+        text: 'Registered',
+        class: 'bg-green-100 text-green-800 border border-green-200'
+      };
+    } else if (member.memberType === 'pending_registration') {
+      return {
+        text: 'Pending Registration',
+        class: 'bg-amber-100 text-amber-800 border border-amber-200'
+      };
+    }
+    return {
+      text: 'Unknown',
+      class: 'bg-gray-100 text-gray-800 border border-gray-200'
+    };
+  }
+
+  calculateMemberAge(member: HouseholdMemberWithResident): number | string {
+    const birthDate = member.residentInfo?.birthDate || member.birthDate;
+    if (!birthDate) return '-';
+    
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age >= 0 ? age : '-';
+  }
+
+  async viewHouseholdMember(member: HouseholdMemberWithResident) {
+    // Only allow viewing details for linked members (registered residents)
+    if (member.memberType === 'linked' && member.linkedResidentId) {
+      try {
+        // Fetch the full resident details
+        const resident = await this.adminService.getResidentById(member.linkedResidentId);
+        if (resident) {
+          this.viewResident(resident);
+        }
+      } catch (error) {
+        console.error('Error fetching resident details:', error);
+      }
+    }
   }
 }

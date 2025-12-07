@@ -6,6 +6,7 @@ import { AnnouncementService } from '../../shared/services/announcement.service'
 import { ComplaintService } from '../../shared/services/complaint.service';
 import { ResidentUpdateService } from '../../shared/services/resident-update.service';
 import { DataRefreshService } from '../../shared/services/data-refresh.service';
+import { HouseholdService } from '../../shared/services/household.service';
 import { ResidentInfo } from '../../shared/types/resident';
 import { Announcement } from '../../shared/types/announcement';
 import { Complaint } from '../../shared/types/complaint';
@@ -74,7 +75,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
             <div class="relative flex items-center justify-between">
               <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Update Requests</p>
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Resident Information Update Requests</p>
                 <p class="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{{ pendingUpdateRequests }}</p>
               </div>
               <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/50 group-hover:scale-110 transition-transform duration-300">
@@ -180,6 +181,54 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               </div>
             </div>
           </div>
+
+          <!-- Pending Household Requests -->
+          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-amber-100 hover:border-amber-300 overflow-hidden" [routerLink]="['/admin/household-requests']">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Pending Household Requests</p>
+                <p class="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{{ pendingHouseholdRequests }}</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/50 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Households -->
+          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-blue-100 hover:border-blue-300 overflow-hidden" [routerLink]="['/admin/household-requests']">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Total Households</p>
+                <p class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{{ totalHouseholds }}</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Avg Members per Household -->
+          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-emerald-100 hover:border-emerald-300 overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Avg. Members/Household</p>
+                <p class="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">{{ avgHouseholdSize }}</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Priority Actions Widget -->
@@ -212,6 +261,55 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               </div>
             </li>
           </ul>
+        </div>
+
+        <!-- Top 5 Largest Households -->
+        <div *ngIf="householdAnalytics" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 mb-8">
+          <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+            Top 5 Largest Households
+          </h3>
+          <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rank</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Household Code</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Head of Household</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Address</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Members</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let household of householdAnalytics.topHouseholds; let i = index" class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
+                          [ngClass]="{
+                            'bg-yellow-100 text-yellow-800': i === 0,
+                            'bg-gray-100 text-gray-800': i === 1,
+                            'bg-orange-100 text-orange-800': i === 2,
+                            'bg-blue-50 text-blue-600': i > 2
+                          }">
+                      {{ i + 1 }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap font-mono text-sm text-gray-900 font-semibold">{{ household.householdCode }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ household.headName }}</td>
+                  <td class="px-6 py-4 text-sm text-gray-500">{{ household.address }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                      {{ household.memberCount }} members
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="!householdAnalytics.topHouseholds || householdAnalytics.topHouseholds.length === 0" class="bg-gray-50">
+                  <td colspan="5" class="px-6 py-8 text-center text-gray-400 font-medium">No household data available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Recent Activity & Charts -->
@@ -336,6 +434,22 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                 <canvas id="employmentChart"></canvas>
               </div>
             </div>
+
+            <!-- Household Size Distribution -->
+            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">Household Size Distribution</h2>
+              <div class="h-64">
+                <canvas id="householdSizeChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Household Heads by Gender -->
+            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">Household Heads by Gender</h2>
+              <div class="h-64">
+                <canvas id="headGenderChart"></canvas>
+              </div>
+            </div>
           </div>
 
           <!-- Charts Column -->
@@ -393,6 +507,22 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               <h2 class="text-xl font-bold text-gray-900 mb-6">Residents per Purok</h2>
               <div class="h-64">
                 <canvas id="purokChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Households by Purok -->
+            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">Households by Purok</h2>
+              <div class="h-64">
+                <canvas id="householdsByPurokChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Household Heads by Age Group -->
+            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+              <h2 class="text-xl font-bold text-gray-900 mb-6">Household Heads by Age Group</h2>
+              <div class="h-64">
+                <canvas id="headAgeChart"></canvas>
               </div>
             </div>
 
@@ -459,6 +589,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   pendingComplaints = 0;
   pendingUpdateRequests = 0;
   newResidentsLastMonth = 0;
+
+  // Household Statistics
+  pendingHouseholdRequests = 0;
+  totalHouseholds = 0;
+  avgHouseholdSize = 0;
 
   // Phase 1 additions
   priorityActions: any[] = [];
@@ -532,6 +667,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     data: [] as number[]
   };
 
+  // Household Analytics
+  householdAnalytics: any = null;
+  private householdsByPurokChart: Chart | null = null;
+  private householdSizeChart: Chart | null = null;
+  private headGenderChart: Chart | null = null;
+  private headAgeChart: Chart | null = null;
+
   private genderChart: Chart | null = null;
   private ageGroupChart: Chart | null = null;
   private educationChart: Chart | null = null;
@@ -551,7 +693,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private announcementService: AnnouncementService,
     private complaintService: ComplaintService,
     private residentUpdateService: ResidentUpdateService,
-    private dataRefreshService: DataRefreshService
+    private dataRefreshService: DataRefreshService,
+    private householdService: HouseholdService
   ) {}
 
   async ngOnInit() {
@@ -579,10 +722,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private async loadCriticalStats() {
     try {
       // Load only essential stats for immediate display
-      const [residentStats, announcements, pendingResidents] = await Promise.all([
+      const [residentStats, announcements, pendingResidents, householdStats, pendingHouseholdMembers] = await Promise.all([
         this.adminService.getResidentStats(),
         this.announcementService.getActiveAnnouncements(),
-        this.adminService.getPendingResidents()
+        this.adminService.getPendingResidents(),
+        this.householdService.getHouseholdStats(),
+        this.householdService.getPendingHouseholdMembers()
       ]);
 
       // Set immediate stats
@@ -590,6 +735,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.newResidentsLastMonth = (residentStats as any).recent || 0;
       this.pendingResidentApprovals = pendingResidents.length || 0;
       this.recentAnnouncements = announcements.slice(0, 3);
+      
+      // Set household stats
+      this.pendingHouseholdRequests = pendingHouseholdMembers.length || 0;
+      this.totalHouseholds = householdStats.totalHouseholds || 0;
+      this.avgHouseholdSize = householdStats.avgHouseholdSize || 0;
     } catch (error) {
       console.error('Error loading critical stats:', error);
     }
@@ -623,11 +773,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.calculateAgeGroups(residents);
       this.calculateComprehensiveStats(residents);
       await this.calculateComplaintsByMonth();
+      await this.loadHouseholdAnalytics();
       
       // Render charts after data is ready
       setTimeout(() => this.renderCharts(), 100);
     } catch (error) {
       console.error('Error loading full resident data for charts:', error);
+    }
+  }
+
+  private async loadHouseholdAnalytics() {
+    try {
+      this.householdAnalytics = await this.householdService.getHouseholdAnalytics();
+      console.log('Household analytics loaded:', this.householdAnalytics);
+    } catch (error) {
+      console.error('Error loading household analytics:', error);
     }
   }
 
@@ -875,6 +1035,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.childrenAgeChart) this.childrenAgeChart.destroy();
     if (this.complaintsTimeChart) this.complaintsTimeChart.destroy();
     if (this.purokChart) this.purokChart.destroy();
+    if (this.householdsByPurokChart) this.householdsByPurokChart.destroy();
+    if (this.householdSizeChart) this.householdSizeChart.destroy();
+    if (this.headGenderChart) this.headGenderChart.destroy();
+    if (this.headAgeChart) this.headAgeChart.destroy();
     this.refreshSubscription?.unsubscribe();
   }
 
@@ -930,6 +1094,178 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.renderChildrenAgeChart();
     this.renderComplaintsTimeChart();
     this.renderPurokChart();
+    this.renderHouseholdCharts();
+  }
+
+  private renderHouseholdCharts() {
+    if (!this.householdAnalytics) return;
+
+    this.renderHouseholdsByPurokChart();
+    this.renderHouseholdSizeChart();
+    this.renderHeadGenderChart();
+    this.renderHeadAgeChart();
+  }
+
+  private renderHouseholdsByPurokChart() {
+    const canvas = document.getElementById('householdsByPurokChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    if (this.householdsByPurokChart) this.householdsByPurokChart.destroy();
+
+    const labels = Object.keys(this.householdAnalytics.byPurok).sort((a, b) => {
+      if (a === 'Unknown') return 1;
+      if (b === 'Unknown') return -1;
+      return parseInt(a) - parseInt(b);
+    }).map(p => p === 'Unknown' ? p : `Purok ${p}`);
+    
+    const data = labels.map(label => {
+      const purokNo = label === 'Unknown' ? 'Unknown' : label.replace('Purok ', '');
+      return this.householdAnalytics.byPurok[purokNo] || 0;
+    });
+
+    this.householdsByPurokChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Households',
+          data,
+          backgroundColor: 'rgba(59, 130, 246, 0.8)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, font: { size: 12 }, color: '#6B7280' },
+            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 11, weight: 500 as any }, color: '#374151', maxRotation: 45, minRotation: 45 },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  private renderHouseholdSizeChart() {
+    const canvas = document.getElementById('householdSizeChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    if (this.householdSizeChart) this.householdSizeChart.destroy();
+
+    this.householdSizeChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(this.householdAnalytics.sizeDistribution),
+        datasets: [{
+          data: Object.values(this.householdAnalytics.sizeDistribution),
+          backgroundColor: [
+            'rgba(59, 130, 246, 0.85)',
+            'rgba(16, 185, 129, 0.85)',
+            'rgba(245, 158, 11, 0.85)',
+            'rgba(239, 68, 68, 0.85)'
+          ],
+          borderWidth: 3,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            display: true,
+            position: 'bottom',
+            labels: { padding: 15, font: { size: 11, weight: 500 as any }, color: '#374151', usePointStyle: true }
+          },
+          title: { display: false }
+        },
+        cutout: '60%'
+      }
+    });
+  }
+
+  private renderHeadGenderChart() {
+    const canvas = document.getElementById('headGenderChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    if (this.headGenderChart) this.headGenderChart.destroy();
+
+    this.headGenderChart = new Chart(canvas, {
+      type: 'pie',
+      data: {
+        labels: ['Male', 'Female'],
+        datasets: [{
+          data: [
+            this.householdAnalytics.headDemographics.byGender.Male,
+            this.householdAnalytics.headDemographics.byGender.Female
+          ],
+          backgroundColor: ['rgba(59, 130, 246, 0.85)', 'rgba(236, 72, 153, 0.85)'],
+          borderWidth: 3,
+          borderColor: '#ffffff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            display: true,
+            position: 'bottom',
+            labels: { padding: 15, font: { size: 11, weight: 500 as any }, color: '#374151', usePointStyle: true }
+          },
+          title: { display: false }
+        }
+      }
+    });
+  }
+
+  private renderHeadAgeChart() {
+    const canvas = document.getElementById('headAgeChart') as HTMLCanvasElement;
+    if (!canvas) return;
+    if (this.headAgeChart) this.headAgeChart.destroy();
+
+    this.headAgeChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(this.householdAnalytics.headDemographics.byAgeGroup),
+        datasets: [{
+          label: 'Household Heads',
+          data: Object.values(this.householdAnalytics.headDemographics.byAgeGroup),
+          backgroundColor: 'rgba(16, 185, 129, 0.85)',
+          borderColor: 'rgba(16, 185, 129, 1)',
+          borderWidth: 1,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, font: { size: 12 }, color: '#6B7280' },
+            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+          },
+          x: {
+            ticks: { font: { size: 12, weight: 500 as any }, color: '#374151' },
+            grid: { display: false }
+          }
+        }
+      }
+    });
   }
 
   private renderGenderChart() {

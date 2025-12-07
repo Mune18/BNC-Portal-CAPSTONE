@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Account, Avatars, Client, Databases, Storage, Graphql } from 'appwrite';
 import { environment } from '../../environment/environment';
@@ -14,7 +14,7 @@ export class BaseAppwriteService {
   protected storage!: Storage;
   protected graphql!: Graphql;
 
-  constructor(protected router: Router) {
+  constructor(@Inject(Router) protected router: Router) {
     this.initializeAppwrite();
   }
 

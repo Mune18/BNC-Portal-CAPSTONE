@@ -174,13 +174,46 @@ import Swal from 'sweetalert2';
           </svg>
           <h3 class="text-xl font-bold text-gray-900 mb-2">No Household Found</h3>
           <p class="text-gray-600 mb-2">You are not currently part of any household.</p>
-          <p class="text-sm text-gray-500">Your household will be created once your registration is approved by an admin, or you may be added as a member by a household head.</p>
+          
+          <div *ngIf="currentResident?.personalInfo" class="mt-6 space-y-4">
+            <!-- Create Own Household Option -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 max-w-md mx-auto">
+              <h4 class="font-semibold text-gray-900 mb-2 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Option 1: Create Your Own Household
+              </h4>
+              <p class="text-sm text-gray-700 mb-4">If you are the head of your family, create a household and add members.</p>
+              <button 
+                (click)="createOwnHousehold()"
+                [disabled]="creatingHousehold"
+                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg hover:shadow-xl flex items-center gap-2 mx-auto"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {{ creatingHousehold ? 'Creating Household...' : 'Create My Household' }}
+              </button>
+            </div>
+
+            <!-- Join Existing Household Option -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 max-w-md mx-auto">
+              <h4 class="font-semibold text-gray-900 mb-2 flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Option 2: Join an Existing Household
+              </h4>
+              <p class="text-sm text-gray-700">If you belong to an existing household, ask the household head to add you as a member from their household page.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Add Member Modal -->
-    <div *ngIf="showAddMemberModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" (click)="closeAddMemberModal()">
+    <div *ngIf="showAddMemberModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closeAddMemberModal()">
       <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
         <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
           <h3 class="text-2xl font-bold text-gray-900">Add Household Member</h3>
@@ -225,7 +258,12 @@ import Swal from 'sweetalert2';
                 <div class="flex justify-between items-start">
                   <div>
                     <p class="font-semibold text-gray-900">{{ result.fullName }}</p>
-                    <p class="text-sm text-gray-600">{{ result.age }} years old • {{ result.gender }}</p>
+                    <p class="text-sm text-gray-600">
+                      <span *ngIf="result.age">{{ result.age }} years old</span>
+                      <span *ngIf="!result.age && result.birthDate">{{ calculateAge(result.birthDate) }} years old</span>
+                      <span *ngIf="!result.age && !result.birthDate">Age not specified</span>
+                      <span *ngIf="result.gender"> • {{ result.gender }}</span>
+                    </p>
                     <p class="text-sm text-gray-500">Purok {{ result.purokNo }} • {{ result.contactNo }}</p>
                   </div>
                   <div>
@@ -344,6 +382,8 @@ export class HouseholdComponent implements OnInit {
   loading = true;
   household: HouseholdWithMembers | null = null;
   currentUserId: string = '';
+  currentResident: any = null;
+  creatingHousehold = false;
 
   // Add member modal
   showAddMemberModal = false;
@@ -375,6 +415,7 @@ export class HouseholdComponent implements OnInit {
       
       if (resident?.$id) {
         this.currentUserId = resident.$id;
+        this.currentResident = resident; // Store resident info
         // Use new method that checks if user is head OR member
         const household = await this.householdService.getHouseholdForResident(resident.$id);
         
@@ -624,5 +665,85 @@ export class HouseholdComponent implements OnInit {
       'claimed': 'Claimed'
     };
     return formats[status] || status;
+  }
+
+  async createOwnHousehold() {
+    if (!this.currentResident?.personalInfo) {
+      Swal.fire('Error', 'Unable to retrieve your resident information', 'error');
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: 'Create Your Household',
+      html: `
+        <div class="text-left space-y-3">
+          <p class="text-gray-700">You are about to create a household with the following information:</p>
+          <div class="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+            <p><strong>Head of Household:</strong> ${this.currentResident.personalInfo.firstName} ${this.currentResident.personalInfo.lastName}</p>
+            <p><strong>Purok No.:</strong> ${this.currentResident.personalInfo.purokNo}</p>
+            <p><strong>House No.:</strong> ${this.currentResident.personalInfo.houseNo}</p>
+            <p><strong>Street:</strong> ${this.currentResident.personalInfo.street}</p>
+          </div>
+          <p class="text-sm text-gray-600 mt-4">Once created, you will be registered as the head of this household and can add other members.</p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Create Household',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#2563eb'
+    });
+
+    if (result.isConfirmed) {
+      this.creatingHousehold = true;
+      try {
+        const household = await this.householdService.createHousehold(
+          this.currentResident.$id,
+          this.currentResident.personalInfo.purokNo,
+          this.currentResident.personalInfo.houseNo,
+          this.currentResident.personalInfo.street
+        );
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Household Created!',
+          html: `
+            <div class="text-left space-y-3">
+              <p class="text-gray-700">Your household has been successfully created.</p>
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p class="text-sm font-semibold text-green-900">Household Code:</p>
+                <p class="text-lg font-bold text-green-700 font-mono">${household.householdCode}</p>
+              </div>
+              <p class="text-sm text-gray-600">You can now add household members using the "Add Household Member" button.</p>
+            </div>
+          `,
+          confirmButtonColor: '#10b981'
+        });
+
+        await this.loadHousehold();
+      } catch (error: any) {
+        console.error('Error creating household:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to Create Household',
+          text: error.message || 'An error occurred while creating your household',
+          confirmButtonColor: '#ef4444'
+        });
+      } finally {
+        this.creatingHousehold = false;
+      }
+    }
+  }
+
+  calculateAge(birthDate: string): number {
+    if (!birthDate) return 0;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
   }
 }

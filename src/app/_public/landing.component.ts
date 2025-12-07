@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LoadingComponent } from '../shared/components/loading.component';
@@ -1546,10 +1546,10 @@ export class LandingComponent implements OnInit, OnDestroy, AfterViewInit {
   private scrollListener?: () => void;
   private counterAnimationFrames: number[] = [];
 
-  constructor(
-    private router: Router,
-    private analyticsService: AnalyticsService
-  ) {
+  private router = inject(Router);
+  private analyticsService = inject(AnalyticsService);
+
+  constructor() {
     this.generateFloatingElements();
   }
 

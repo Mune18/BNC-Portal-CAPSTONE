@@ -288,6 +288,7 @@ export class HouseholdService extends BaseAppwriteService {
 
   /**
    * Search for existing residents to add as household members
+   * Uses client-side filtering for efficient searching without fulltext indexes
    */
   async searchResidents(
     query: string,
@@ -300,27 +301,43 @@ export class HouseholdService extends BaseAppwriteService {
         .filter(m => m.linkedResidentId)
         .map(m => m.linkedResidentId!);
 
-      // Search residents
+      // Fetch all active/inactive residents (limited to 100 for performance)
+      // Client-side filtering is more efficient than multiple server queries
       const response = await this.database.listDocuments(
         environment.appwriteDatabaseId,
         this.RESIDENTS_COLLECTION,
         [
-          Query.or([
-            Query.search('personalInfo.firstName', query),
-            Query.search('personalInfo.lastName', query),
-            Query.search('otherDetails.nationalIdNo', query),
-            Query.search('otherDetails.votersIdNo', query)
-          ]),
-          Query.equal('otherDetails.status', ['Active', 'Inactive']),
-          Query.limit(10)
+          Query.equal('status', ['Active', 'Inactive']),
+          Query.limit(100),
+          Query.orderDesc('$createdAt')
         ]
       );
 
-      const residents = response.documents as unknown as ResidentInfo[];
+      // Data from Appwrite comes flat, need to access using bracket notation
+      const allResidents = response.documents;
 
-      // Check if each resident is head of household
+      // Client-side filtering: case-insensitive search across multiple fields
+      const searchTerm = query.toLowerCase().trim();
+      const filteredResidents = allResidents.filter((resident: any) => {
+        const firstName = (resident['firstName'] || '').toLowerCase();
+        const lastName = (resident['lastName'] || '').toLowerCase();
+        const middleName = (resident['middleName'] || '').toLowerCase();
+        const fullName = `${firstName} ${middleName} ${lastName}`.trim();
+        const nationalId = (resident['NationalIdNo'] || '').toLowerCase();
+        const votersId = (resident['votersIdNo'] || '').toLowerCase();
+
+        // Match if query is found in any field
+        return firstName.includes(searchTerm) ||
+               lastName.includes(searchTerm) ||
+               middleName.includes(searchTerm) ||
+               fullName.includes(searchTerm) ||
+               nationalId.includes(searchTerm) ||
+               votersId.includes(searchTerm);
+      }).slice(0, 10); // Limit to 10 results
+
+      // Check if each resident is head of household (batch check for efficiency)
       const householdHeadChecks = await Promise.all(
-        residents.map(async (r) => {
+        filteredResidents.map(async (r: any) => {
           const household = await this.getHouseholdByHeadId(r.$id!);
           return { residentId: r.$id!, isHead: !!household };
         })
@@ -330,17 +347,17 @@ export class HouseholdService extends BaseAppwriteService {
         householdHeadChecks.map(h => [h.residentId, h.isHead])
       );
 
-      return residents.map(resident => ({
+      return filteredResidents.map((resident: any) => ({
         $id: resident.$id!,
-        fullName: `${resident.personalInfo.firstName} ${resident.personalInfo.middleName || ''} ${resident.personalInfo.lastName}`.trim(),
-        firstName: resident.personalInfo.firstName,
-        lastName: resident.personalInfo.lastName,
-        middleName: resident.personalInfo.middleName,
-        birthDate: resident.personalInfo.birthDate,
-        age: resident.personalInfo.age,
-        gender: resident.personalInfo.gender,
-        contactNo: resident.personalInfo.contactNo,
-        purokNo: resident.personalInfo.purokNo,
+        fullName: `${resident['firstName']} ${resident['middleName'] || ''} ${resident['lastName']}`.trim(),
+        firstName: resident['firstName'],
+        lastName: resident['lastName'],
+        middleName: resident['middleName'],
+        birthDate: resident['birthDate'],
+        age: resident['age'],
+        gender: resident['gender'],
+        contactNo: resident['contactNo'],
+        purokNo: resident['purokNo'],
         alreadyInHousehold: existingResidentIds.includes(resident.$id!),
         isHouseholdHead: headMap.get(resident.$id!) || false
       }));
@@ -1019,5 +1036,127 @@ export class HouseholdService extends BaseAppwriteService {
     }
     
     return age >= 0 ? age : 0;
+  }
+
+  /**
+   * Get comprehensive household analytics for dashboard
+   */
+  async getHouseholdAnalytics() {
+    try {
+      const households = await this.getAllHouseholds();
+      
+      // Fetch household head info and members in parallel
+      const householdsWithData = await Promise.all(
+        households.map(async (household) => {
+          const members = await this.getHouseholdMembers(household.$id!);
+          
+          // Fetch head of household name
+          let headName = 'Unknown';
+          try {
+            const headDoc = await this.database.getDocument(
+              environment.appwriteDatabaseId,
+              this.RESIDENTS_COLLECTION,
+              household.headOfHouseholdId
+            );
+            headName = `${headDoc['firstName'] || ''} ${headDoc['lastName'] || ''}`.trim() || 'Unknown';
+          } catch (error) {
+            console.error('Error fetching head name for household:', household.$id, error);
+          }
+          
+          return { household, members, headName };
+        })
+      );
+
+      // Households by Purok
+      const byPurok: { [key: string]: number } = {};
+      households.forEach(h => {
+        const purok = h.purokNo || 'Unknown';
+        byPurok[purok] = (byPurok[purok] || 0) + 1;
+      });
+
+      // Household size distribution
+      const sizeDistribution = {
+        '1-2': 0,
+        '3-4': 0,
+        '5-6': 0,
+        '7+': 0
+      };
+
+      // Calculate size distribution
+      householdsWithData.forEach(({ members }) => {
+        const size = members.length;
+        if (size <= 2) sizeDistribution['1-2']++;
+        else if (size <= 4) sizeDistribution['3-4']++;
+        else if (size <= 6) sizeDistribution['5-6']++;
+        else sizeDistribution['7+']++;
+      });
+
+      // Top households by member count
+      const topHouseholds = householdsWithData
+        .map(({ household, members, headName }) => ({
+          householdCode: household.householdCode,
+          headName,
+          purok: household.purokNo,
+          memberCount: members.length,
+          address: `${household.houseNo || ''} ${household.street || ''}, Purok ${household.purokNo || 'N/A'}`.trim()
+        }))
+        .sort((a, b) => b.memberCount - a.memberCount)
+        .slice(0, 5);
+
+      // Household head demographics
+      const headDemographics = {
+        byGender: { Male: 0, Female: 0 },
+        byAgeGroup: { '18-30': 0, '31-45': 0, '46-60': 0, '60+': 0 }
+      };
+
+      for (const { household } of householdsWithData) {
+        try {
+          const residents = await this.database.listDocuments(
+            environment.appwriteDatabaseId,
+            this.RESIDENTS_COLLECTION,
+            [Query.equal('$id', household.headOfHouseholdId)]
+          );
+
+          if (residents.documents.length > 0) {
+            const head = residents.documents[0];
+            const gender = head['gender'] as string;
+            if (gender === 'Male') headDemographics.byGender.Male++;
+            else if (gender === 'Female') headDemographics.byGender.Female++;
+
+            const age = head['age'] ? parseInt(head['age']) : 
+                       head['birthDate'] ? this.calculateAge(head['birthDate']) : 0;
+            
+            if (age >= 18 && age <= 30) headDemographics.byAgeGroup['18-30']++;
+            else if (age >= 31 && age <= 45) headDemographics.byAgeGroup['31-45']++;
+            else if (age >= 46 && age <= 60) headDemographics.byAgeGroup['46-60']++;
+            else if (age > 60) headDemographics.byAgeGroup['60+']++;
+          }
+        } catch (error) {
+          console.error('Error getting head demographics:', error);
+        }
+      }
+
+      return {
+        byPurok,
+        sizeDistribution,
+        topHouseholds,
+        headDemographics,
+        totalHouseholds: households.length,
+        totalMembers: householdsWithData.reduce((sum, { members }) => sum + members.length, 0)
+      };
+    } catch (error) {
+      console.error('Error getting household analytics:', error);
+      return {
+        byPurok: {},
+        sizeDistribution: { '1-2': 0, '3-4': 0, '5-6': 0, '7+': 0 },
+        topHouseholds: [],
+        headDemographics: {
+          byGender: { Male: 0, Female: 0 },
+          byAgeGroup: { '18-30': 0, '31-45': 0, '46-60': 0, '60+': 0 }
+        },
+        totalHouseholds: 0,
+        totalMembers: 0
+      };
+    }
   }
 }
