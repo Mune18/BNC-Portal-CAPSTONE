@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AnnouncementService } from '../../shared/services/announcement.service';
 import { DataRefreshService } from '../../shared/services/data-refresh.service';
 import { UserService } from '../../shared/services/user.service';
@@ -558,17 +558,36 @@ export class HomeComponent implements OnInit, OnDestroy {
     private dataRefreshService: DataRefreshService,
     private userService: UserService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   async ngOnInit() {
     // Show content immediately, load announcements in background
     this.loading = false;
-    this.loadAnnouncements();
+    await this.loadAnnouncements();
     
     // Subscribe to refresh notifications
     this.refreshSubscription = this.dataRefreshService.onRefresh('announcements').subscribe(() => {
       this.loadAnnouncements();
+    });
+    
+    // Check if we need to auto-open a specific announcement from notification
+    this.route.queryParams.subscribe(params => {
+      const openItemId = params['openItem'];
+      if (openItemId && this.announcements.length > 0) {
+        const announcement = this.announcements.find(a => a.$id === openItemId);
+        if (announcement) {
+          // Open the announcement details modal
+          this.openAnnouncement(announcement);
+          
+          // Remove the query param to prevent re-opening on refresh
+          this.router.navigate([], {
+            queryParams: { openItem: null },
+            queryParamsHandling: 'merge'
+          });
+        }
+      }
     });
   }
 

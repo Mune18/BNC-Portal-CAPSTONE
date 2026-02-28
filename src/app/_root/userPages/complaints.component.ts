@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ComplaintService } from '../../shared/services/complaint.service';
 import { Complaint, NewComplaint } from '../../shared/types/complaint';
 import { UserService } from '../../shared/services/user.service';
@@ -848,11 +849,31 @@ export class ComplaintsComponent implements OnInit {
 
   constructor(
     private complaintService: ComplaintService,
-    private userService: UserService
+    private userService: UserService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   async ngOnInit() {
     await this.loadComplaints();
+    
+    // Check if we need to auto-open a specific complaint from notification
+    this.route.queryParams.subscribe(params => {
+      const openItemId = params['openItem'];
+      if (openItemId && this.complaints.length > 0) {
+        const complaint = this.complaints.find(c => c.$id === openItemId);
+        if (complaint) {
+          // Open the complaint details modal
+          this.viewReply(complaint);
+          
+          // Remove the query param to prevent re-opening on refresh
+          this.router.navigate([], {
+            queryParams: { openItem: null },
+            queryParamsHandling: 'merge'
+          });
+        }
+      }
+    });
   }
 
   async loadComplaints() {

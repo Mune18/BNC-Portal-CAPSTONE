@@ -150,9 +150,6 @@ import Swal from 'sweetalert2';
                             <div class="flex items-start justify-between">
                               <p class="text-xs sm:text-sm font-medium text-gray-900 truncate pr-2">{{ notification.title }}</p>
                               <div class="flex items-center flex-shrink-0">
-                                <span *ngIf="notification.priority === 'high'" 
-                                      class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full mr-1" 
-                                      title="High Priority"></span>
                                 <span *ngIf="!notification.isRead" 
                                       class="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full"
                                       title="Unread"></span>
@@ -416,9 +413,17 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
 
     // Check for new notifications every 10 seconds (smart refresh)
     this.notificationCheckInterval = setInterval(async () => {
-      const hasNew = await this.notificationService.hasNewNotifications();
-      if (hasNew) {
-        this.loadUserNotifications();
+      try {
+        const account = await this.authService.getAccount();
+        if (account) {
+          const currentNotifications = await this.notificationService.getUserNotifications(account.$id);
+          const hasNew = currentNotifications.some(n => n.timestamp > this.notificationService['lastNotificationCheck'] && !n.isRead);
+          if (hasNew) {
+            this.loadUserNotifications();
+          }
+        }
+      } catch (error) {
+        console.error('Error checking for new notifications:', error);
       }
     }, 10000);
     
@@ -492,7 +497,20 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
     
     // Navigate to the action URL if provided
     if (notification.actionUrl) {
-      this.router.navigateByUrl(notification.actionUrl);
+      const url = notification.actionUrl.split('?')[0];
+      const queryParams = new URLSearchParams(notification.actionUrl.split('?')[1] || '');
+      const params: any = {};
+      queryParams.forEach((value, key) => params[key] = value);
+      
+      // Add the item ID for auto-opening
+      if (notification.relatedId) {
+        params['openItem'] = notification.relatedId;
+      }
+      
+      this.router.navigate([url], { 
+        queryParams: params,
+        queryParamsHandling: 'merge'
+      });
     }
   }
 

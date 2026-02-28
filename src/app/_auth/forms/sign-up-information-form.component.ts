@@ -798,7 +798,6 @@ import Swal from 'sweetalert2';
                       <option value="Student">Student</option>
                       <option value="OFW">OFW</option>
                       <option value="Retired">Retired</option>
-                      <option value="Housewife">Housewife</option>
                     </select>
                     <div *ngIf="hasFieldError('employmentStatus')" class="text-red-500 text-xs mt-1 flex items-center">
                       <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -3259,7 +3258,7 @@ export class SignUpInformationFormComponent implements OnInit {
     }
     
     // Auto-set occupation to "None" and monthly income to 0 for statuses that don't require them
-    const noOccupationStatuses = ['Unemployed', 'Student', 'Retired', 'Housewife'];
+    const noOccupationStatuses = ['Unemployed', 'Student', 'Retired'];
     if (noOccupationStatuses.includes(status)) {
       this.formData.personalInfo.occupation = 'None';
       this.formData.personalInfo.monthlyIncome = 0;

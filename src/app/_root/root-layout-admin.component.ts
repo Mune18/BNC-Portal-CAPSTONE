@@ -144,9 +144,6 @@ import Swal from 'sweetalert2';
                             <div class="flex items-start justify-between">
                               <p class="text-sm font-medium text-gray-900 truncate">{{ notification.title }}</p>
                               <div class="flex items-center ml-2">
-                                <span *ngIf="notification.priority === 'high'" 
-                                      class="inline-block w-2 h-2 bg-red-500 rounded-full mr-1" 
-                                      title="High Priority"></span>
                                 <span *ngIf="!notification.isRead" 
                                       class="inline-block w-2 h-2 bg-blue-500 rounded-full"
                                       title="Unread"></span>
@@ -173,19 +170,12 @@ import Swal from 'sweetalert2';
                 <span class="text-sm">{{currentDateTime | date:'EEEE, MMM d, yyyy, h:mm a'}}</span>
               </div>
 
-              <!-- Add profile dropdown -->
-              <div class="relative">
-                <button (click)="toggleProfileMenu()" class="profile-button flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100">
-                  <img src="/assets/BNC_Portal_Logo.png" alt="Profile" class="w-8 h-8 rounded-full">
-                </button>
-
-                <!-- Dropdown menu -->
-                <div *ngIf="isProfileMenuOpen" class="profile-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                  <a [routerLink]="['/admin/settings']" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Settings</a>
-                  <hr class="my-1 border-gray-200">
-                  <a (click)="logout()" class="block px-4 py-2 text-red-600 hover:bg-gray-100 cursor-pointer">Logout</a>
-                </div>
-              </div>
+              <!-- Logout Button -->
+              <button (click)="logout()" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+              </button>
             </div>
           </div>
         </nav>
@@ -221,7 +211,6 @@ import Swal from 'sweetalert2';
 })
 export class RootLayoutAdminComponent implements OnInit, OnDestroy {
   isSidebarHidden = false;
-  isProfileMenuOpen = false;
   isNotificationMenuOpen = false;
   currentDateTime: Date = new Date();
   notifications: Notification[] = [];
@@ -267,10 +256,6 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
     this.isSidebarHidden = !this.isSidebarHidden;
   }
 
-  toggleProfileMenu() {
-    this.isProfileMenuOpen = !this.isProfileMenuOpen;
-  }
-
   toggleNotificationMenu() {
     this.isNotificationMenuOpen = !this.isNotificationMenuOpen;
     if (this.isNotificationMenuOpen) {
@@ -307,7 +292,20 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
     
     // Navigate to the action URL if provided
     if (notification.actionUrl) {
-      this.router.navigateByUrl(notification.actionUrl);
+      const url = notification.actionUrl.split('?')[0];
+      const queryParams = new URLSearchParams(notification.actionUrl.split('?')[1] || '');
+      const params: any = {};
+      queryParams.forEach((value, key) => params[key] = value);
+      
+      // Add the item ID for auto-opening
+      if (notification.relatedId) {
+        params['openItem'] = notification.relatedId;
+      }
+      
+      this.router.navigate([url], { 
+        queryParams: params,
+        queryParamsHandling: 'merge'
+      });
     }
   }
 
@@ -386,16 +384,8 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
-    const profileButton = document.querySelector('.profile-button');
-    const profileMenu = document.querySelector('.profile-menu');
     const notificationButton = document.querySelector('.notification-button');
     const notificationMenu = document.querySelector('.notification-menu');
-    
-    // Close profile menu if clicked outside
-    if (!profileButton?.contains(event.target as Node) && 
-        !profileMenu?.contains(event.target as Node)) {
-      this.isProfileMenuOpen = false;
-    }
 
     // Close notification menu if clicked outside
     if (!notificationButton?.contains(event.target as Node) && 
