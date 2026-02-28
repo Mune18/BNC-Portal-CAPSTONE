@@ -1,9 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
 import { AuthService } from '../shared/services/auth.service';
 import { NotificationService, Notification } from '../shared/services/notification.service';
-import Swal from 'sweetalert2'; 
+import { AdminService } from '../shared/services/admin.service';
+import { ResidentUpdateService } from '../shared/services/resident-update.service';
+import { HouseholdService } from '../shared/services/household.service';
+import { ComplaintService } from '../shared/services/complaint.service';
+import { DataRefreshService } from '../shared/services/data-refresh.service';
+import Swal from 'sweetalert2';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs'; 
 
 @Component({
   selector: 'app-root-layout-admin',
@@ -25,23 +32,35 @@ import Swal from 'sweetalert2';
               </a>
             </li>
             <li>
-              <a [routerLink]="['/admin/residents']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/residents']" routerLinkActive="bg-blue-100" class="relative flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/teamwork.png" alt="Residents Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Residents</span>
+                <span *ngIf="pendingResidentsCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full min-w-[1.25rem]">
+                  {{ pendingResidentsCount > 99 ? '99+' : pendingResidentsCount }}
+                </span>
               </a>
             </li>
             <li>
-              <a [routerLink]="['/admin/update-requests']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/update-requests']" routerLinkActive="bg-blue-100" class="relative flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/request.png" alt="Update Requests Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Information Requests</span>
+                <span *ngIf="pendingUpdateRequestsCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full min-w-[1.25rem]">
+                  {{ pendingUpdateRequestsCount > 99 ? '99+' : pendingUpdateRequestsCount }}
+                </span>
               </a>
             </li>
             <li>
-              <a [routerLink]="['/admin/household-requests']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/household-requests']" routerLinkActive="bg-blue-100" class="relative flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span class="flex-1 ms-3 whitespace-nowrap">Household Requests</span>
+                <span *ngIf="pendingHouseholdRequestsCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full min-w-[1.25rem]">
+                  {{ pendingHouseholdRequestsCount > 99 ? '99+' : pendingHouseholdRequestsCount }}
+                </span>
               </a>
             </li>
             <!-- <li>
@@ -57,9 +76,13 @@ import Swal from 'sweetalert2';
               </a>
             </li>
             <li>
-              <a [routerLink]="['/admin/reports']" routerLinkActive="bg-blue-100" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/admin/reports']" routerLinkActive="bg-blue-100" class="relative flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/report.png" alt="Complaints Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Complaints & Reports</span>
+                <span *ngIf="pendingComplaintsCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full min-w-[1.25rem]">
+                  {{ pendingComplaintsCount > 99 ? '99+' : pendingComplaintsCount }}
+                </span>
               </a>
             </li>
           </ul>
@@ -216,13 +239,25 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   unreadNotificationsCount = 0;
   notificationsLoading = false;
+  pendingResidentsCount = 0;
+  pendingUpdateRequestsCount = 0;
+  pendingHouseholdRequestsCount = 0;
+  pendingComplaintsCount = 0;
   private dateTimeInterval: any;
   private notificationCheckInterval: any;
+  private pendingCountsCheckInterval: any;
+  private routerSubscription?: Subscription;
+  private dataRefreshSubscription?: Subscription;
 
   constructor(
     private router: Router, 
     private authService: AuthService,
-    public notificationService: NotificationService
+    public notificationService: NotificationService,
+    private adminService: AdminService,
+    private residentUpdateService: ResidentUpdateService,
+    private householdService: HouseholdService,
+    private complaintService: ComplaintService,
+    private dataRefreshService: DataRefreshService
   ) {}
 
   ngOnInit() {
@@ -234,6 +269,9 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
     // Load initial notifications
     this.loadNotifications();
 
+    // Load initial pending counts
+    this.loadPendingCounts();
+
     // Check for new notifications every 10 seconds (smart refresh)
     this.notificationCheckInterval = setInterval(async () => {
       const hasNew = await this.notificationService.hasNewNotifications();
@@ -241,6 +279,41 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
         this.loadNotifications();
       }
     }, 10000);
+
+    // Check for pending counts every 30 seconds
+    this.pendingCountsCheckInterval = setInterval(() => {
+      this.loadPendingCounts();
+    }, 30000);
+
+    // Subscribe to router events to refresh counts on navigation
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.loadPendingCounts();
+      });
+
+    // Subscribe to data refresh events for all relevant data types
+    this.dataRefreshSubscription = new Subscription();
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('residents').subscribe(() => {
+        this.loadPendingCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('updateRequests').subscribe(() => {
+        this.loadPendingCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('householdMembers').subscribe(() => {
+        this.loadPendingCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('complaints').subscribe(() => {
+        this.loadPendingCounts();
+      })
+    );
   }
 
   ngOnDestroy() {
@@ -249,6 +322,15 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
     }
     if (this.notificationCheckInterval) {
       clearInterval(this.notificationCheckInterval);
+    }
+    if (this.pendingCountsCheckInterval) {
+      clearInterval(this.pendingCountsCheckInterval);
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+    if (this.dataRefreshSubscription) {
+      this.dataRefreshSubscription.unsubscribe();
     }
   }
 
@@ -318,6 +400,25 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
       this.unreadNotificationsCount = 0;
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
+    }
+  }
+
+  async loadPendingCounts() {
+    try {
+      // Load all pending counts in parallel
+      const [pendingResidents, pendingUpdateRequests, pendingHouseholdRequests, allComplaints] = await Promise.all([
+        this.adminService.getPendingResidents(),
+        this.residentUpdateService.getPendingUpdateRequests(),
+        this.householdService.getPendingHouseholdMembers(),
+        this.complaintService.getAllComplaints()
+      ]);
+
+      this.pendingResidentsCount = pendingResidents.length;
+      this.pendingUpdateRequestsCount = pendingUpdateRequests.length;
+      this.pendingHouseholdRequestsCount = pendingHouseholdRequests.length;
+      this.pendingComplaintsCount = allComplaints.filter(c => c.status === 'pending').length;
+    } catch (error) {
+      console.error('Error loading pending counts:', error);
     }
   }
 

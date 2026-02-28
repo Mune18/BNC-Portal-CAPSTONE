@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AdminService } from '../../shared/services/admin.service';
 import { AnnouncementService } from '../../shared/services/announcement.service';
 import { ComplaintService } from '../../shared/services/complaint.service';
@@ -35,203 +35,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
         <app-loading type="spinner" [fullScreen]="true" message="Loading dashboard data..."></app-loading>
       </div>
 
-      <div *ngIf="!loading">
-        <!-- Analytics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <!-- Total Residents -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-blue-100 hover:border-blue-300 overflow-hidden" [routerLink]="['/admin/residents']">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Total Residents</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{{ totalResidents }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pending Resident Approval -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-purple-100 hover:border-purple-300 overflow-hidden" [routerLink]="['/admin/residents']" [queryParams]="{ filter: 'pending' }">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Pending Registrations</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{{ pendingResidentApprovals }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pending Update Requests -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-amber-100 hover:border-amber-300 overflow-hidden" [routerLink]="['/admin/update-requests']">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Resident Information Update Requests</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{{ pendingUpdateRequests }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pending Complaints -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-orange-100 hover:border-orange-300 overflow-hidden" [routerLink]="['/admin/reports']">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Pending Complaints</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">{{ pendingComplaints }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Senior Citizens -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-indigo-100 hover:border-indigo-300 overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Senior Citizens</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">{{ seniorCitizensCount }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-lg shadow-indigo-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- PWD -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-teal-100 hover:border-teal-300 overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">PWD</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">{{ pwdCount }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 shadow-lg shadow-teal-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- 4Ps Members -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-green-100 hover:border-green-300 overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">4Ps Members</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">{{ fourPsCount }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 shadow-lg shadow-green-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Solo Parents -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-pink-100 hover:border-pink-300 overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Solo Parents</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">{{ soloParentCount }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 shadow-lg shadow-pink-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Indigent -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-red-100 hover:border-red-300 overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Indigent</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">{{ indigentCount }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 shadow-lg shadow-red-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pending Household Requests -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-amber-100 hover:border-amber-300 overflow-hidden" [routerLink]="['/admin/household-requests']">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Pending Household Requests</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{{ pendingHouseholdRequests }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Total Households -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-blue-100 hover:border-blue-300 overflow-hidden" [routerLink]="['/admin/household-requests']">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Total Households</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{{ totalHouseholds }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Avg Members per Household -->
-          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-emerald-100 hover:border-emerald-300 overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-            <div class="relative flex items-center justify-between">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Avg. Members/Household</p>
-                <p class="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">{{ avgHouseholdSize }}</p>
-              </div>
-              <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-500/50 group-hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Priority Actions Widget -->
+      <!-- Priority Actions Widget -->
         <div class="bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300 rounded-2xl p-6 mb-6 shadow-lg shadow-red-500/20" *ngIf="priorityActions.length > 0">
           <div class="flex items-center mb-4">
             <div class="p-2 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl shadow-lg shadow-red-500/50">
@@ -263,52 +67,73 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           </ul>
         </div>
 
-        <!-- Top 5 Largest Households -->
-        <div *ngIf="householdAnalytics" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 mb-8">
-          <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-            Top 5 Largest Households
-          </h3>
-          <div class="overflow-x-auto rounded-xl border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rank</th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Household Code</th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Head of Household</th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Address</th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Members</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr *ngFor="let household of householdAnalytics.topHouseholds; let i = index" class="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold"
-                          [ngClass]="{
-                            'bg-yellow-100 text-yellow-800': i === 0,
-                            'bg-gray-100 text-gray-800': i === 1,
-                            'bg-orange-100 text-orange-800': i === 2,
-                            'bg-blue-50 text-blue-600': i > 2
-                          }">
-                      {{ i + 1 }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap font-mono text-sm text-gray-900 font-semibold">{{ household.householdCode }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ household.headName }}</td>
-                  <td class="px-6 py-4 text-sm text-gray-500">{{ household.address }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
-                      {{ household.memberCount }} members
-                    </span>
-                  </td>
-                </tr>
-                <tr *ngIf="!householdAnalytics.topHouseholds || householdAnalytics.topHouseholds.length === 0" class="bg-gray-50">
-                  <td colspan="5" class="px-6 py-8 text-center text-gray-400 font-medium">No household data available</td>
-                </tr>
-              </tbody>
-            </table>
+      <div *ngIf="!loading">
+        <!-- Analytics Cards - trimmed to essentials -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <!-- Total Residents -->
+          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-blue-100 hover:border-blue-300 overflow-hidden" [routerLink]="['/admin/residents']">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Total Residents</p>
+                <p class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{{ totalResidents }}</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Households -->
+          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-blue-100 hover:border-blue-300 overflow-hidden" [routerLink]="['/admin/household-requests']">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Total Households</p>
+                <p class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{{ totalHouseholds }}</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/50 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Complaints -->
+          <div class="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-orange-100 hover:border-orange-300 overflow-hidden" [routerLink]="['/admin/reports']">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+            <div class="relative flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">Pending Complaints</p>
+                <p class="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">{{ pendingComplaints }}</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg shadow-orange-500/50 group-hover:scale-110 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="mb-6 flex justify-end">
+          <div class="inline-flex bg-white rounded-xl shadow-lg border border-gray-200 p-1.5 gap-1">
+            <button
+              *ngFor="let category of filterCategories"
+              (click)="setFilter($any(category.id))"
+              [class]="selectedFilter === category.id ? 
+                'flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md' : 
+                'flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 text-gray-600 hover:bg-gray-100'"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="category.icon" />
+              </svg>
+              <span>{{ category.label }}</span>
+            </button>
           </div>
         </div>
 
@@ -317,7 +142,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           <!-- Recent Activity Column -->
           <div class="lg:col-span-1 space-y-6">
             <!-- Recent Complaints -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('recentComplaints')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <div class="flex justify-between items-center mb-5">
                 <h2 class="text-xl font-bold text-gray-900">Recent Complaints</h2>
                 <a [routerLink]="['/admin/reports']" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">View All →</a>
@@ -350,7 +175,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Recent Announcements -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('recentAnnouncements')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <div class="flex justify-between items-center mb-5">
                 <h2 class="text-xl font-bold text-gray-900">Recent Announcements</h2>
                 <a [routerLink]="['/admin/announcements']" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">View All →</a>
@@ -379,7 +204,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Residents by Gender -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('genderChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Residents by Gender</h2>
               <div class="flex items-center">
                 <div class="w-1/2 h-48">
@@ -412,7 +237,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Housing Ownership -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('housingChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Housing Ownership</h2>
               <div class="h-64">
                 <canvas id="housingChart"></canvas>
@@ -420,7 +245,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Children by Age Group -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('childrenAgeChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Children by Age Group</h2>
               <div class="h-64">
                 <canvas id="childrenAgeChart"></canvas>
@@ -428,7 +253,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Employment Status -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('employmentChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Employment Status</h2>
               <div class="h-64">
                 <canvas id="employmentChart"></canvas>
@@ -436,18 +261,10 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Household Size Distribution -->
-            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="householdAnalytics && shouldShowSection('householdSizeChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Household Size Distribution</h2>
               <div class="h-64">
                 <canvas id="householdSizeChart"></canvas>
-              </div>
-            </div>
-
-            <!-- Household Heads by Gender -->
-            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-              <h2 class="text-xl font-bold text-gray-900 mb-6">Household Heads by Gender</h2>
-              <div class="h-64">
-                <canvas id="headGenderChart"></canvas>
               </div>
             </div>
           </div>
@@ -455,7 +272,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           <!-- Charts Column -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Residents by Age Group -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('ageGroupChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Residents by Age Group</h2>
               <div class="h-48">
                 <canvas id="ageGroupChart"></canvas>
@@ -463,23 +280,15 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Educational Attainment -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('educationChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Educational Attainment</h2>
               <div class="h-64">
                 <canvas id="educationChart"></canvas>
               </div>
             </div>
 
-            <!-- Detailed Age Distribution -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-              <h2 class="text-xl font-bold text-gray-900 mb-6">Detailed Age Distribution</h2>
-              <div class="h-64">
-                <canvas id="detailedAgeChart"></canvas>
-              </div>
-            </div>
-
             <!-- Youth Distribution -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('youthChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Youth Distribution (13-30 years old)</h2>
               <div class="h-64">
                 <canvas id="youthChart"></canvas>
@@ -487,7 +296,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Years in Barangay -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('yearsInBarangayChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Residency Duration</h2>
               <div class="h-64">
                 <canvas id="yearsInBarangayChart"></canvas>
@@ -495,7 +304,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Complaints by Month -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('complaintsTimeChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Complaint Trends (Last 6 Months)</h2>
               <div class="h-64">
                 <canvas id="complaintsTimeChart"></canvas>
@@ -503,7 +312,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Residents per Purok -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('purokChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Residents per Purok</h2>
               <div class="h-64">
                 <canvas id="purokChart"></canvas>
@@ -511,23 +320,15 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Households by Purok -->
-            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="householdAnalytics && shouldShowSection('householdsByPurokChart')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <h2 class="text-xl font-bold text-gray-900 mb-6">Households by Purok</h2>
               <div class="h-64">
                 <canvas id="householdsByPurokChart"></canvas>
               </div>
             </div>
 
-            <!-- Household Heads by Age Group -->
-            <div *ngIf="householdAnalytics" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-              <h2 class="text-xl font-bold text-gray-900 mb-6">Household Heads by Age Group</h2>
-              <div class="h-64">
-                <canvas id="headAgeChart"></canvas>
-              </div>
-            </div>
-
             <!-- Newest Residents -->
-            <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+            <div *ngIf="shouldShowSection('newestResidents')" class="bg-white shadow-lg rounded-2xl p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
               <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-900">Newest Residents</h2>
                 <a [routerLink]="['/admin/residents']" class="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors">View All →</a>
@@ -674,6 +475,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private headGenderChart: Chart | null = null;
   private headAgeChart: Chart | null = null;
 
+  // Filter categories
+  selectedFilter: 'all' | 'residents' | 'households' | 'complaints' | 'announcements' = 'all';
+  filterCategories = [
+    { id: 'all', label: 'All Analytics', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' },
+    { id: 'residents', label: 'Residents', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+    { id: 'households', label: 'Households', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+    { id: 'complaints', label: 'Complaints', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
+    { id: 'announcements', label: 'Announcements', icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z' }
+  ];
+
   private genderChart: Chart | null = null;
   private ageGroupChart: Chart | null = null;
   private educationChart: Chart | null = null;
@@ -694,7 +505,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private complaintService: ComplaintService,
     private residentUpdateService: ResidentUpdateService,
     private dataRefreshService: DataRefreshService,
-    private householdService: HouseholdService
+    private householdService: HouseholdService,
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -2058,8 +1870,86 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   handlePriorityAction(action: any): void {
     // Handle priority action click - navigate to appropriate page
     if (action.route) {
-      // Use router to navigate
-      window.location.href = action.route;
+      const url = action.route.split('?')[0];
+      const queryParams = new URLSearchParams(action.route.split('?')[1] || '');
+      const params: any = {};
+      queryParams.forEach((value, key) => params[key] = value);
+      
+      // Add the item ID for auto-opening if available
+      if (action.relatedId) {
+        params['openItem'] = action.relatedId;
+      }
+      
+      // Add the action type to help the target page know what to open
+      if (action.type) {
+        params['actionType'] = action.type;
+      }
+      
+      this.router.navigate([url], { 
+        queryParams: params,
+        queryParamsHandling: 'merge'
+      });
+    }
+  }
+
+  // Filter Methods
+  setFilter(filter: 'all' | 'residents' | 'households' | 'complaints' | 'announcements'): void {
+    this.selectedFilter = filter;
+    
+    // Reset chartsRendered flag to allow re-rendering
+    this.chartsRendered = false;
+    
+    // Wait for DOM to update, then re-render visible charts
+    setTimeout(() => {
+      this.renderVisibleCharts();
+      this.chartsRendered = true;
+    }, 200);
+  }
+
+  shouldShowSection(section: string): boolean {
+    if (this.selectedFilter === 'all') return true;
+    
+    const sectionFilterMap: { [key: string]: string[] } = {
+      'recentComplaints': ['complaints'],
+      'recentAnnouncements': ['announcements'],
+      'genderChart': ['residents'],
+      'housingChart': ['households'],
+      'childrenAgeChart': ['residents'],
+      'employmentChart': ['residents'],
+      'householdSizeChart': ['households'],
+      'ageGroupChart': ['residents'],
+      'educationChart': ['residents'],
+      'youthChart': ['residents'],
+      'yearsInBarangayChart': ['residents'],
+      'complaintsTimeChart': ['complaints'],
+      'purokChart': ['residents'],
+      'householdsByPurokChart': ['households'],
+      'newestResidents': ['residents']
+    };
+    
+    return sectionFilterMap[section]?.includes(this.selectedFilter) || false;
+  }
+
+  private renderVisibleCharts(): void {
+    // Render charts based on current filter
+    if (this.selectedFilter === 'all' || this.selectedFilter === 'residents') {
+      this.renderGenderChart();
+      this.renderAgeGroupChart();
+      this.renderEducationChart();
+      this.renderEmploymentChart();
+      this.renderYouthChart();
+      this.renderYearsInBarangayChart();
+      this.renderChildrenAgeChart();
+      this.renderPurokChart();
+    }
+    
+    if (this.selectedFilter === 'all' || this.selectedFilter === 'households') {
+      this.renderHousingChart();
+      this.renderHouseholdCharts();
+    }
+    
+    if (this.selectedFilter === 'all' || this.selectedFilter === 'complaints') {
+      this.renderComplaintsTimeChart();
     }
   }
 
@@ -2080,12 +1970,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       if (oldPendingResidents.length > 0) {
+        // Get the oldest one to open directly
+        const oldestResident = oldPendingResidents.sort((a, b) => {
+          const dateA = new Date(a.$createdAt || '');
+          const dateB = new Date(b.$createdAt || '');
+          return dateA.getTime() - dateB.getTime();
+        })[0];
+        
         this.priorityActions.push({
           title: `${oldPendingResidents.length} Resident Approvals Overdue`,
           description: 'Some resident registrations have been pending for more than 7 days',
           timeAgo: 'Over 7 days ago',
-          route: '/admin/residents?filter=pending',
-          type: 'approval'
+          route: '/admin/residents',
+          type: 'approval',
+          relatedId: oldestResident.$id
         });
       }
 
@@ -2100,12 +1998,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       if (oldComplaints.length > 0) {
+        // Get the oldest one to open directly
+        const oldestComplaint = oldComplaints.sort((a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateA.getTime() - dateB.getTime();
+        })[0];
+        
         this.priorityActions.push({
           title: `${oldComplaints.length} Unresolved Complaints`,
           description: 'Some complaints have been pending for more than 5 days',
           timeAgo: 'Over 5 days ago',
-          route: '/admin/reports?status=pending',
-          type: 'complaint'
+          route: '/admin/reports',
+          type: 'complaint',
+          relatedId: oldestComplaint.$id
         });
       }
 
@@ -2120,12 +2026,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       if (oldUpdateRequests.length > 0) {
+        // Get the oldest one to open directly
+        const oldestRequest = oldUpdateRequests.sort((a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateA.getTime() - dateB.getTime();
+        })[0];
+        
         this.priorityActions.push({
           title: `${oldUpdateRequests.length} Update Requests Pending`,
           description: 'Some update requests have been pending for more than 3 days',
           timeAgo: 'Over 3 days ago',
           route: '/admin/update-requests',
-          type: 'update'
+          type: 'update',
+          relatedId: oldestRequest.$id
         });
       }
 

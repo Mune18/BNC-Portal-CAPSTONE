@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { AdminService } from '../../shared/services/admin.service';
 import { HouseholdService } from '../../shared/services/household.service';
 import { ResidentInfo } from '../../shared/types/resident';
@@ -909,13 +910,42 @@ export class ResidentsComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
-    private householdService: HouseholdService
+    private householdService: HouseholdService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.loadResidentsOptimized();
     this.loadPendingResidents();
     this.loadHouseholdsCount();
+    
+    // Check for openItem query parameter
+    this.route.queryParams.subscribe(params => {
+      const openItemId = params['openItem'];
+      const actionType = params['actionType'];
+      
+      if (openItemId) {
+        // If it's an approval action, switch to pending tab and open the resident
+        if (actionType === 'approval') {
+          this.setActiveTab('pending');
+          // Wait for pending residents to load, then open the modal
+          setTimeout(() => {
+            const resident = this.pendingResidents.find(r => r.$id === openItemId);
+            if (resident) {
+              this.viewResident(resident);
+            }
+          }, 500);
+        } else {
+          // For regular residents, stay on residents tab
+          setTimeout(() => {
+            const resident = this.residents.find(r => r.$id === openItemId);
+            if (resident) {
+              this.viewResident(resident);
+            }
+          }, 500);
+        }
+      }
+    });
   }
 
   // Tab management

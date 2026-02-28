@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 import { ComplaintService } from '../../shared/services/complaint.service';
 import { Complaint, ComplaintStatus } from '../../shared/types/complaint';
@@ -480,11 +481,27 @@ export class ReportsComponent implements OnInit {
   
   constructor(
     private complaintService: ComplaintService,
-    private userService: UserService
+    private userService: UserService,
+    private route: ActivatedRoute
   ) {}
   
   async ngOnInit() {
     await this.loadComplaints();
+    
+    // Check for openItem query parameter
+    this.route.queryParams.subscribe(params => {
+      const openItemId = params['openItem'];
+      
+      if (openItemId) {
+        // Wait for complaints to load, then open the modal
+        setTimeout(() => {
+          const complaint = this.complaints.find(c => c.$id === openItemId);
+            if (complaint) {
+              this.selectComplaint(complaint);
+            }
+        }, 500);
+      }
+    });
   }
 
   async loadComplaints() {

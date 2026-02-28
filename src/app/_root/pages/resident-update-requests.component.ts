@@ -5,7 +5,7 @@ import { ResidentUpdate } from '../../shared/types/resident-update';
 import { ResidentInfo } from '../../shared/types/resident';
 import { ResidentUpdateService } from '../../shared/services/resident-update.service';
 import { AuthService } from '../../shared/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 import { LoadingComponent } from '../../shared/components/loading.component';
 
@@ -320,11 +320,33 @@ export class ResidentUpdateRequestsComponent implements OnInit {
   constructor(
     private residentUpdateService: ResidentUpdateService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   async ngOnInit() {
     await this.loadUpdateRequests();
+    
+    // Check for openItem query parameter
+    this.route.queryParams.subscribe(params => {
+      const openItemId = params['openItem'];
+      
+      if (openItemId) {
+        // Wait for update requests to load, then expand the row
+        setTimeout(() => {
+          const index = this.updateRequests.findIndex(r => r.$id === openItemId);
+          if (index !== -1) {
+            // Expand the row to show details
+            this.expandedRows[index] = true;
+            // Scroll to the row
+            setTimeout(() => {
+              const element = document.querySelector(`tr:nth-child(${(index + 1) * 2})`);
+              element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+          }
+        }, 500);
+      }
+    });
   }
 
   async loadUpdateRequests() {
