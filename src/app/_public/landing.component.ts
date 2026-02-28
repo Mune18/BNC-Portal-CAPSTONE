@@ -363,19 +363,18 @@ interface VisitStats {
             <div class="text-center group">
               <div class="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 hover:border-white/40 transition-all duration-500 hover:scale-105 hover:bg-white/15 animate-fade-in-up animation-delay-500">
                 <!-- Glow Effect -->
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-green-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <div class="relative z-10">
                   <div class="text-4xl lg:text-6xl font-bold text-white mb-2 flex items-center justify-center gap-2">
                     <span class="animate-counter animate-number-glow" [attr.data-target]="visitStats.onlineUsers">{{ displayedStats.onlineUsers | number }}</span>
-                    <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
                   </div>
-                  <div class="text-blue-200 text-lg font-medium">Online Now</div>
-                  <div class="text-blue-300 text-sm mt-2">Active users</div>
+                  <div class="text-blue-200 text-lg font-medium">Total Users</div>
+                  <div class="text-blue-300 text-sm mt-2">Registered Users</div>
                 </div>
                 
                 <!-- Decorative Element -->
-                <div class="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full animate-ping animation-delay-2000"></div>
+                <div class="absolute -top-2 -right-2 w-4 h-4 bg-indigo-400 rounded-full animate-ping animation-delay-2000"></div>
               </div>
             </div>
           </div>
