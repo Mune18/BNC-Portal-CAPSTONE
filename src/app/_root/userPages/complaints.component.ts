@@ -15,37 +15,37 @@ import { LoadingComponent } from '../../shared/components/loading.component';
   standalone: true,
   imports: [FormsModule, CommonModule, StatusFormatPipe, LoadingComponent],
   template: `
-  <div class="container mx-auto px-4 py-6">
+  <div class="container mx-auto px-2 sm:px-4 py-3 sm:py-6">
     <!-- Unified Loading Indicator -->
     <div *ngIf="loading" class="w-full">
       <app-loading type="spinner" [fullScreen]="true" message="Loading your complaints..."></app-loading>
     </div>
 
     <!-- Header Section -->
-    <div *ngIf="!loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div *ngIf="!loading" class="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6 mb-3 sm:mb-6">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-800 mb-2">Submit a Complaint</h1>
-          <p class="text-gray-600">Let us know your concerns, and we will address them as soon as possible.</p>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">Submit a Complaint</h1>
+          <p class="text-gray-600 text-[10px] sm:text-base">Let us know your concerns, and we will address them as soon as possible.</p>
         </div>
         <button
-          class="mt-4 md:mt-0 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-2"
+          class="mt-2 sm:mt-4 md:mt-0 px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center space-x-1 sm:space-x-2"
           (click)="openComplaintModal()"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
-          <span>Submit Complaint</span>
+          <span class="text-[10px] sm:text-base">Submit Complaint</span>
         </button>
       </div>
     </div>
 
     <!-- Complaints List -->
-    <div *ngIf="!loading" class="grid grid-cols-1 gap-8">
+    <div *ngIf="!loading" class="grid grid-cols-1 gap-3 sm:gap-8">
       <!-- Main Complaints List -->
-      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-xl font-bold text-gray-900">Your Complaints</h2>
+      <div class="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+        <div class="px-3 sm:px-6 py-2 sm:py-4 border-b border-gray-200">
+          <h2 class="text-lg sm:text-xl font-bold text-gray-900">Your Complaints</h2>
         </div>
         
         <div *ngIf="complaints.length > 0; else noComplaints">
@@ -154,13 +154,13 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               (click)="viewReply(complaint)"
             >
               <!-- Header with status -->
-              <div class="flex items-start justify-between mb-3">
+              <div class="flex items-start justify-between mb-2 sm:mb-3">
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-base font-semibold text-gray-900 truncate pr-2">{{ complaint.subject }}</h3>
-                  <p class="text-sm text-gray-500 capitalize mt-1">{{ complaint.category }}</p>
+                  <h3 class="text-sm sm:text-base font-semibold text-gray-900 truncate pr-2">{{ complaint.subject }}</h3>
+                  <p class="text-[10px] sm:text-sm text-gray-500 capitalize mt-0.5 sm:mt-1">{{ complaint.category }}</p>
                 </div>
                 <span 
-                  class="px-2 py-1 text-xs font-medium rounded-full flex-shrink-0" 
+                  class="px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full flex-shrink-0" 
                   [ngClass]="{
                     'bg-yellow-100 text-yellow-800': complaint.status === 'pending',
                     'bg-blue-100 text-blue-800': complaint.status === 'in_review',
@@ -173,14 +173,14 @@ import { LoadingComponent } from '../../shared/components/loading.component';
               </div>
 
               <!-- Description -->
-              <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ complaint.description }}</p>
+              <p class="text-[10px] sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{{ complaint.description }}</p>
 
               <!-- Bottom row with metadata -->
-              <div class="flex items-center justify-between text-xs text-gray-500">
-                <div class="flex items-center space-x-4">
+              <div class="flex items-center justify-between text-[10px] sm:text-xs text-gray-500">
+                <div class="flex items-center space-x-2 sm:space-x-4">
                   <!-- Date -->
                   <div class="flex items-center">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                     <span>{{ complaint.createdAt | date:'MMM d' }}</span>
@@ -189,7 +189,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                   <!-- Attachment indicator -->
                   <div *ngIf="complaint.attachments" class="flex items-center">
                     <!-- Try to display as image first -->
-                    <div class="w-8 h-8 mr-2">
+                    <div class="w-6 h-6 sm:w-8 sm:h-8 mr-1 sm:mr-2">
                       <img 
                         [src]="getAttachmentUrl(complaint.attachments)" 
                         alt="Attachment preview" 
@@ -200,7 +200,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                       >
                       <!-- Fallback file icon when image fails to load -->
                       <div *ngIf="isTableImageError(complaint.$id || '')" class="w-full h-full flex items-center justify-center bg-gray-100 rounded border border-gray-200 text-blue-600">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/>
                           <path d="M6 5h8v2H6V5zM6 8h8v2H6V8zM6 11h4v2H6v-2z"/>
                         </svg>
@@ -214,22 +214,22 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                 <!-- Response status -->
                 <div class="flex items-center">
                   <div *ngIf="complaint.barangayResponse" class="flex items-center text-green-600">
-                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
                     </svg>
-                    <span class="font-medium">Reply</span>
+                    <span class="font-medium text-[10px] sm:text-xs">Reply</span>
                   </div>
-                  <div *ngIf="!complaint.barangayResponse" class="text-gray-400">
+                  <div *ngIf="!complaint.barangayResponse" class="text-gray-400 text-[10px] sm:text-xs">
                     <span>Pending</span>
                   </div>
                 </div>
               </div>
 
               <!-- Tap indicator -->
-              <div class="flex justify-center mt-3 pt-2 border-t border-gray-100">
-                <div class="flex items-center text-xs text-gray-400">
+              <div class="flex justify-center mt-2 sm:mt-3 pt-1 sm:pt-2 border-t border-gray-100">
+                <div class="flex items-center text-[10px] sm:text-xs text-gray-400">
                   <span>Tap to view details</span>
-                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-3 h-3 sm:w-4 sm:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                   </svg>
                 </div>
@@ -253,32 +253,32 @@ import { LoadingComponent } from '../../shared/components/loading.component';
     <!-- Submit Complaint Modal -->
     <div 
       *ngIf="showComplaintModal"
-      class="fixed inset-0 flex items-center justify-center z-50 p-4"
+      class="fixed inset-0 flex items-center justify-center z-50 p-1 sm:p-4"
     >
       <div 
         class="absolute inset-0 backdrop-blur-md bg-black/30"
         (click)="closeComplaintModal()"
       ></div>
-      <div class="bg-white rounded-2xl shadow-2xl relative w-full max-w-md md:max-w-2xl z-10 max-h-[95vh] overflow-y-auto">
+      <div class="bg-white rounded-lg sm:rounded-2xl shadow-2xl relative w-full max-w-md md:max-w-2xl z-10 max-h-[95vh] overflow-y-auto">
         <!-- Modal Header -->
-        <div class="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-4 md:px-6 py-4 flex items-center justify-between">
-          <h2 class="text-lg md:text-xl font-semibold text-gray-800">Submit a Complaint</h2>
+        <div class="sticky top-0 bg-white rounded-t-lg sm:rounded-t-2xl border-b border-gray-200 px-2 sm:px-4 md:px-6 py-2 sm:py-4 flex items-center justify-between">
+          <h2 class="text-sm sm:text-lg md:text-xl font-semibold text-gray-800">Submit a Complaint</h2>
           <button 
             (click)="closeComplaintModal()" 
-            class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+            class="p-1 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
 
         <!-- Modal Body -->
-        <div class="px-4 md:px-6 py-4">
-          <form (submit)="submitComplaint($event)" class="space-y-5">
+        <div class="px-2 sm:px-4 md:px-6 py-2 sm:py-4">
+          <form (submit)="submitComplaint($event)" class="space-y-2 sm:space-y-5">
             <!-- Subject Field -->
             <div>
-              <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="subject" class="block text-[10px] sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Subject <span class="text-red-500">*</span>
               </label>
               <input 
@@ -286,7 +286,7 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                 [(ngModel)]="newComplaint.subject" 
                 name="subject" 
                 type="text" 
-                class="block w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                class="block w-full px-2 py-1.5 sm:px-4 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-[10px] sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="Enter the subject of your complaint"
                 required
               >
@@ -294,14 +294,14 @@ import { LoadingComponent } from '../../shared/components/loading.component';
 
             <!-- Category Field -->
             <div>
-              <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="category" class="block text-[10px] sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Category <span class="text-red-500">*</span>
               </label>
               <select
                 id="category"
                 [(ngModel)]="newComplaint.category"
                 name="category"
-                class="block w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white"
+                class="block w-full px-2 py-1.5 sm:px-4 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-[10px] sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none bg-white"
                 required
               >
                 <option value="" disabled selected>Select a category</option>
@@ -313,36 +313,36 @@ import { LoadingComponent } from '../../shared/components/loading.component';
 
             <!-- Description Field -->
             <div>
-              <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="description" class="block text-[10px] sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Description <span class="text-red-500">*</span>
               </label>
               <textarea 
                 id="description" 
                 [(ngModel)]="newComplaint.description" 
                 name="description" 
-                rows="4" 
-                class="block w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                rows="3" 
+                class="block w-full px-2 py-1.5 sm:px-4 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl text-[10px] sm:text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none sm:min-h-[6rem]"
                 placeholder="Describe your complaint in detail..."
                 required
               ></textarea>
-              <p class="text-xs text-gray-500 mt-1">Please provide as much detail as possible</p>
+              <p class="text-[10px] sm:text-xs text-gray-500 mt-1">Please provide as much detail as possible</p>
             </div>
 
 
 
             <!-- Attachment Field -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <label class="block text-[10px] sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 Attachment (Optional)
               </label>
-              <div class="space-y-3">
+              <div class="space-y-1.5 sm:space-y-3">
                 <label class="cursor-pointer block">
-                  <div class="flex items-center justify-center w-full h-20 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 transition-colors bg-gray-50 hover:bg-blue-50">
+                  <div class="flex items-center justify-center w-full h-12 sm:h-20 border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl hover:border-blue-400 transition-colors bg-gray-50 hover:bg-blue-50">
                     <div class="text-center">
-                      <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="mx-auto h-5 w-5 sm:h-8 sm:w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                       </svg>
-                      <span class="text-sm text-gray-600">
+                      <span class="text-[10px] sm:text-sm text-gray-600">
                         {{ attachmentFileName || 'Tap to choose a file' }}
                       </span>
                     </div>
@@ -356,50 +356,50 @@ import { LoadingComponent } from '../../shared/components/loading.component';
                 </label>
                 
                 <!-- Selected File Display -->
-                <div *ngIf="attachmentFileName" class="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                <div *ngIf="attachmentFileName" class="flex items-center justify-between p-2 sm:p-3 bg-blue-50 rounded-lg sm:rounded-xl">
                   <div class="flex items-center">
-                    <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"/>
                     </svg>
-                    <span class="text-sm text-blue-800 font-medium truncate max-w-48">{{ attachmentFileName }}</span>
+                    <span class="text-[10px] sm:text-sm text-blue-800 font-medium truncate max-w-32 sm:max-w-48">{{ attachmentFileName }}</span>
                   </div>
                   <button 
                     type="button"
                     (click)="removeAttachment()"
-                    class="ml-2 p-1 text-red-600 hover:text-red-800 transition-colors"
+                    class="ml-2 p-0.5 sm:p-1 text-red-600 hover:text-red-800 transition-colors"
                   >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                   </button>
                 </div>
                 
-                <p class="text-xs text-gray-500">Supported: Images, PDF, DOC, DOCX (Max 10MB)</p>
+                <p class="text-[8px] sm:text-xs text-gray-500">Supported: Images, PDF, DOC, DOCX (Max 10MB)</p>
               </div>
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-3 pt-4">
+            <div class="flex flex-col sm:flex-row gap-1.5 sm:gap-3 pt-1.5 sm:pt-4">
               <button 
                 type="button"
-                class="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all font-medium"
+                class="w-full sm:w-auto px-3 py-2 sm:px-6 sm:py-3 bg-gray-100 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all font-medium text-[10px] sm:text-base"
                 (click)="closeComplaintModal()"
               >
                 Cancel
               </button>
               <button 
                 type="submit" 
-                class="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full sm:flex-1 px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg sm:rounded-xl hover:bg-blue-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed text-[10px] sm:text-base"
                 [disabled]="isSubmitting"
               >
                 <span *ngIf="!isSubmitting" class="flex items-center justify-center">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                   </svg>
                   Submit Complaint
                 </span>
                 <span *ngIf="isSubmitting" class="flex items-center justify-center">
-                  <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg class="animate-spin -ml-1 mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-5 sm:w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -415,20 +415,20 @@ import { LoadingComponent } from '../../shared/components/loading.component';
     <!-- Reply Modal -->
     <div 
       *ngIf="selectedComplaint" 
-      class="fixed inset-0 flex items-center justify-center z-50 p-4"
+      class="fixed inset-0 flex items-center justify-center z-50 p-1 sm:p-4"
     >
       <div 
         class="absolute inset-0 backdrop-blur-md bg-black/40"
         (click)="closeReply()"
       ></div>
-      <div class="bg-white rounded-2xl shadow-2xl relative w-full max-w-md md:max-w-3xl z-10 max-h-[95vh] overflow-y-auto">
+      <div class="bg-white rounded-lg sm:rounded-2xl shadow-2xl relative w-full max-w-md md:max-w-3xl z-10 max-h-[95vh] overflow-y-auto">
         <!-- Modal Header -->
-        <div class="sticky top-0 bg-white rounded-t-2xl border-b border-gray-200 px-4 md:px-6 py-4">
+        <div class="sticky top-0 bg-white rounded-t-lg sm:rounded-t-2xl border-b border-gray-200 px-2 sm:px-4 md:px-6 py-2 sm:py-4">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <h2 class="text-lg md:text-xl font-semibold text-gray-800">Complaint Details</h2>
+            <div class="flex items-center space-x-1.5 sm:space-x-3">
+              <h2 class="text-sm sm:text-lg md:text-xl font-semibold text-gray-800">Complaint Details</h2>
               <span 
-                class="px-2 py-1 text-xs font-medium rounded-full" 
+                class="px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full" 
                 [ngClass]="{
                   'bg-yellow-100 text-yellow-800': selectedComplaint.status === 'pending',
                   'bg-blue-100 text-blue-800': selectedComplaint.status === 'in_review',
@@ -441,9 +441,9 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
             <button 
               (click)="closeReply()" 
-              class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+              class="p-1 sm:p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
@@ -451,27 +451,27 @@ import { LoadingComponent } from '../../shared/components/loading.component';
         </div>
 
         <!-- Modal Body -->
-        <div class="px-4 md:px-6 py-4 space-y-6">
+        <div class="px-2 sm:px-4 md:px-6 py-2 sm:py-4 space-y-3 sm:space-y-6">
           <!-- Complaint Info Section -->
-          <div class="space-y-4">
+          <div class="space-y-2 sm:space-y-4">
             <!-- Date and ID -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded-xl">
-              <div class="flex items-center text-sm text-gray-600">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2 sm:p-3 bg-gray-50 rounded-lg sm:rounded-xl">
+              <div class="flex items-center text-[10px] sm:text-sm text-gray-600">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
                 <span>Submitted on {{ selectedComplaint.createdAt | date:'medium' }}</span>
               </div>
-              <div class="text-xs text-gray-500 mt-1 sm:mt-0">
+              <div class="text-[8px] sm:text-xs text-gray-500 mt-0.5 sm:mt-0">
                 ID: {{ selectedComplaint.$id?.slice(-8) }}
               </div>
             </div>
 
             <!-- Subject -->
             <div>
-              <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">{{ selectedComplaint.subject }}</h3>
-              <div class="flex items-center text-sm text-gray-600">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h3 class="text-base sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{{ selectedComplaint.subject }}</h3>
+              <div class="flex items-center text-[10px] sm:text-sm text-gray-600">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                 </svg>
                 <span class="font-medium">Category:</span>
@@ -480,45 +480,45 @@ import { LoadingComponent } from '../../shared/components/loading.component';
             </div>
 
             <!-- Description -->
-            <div class="p-4 bg-gray-50 rounded-xl">
-              <h4 class="font-medium text-gray-800 mb-2 flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="p-2 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl">
+              <h4 class="font-medium text-gray-800 mb-1 sm:mb-2 flex items-center text-[10px] sm:text-sm">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 Description
               </h4>
-              <p class="text-gray-700 whitespace-pre-line leading-relaxed">{{ selectedComplaint.description }}</p>
+              <p class="text-gray-700 whitespace-pre-line leading-relaxed text-[10px] sm:text-sm">{{ selectedComplaint.description }}</p>
             </div>
 
             <!-- Attachment Preview -->
-            <div *ngIf="selectedComplaint.attachments" class="p-4 border border-gray-200 rounded-xl">
-              <h4 class="font-medium text-gray-800 mb-3 flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <div *ngIf="selectedComplaint.attachments" class="p-2 sm:p-4 border border-gray-200 rounded-lg sm:rounded-xl">
+              <h4 class="font-medium text-gray-800 mb-2 sm:mb-3 flex items-center text-[10px] sm:text-sm">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z"/>
                 </svg>
                 Attachment
               </h4>
-              <div class="space-y-3">
+              <div class="space-y-2 sm:space-y-3">
                 <!-- Try to display as image first, fallback to file display if it fails -->
-                <div class="rounded-xl overflow-hidden bg-gray-100">
+                <div class="rounded-lg sm:rounded-xl overflow-hidden bg-gray-100">
                   <img 
                     [src]="getAttachmentUrl(selectedComplaint.attachments)" 
                     alt="Attachment" 
-                    class="w-full h-auto max-h-96 object-contain"
+                    class="w-full h-auto max-h-48 sm:max-h-96 object-contain"
                     (error)="onImageError($event)"
                     (load)="onImageLoad($event)"
                     [style.display]="showImageError ? 'none' : 'block'"
                   >
                   
                   <!-- File Display (shown when image fails to load) -->
-                  <div *ngIf="showImageError" class="flex items-center justify-center p-6 bg-gray-50 rounded-xl">
+                  <div *ngIf="showImageError" class="flex items-center justify-center p-3 sm:p-6 bg-gray-50 rounded-lg sm:rounded-xl">
                     <div class="text-center">
-                      <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+                      <svg class="w-8 h-8 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-1.5 sm:mb-3" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"/>
                         <path d="M6 5h8v2H6V5zM6 8h8v2H6V8zM6 11h4v2H6v-2z"/>
                       </svg>
-                      <p class="text-sm text-gray-600 font-medium">File Attachment</p>
-                      <p class="text-xs text-gray-500 mt-1">Non-image file attached</p>
+                      <p class="text-[10px] sm:text-sm text-gray-600 font-medium">File Attachment</p>
+                      <p class="text-[8px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">Non-image file attached</p>
                     </div>
                   </div>
                 </div>
@@ -527,47 +527,47 @@ import { LoadingComponent } from '../../shared/components/loading.component';
           </div>
 
           <!-- Response Section -->
-          <div class="border-t pt-6">
-            <div class="flex items-center mb-4">
+          <div class="border-t pt-3 sm:pt-6">
+            <div class="flex items-center mb-2 sm:mb-4">
               <div class="flex items-center">
-                <svg class="w-5 h-5 text-gray-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
                 </svg>
-                <h3 class="text-lg font-semibold text-gray-800">Barangay Response</h3>
+                <h3 class="text-sm sm:text-lg font-semibold text-gray-800">Barangay Response</h3>
               </div>
             </div>
             
-            <div class="p-4 rounded-xl" [ngClass]="{
+            <div class="p-2 sm:p-4 rounded-lg sm:rounded-xl" [ngClass]="{
               'bg-green-50 border border-green-200': selectedComplaint.barangayResponse,
               'bg-yellow-50 border border-yellow-200': !selectedComplaint.barangayResponse
             }">
               <div *ngIf="selectedComplaint.barangayResponse" class="flex items-start">
-                <svg class="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 sm:w-5 sm:h-5 text-green-600 mr-1.5 sm:mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <div>
-                  <p class="text-green-800 leading-relaxed">{{ selectedComplaint.barangayResponse }}</p>
-                  <p class="text-xs text-green-600 mt-2">Response received</p>
+                  <p class="text-[10px] sm:text-base text-green-800 leading-relaxed">{{ selectedComplaint.barangayResponse }}</p>
+                  <p class="text-[8px] sm:text-xs text-green-600 mt-1 sm:mt-2">Response received</p>
                 </div>
               </div>
               
               <div *ngIf="!selectedComplaint.barangayResponse" class="flex items-start">
-                <svg class="w-5 h-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 sm:w-5 sm:h-5 text-yellow-600 mr-1.5 sm:mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <div>
-                  <p class="text-yellow-800 font-medium">Waiting for response from barangay officials</p>
-                  <p class="text-xs text-yellow-600 mt-1">You will be notified when a response is available</p>
+                  <p class="text-[10px] sm:text-base text-yellow-800 font-medium">Waiting for response from barangay officials</p>
+                  <p class="text-[8px] sm:text-xs text-yellow-600 mt-0.5 sm:mt-1">You will be notified when a response is available</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Action Button -->
-          <div class="pt-4">
+          <div class="pt-2 sm:pt-4">
             <button
               (click)="closeReply()"
-              class="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all font-medium"
+              class="w-full px-3 py-2 sm:px-6 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg sm:rounded-xl transition-all font-medium text-[10px] sm:text-base"
             >
               Close
             </button>
