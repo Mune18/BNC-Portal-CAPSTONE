@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HouseholdService } from '../../shared/services/household.service';
 import { UserService } from '../../shared/services/user.service';
+import { DataRefreshService } from '../../shared/services/data-refresh.service';
+import { LoadingComponent } from '../../shared/components/loading.component';
 import { 
   HouseholdMemberWithResident, 
   Household 
@@ -17,7 +19,7 @@ interface HouseholdRequestWithDetails extends HouseholdMemberWithResident {
 @Component({
   selector: 'app-household-requests',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoadingComponent],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
       <div class="max-w-7xl mx-auto">
@@ -26,7 +28,7 @@ interface HouseholdRequestWithDetails extends HouseholdMemberWithResident {
           <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
             Household Member Requests
           </h1>
-          <p class="text-gray-600 text-lg">Review and approve household member additions</p>
+          <p class="text-gray-600 text-lg">Review and approve household member additions and removals</p>
         </div>
 
         <!-- Filter Tabs -->
@@ -45,21 +47,28 @@ interface HouseholdRequestWithDetails extends HouseholdMemberWithResident {
             <button 
               (click)="filterStatus = 'pending_verification'; filterRequests()"
               [class.bg-gradient-to-r]="filterStatus === 'pending_verification'"
-              [class.from-amber-500]="filterStatus === 'pending_verification'"
-              [class.to-orange-500]="filterStatus === 'pending_verification'"
+              [class.from-green-500]="filterStatus === 'pending_verification'"
+              [class.to-emerald-500]="filterStatus === 'pending_verification'"
               [class.text-white]="filterStatus === 'pending_verification'"
               [class.text-gray-600]="filterStatus !== 'pending_verification'"
               class="px-4 py-2 rounded-lg font-medium transition-all duration-200">
-              Pending ({{ pendingCount }})
+              Additions ({{ additionCount }})
+            </button>
+            <button 
+              (click)="filterStatus = 'pending_removal'; filterRequests()"
+              [class.bg-gradient-to-r]="filterStatus === 'pending_removal'"
+              [class.from-red-500]="filterStatus === 'pending_removal'"
+              [class.to-rose-500]="filterStatus === 'pending_removal'"
+              [class.text-white]="filterStatus === 'pending_removal'"
+              [class.text-gray-600]="filterStatus !== 'pending_removal'"
+              class="px-4 py-2 rounded-lg font-medium transition-all duration-200">
+              Removals ({{ removalCount }})
             </button>
           </div>
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="loading" class="text-center py-12">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p class="mt-4 text-gray-600">Loading requests...</p>
-        </div>
+        <app-loading *ngIf="loading" type="spinner" [fullScreen]="true" message="Loading household requests..."></app-loading>
 
         <!-- Requests List -->
         <div *ngIf="!loading" class="space-y-4">
@@ -143,7 +152,7 @@ interface HouseholdRequestWithDetails extends HouseholdMemberWithResident {
                     </div>
 
                     <!-- Warning for Pending Registration -->
-                    <div *ngIf="request.memberType === 'pending_registration'" 
+                    <div *ngIf="request.memberType === 'pending_registration' && request.status === 'pending_verification'" 
                          class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                       <div class="flex items-start gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -155,30 +164,72 @@ interface HouseholdRequestWithDetails extends HouseholdMemberWithResident {
                         </p>
                       </div>
                     </div>
+
+                    <!-- Removal Reason -->
+                    <div *ngIf="request.status === 'pending_removal' && request.removalReason" 
+                         class="mt-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <div class="flex items-start gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="flex-1">
+                          <p class="text-sm font-semibold text-red-900 mb-1">Reason for Removal:</p>
+                          <p class="text-sm text-red-800">{{ request.removalReason }}</p>
+                          <p class="text-xs text-red-600 mt-2" *ngIf="request.removalRequestedAt">
+                            Requested on {{ formatDate(request.removalRequestedAt) }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- Actions -->
-              <div *ngIf="request.status === 'pending_verification'" class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-                <button 
-                  (click)="rejectRequest(request)"
-                  [disabled]="processing"
-                  class="px-6 py-2.5 bg-white border-2 border-red-500 text-red-600 rounded-xl hover:bg-red-50 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Reject
-                </button>
-                <button 
-                  (click)="approveRequest(request)"
-                  [disabled]="processing"
-                  class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Approve
-                </button>
+              <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+                <!-- Addition Request Actions -->
+                <ng-container *ngIf="request.status === 'pending_verification'">
+                  <button 
+                    (click)="rejectRequest(request)"
+                    [disabled]="processing"
+                    class="px-6 py-2.5 bg-white border-2 border-red-500 text-red-600 rounded-xl hover:bg-red-50 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Reject
+                  </button>
+                  <button 
+                    (click)="approveRequest(request)"
+                    [disabled]="processing"
+                    class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Approve Addition
+                  </button>
+                </ng-container>
+
+                <!-- Removal Request Actions -->
+                <ng-container *ngIf="request.status === 'pending_removal'">
+                  <button 
+                    (click)="rejectRemovalRequest(request)"
+                    [disabled]="processing"
+                    class="px-6 py-2.5 bg-white border-2 border-blue-500 text-blue-600 rounded-xl hover:bg-blue-50 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Deny Removal
+                  </button>
+                  <button 
+                    (click)="approveRemovalRequest(request)"
+                    [disabled]="processing"
+                    class="px-6 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl hover:from-red-700 hover:to-rose-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Approve Removal
+                  </button>
+                </ng-container>
               </div>
             </div>
           </div>
@@ -190,7 +241,9 @@ interface HouseholdRequestWithDetails extends HouseholdMemberWithResident {
             </svg>
             <h3 class="text-xl font-bold text-gray-900 mb-2">No Requests Found</h3>
             <p class="text-gray-600">
-              {{ filterStatus === 'pending_verification' ? 'No pending requests at this time.' : 'No household member requests found.' }}
+              {{ filterStatus === 'pending_verification' ? 'No pending addition requests at this time.' : 
+                 filterStatus === 'pending_removal' ? 'No pending removal requests at this time.' : 
+                 'No household member requests found.' }}
             </p>
           </div>
         </div>
@@ -208,7 +261,7 @@ export class HouseholdRequestsComponent implements OnInit {
   processing = false;
   requests: HouseholdRequestWithDetails[] = [];
   filteredRequests: HouseholdRequestWithDetails[] = [];
-  filterStatus: 'all' | 'pending_verification' = 'pending_verification';
+  filterStatus: 'all' | 'pending_verification' | 'pending_removal' = 'all';
   
   stats = {
     totalHouseholds: 0,
@@ -219,9 +272,18 @@ export class HouseholdRequestsComponent implements OnInit {
     return this.requests.filter(r => r.status === 'pending_verification').length;
   }
 
+  get additionCount(): number {
+    return this.requests.filter(r => r.status === 'pending_verification').length;
+  }
+
+  get removalCount(): number {
+    return this.requests.filter(r => r.status === 'pending_removal').length;
+  }
+
   constructor(
     private householdService: HouseholdService,
-    private userService: UserService
+    private userService: UserService,
+    private dataRefreshService: DataRefreshService
   ) {}
 
   async ngOnInit() {
@@ -232,6 +294,9 @@ export class HouseholdRequestsComponent implements OnInit {
   async loadRequests() {
     this.loading = true;
     try {
+      // Clean up old rejected members (older than 7 days) to keep database clean
+      await this.householdService.cleanupOldRejectedMembers();
+      
       const pendingMembers = await this.householdService.getPendingHouseholdMembers();
       
       // Enrich with household and head information
@@ -317,6 +382,10 @@ export class HouseholdRequestsComponent implements OnInit {
       try {
         await this.householdService.updateHouseholdMemberStatus(request.$id!, 'active');
         await Swal.fire('Approved!', 'Household member has been approved', 'success');
+        
+        // Trigger data refresh for notifications and badges
+        this.dataRefreshService.triggerMultipleRefresh(['notifications', 'household_requests', 'households']);
+        
         await this.loadRequests();
         await this.loadStats();
       } catch (error) {
@@ -351,13 +420,121 @@ export class HouseholdRequestsComponent implements OnInit {
     if (result.isConfirmed) {
       this.processing = true;
       try {
-        await this.householdService.removeHouseholdMember(request.$id!);
-        await Swal.fire('Rejected', 'Household member request has been rejected', 'success');
+        // Instead of deleting immediately, mark as rejected so user can see notification
+        await this.householdService.updateHouseholdMemberStatus(
+          request.$id!, 
+          'rejected',
+          result.value || undefined // rejection reason from textarea
+        );
+        await Swal.fire('Rejected', 'Household member request has been rejected. The household head will be notified.', 'success');
+        
+        // Trigger data refresh for notifications and badges
+        this.dataRefreshService.triggerMultipleRefresh(['notifications', 'household_requests', 'households']);
+        
         await this.loadRequests();
         await this.loadStats();
       } catch (error) {
         console.error('Error rejecting request:', error);
         Swal.fire('Error', 'Failed to reject household member', 'error');
+      } finally {
+        this.processing = false;
+      }
+    }
+  }
+
+  async approveRemovalRequest(request: HouseholdRequestWithDetails) {
+    const result = await Swal.fire({
+      title: 'Approve Member Removal?',
+      html: `
+        <div class="text-left">
+          <p class="mb-2">You are about to approve the removal of:</p>
+          <p class="font-semibold text-lg mb-4">${this.getMemberName(request)}</p>
+          
+          ${request.removalReason ? `
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
+              <p class="text-sm font-semibold text-red-900 mb-1">Reason for Removal:</p>
+              <p class="text-sm text-red-800">${request.removalReason}</p>
+            </div>
+          ` : ''}
+          
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p class="text-sm text-amber-800">
+              <strong>Warning:</strong> This member will be permanently removed from the household.
+            </p>
+          </div>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Approve Removal',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#ef4444'
+    });
+
+    if (result.isConfirmed) {
+      this.processing = true;
+      try {
+        await this.householdService.removeHouseholdMember(request.$id!);
+        await Swal.fire('Approved!', 'Member has been removed from the household', 'success');
+        
+        // Trigger data refresh for notifications and badges
+        this.dataRefreshService.triggerMultipleRefresh(['notifications', 'household_requests', 'households']);
+        
+        await this.loadRequests();
+        await this.loadStats();
+      } catch (error) {
+        console.error('Error approving removal:', error);
+        Swal.fire('Error', 'Failed to approve member removal', 'error');
+      } finally {
+        this.processing = false;
+      }
+    }
+  }
+
+  async rejectRemovalRequest(request: HouseholdRequestWithDetails) {
+    const result = await Swal.fire({
+      title: 'Deny Member Removal?',
+      html: `
+        <div class="text-left">
+          <p class="mb-2">You are about to deny the removal of:</p>
+          <p class="font-semibold text-lg mb-4">${this.getMemberName(request)}</p>
+          
+          ${request.removalReason ? `
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
+              <p class="text-sm font-semibold text-red-900 mb-1">Reason for Removal:</p>
+              <p class="text-sm text-red-800">${request.removalReason}</p>
+            </div>
+          ` : ''}
+          
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800">
+              <strong>Note:</strong> The member will remain in the household with active status.
+            </p>
+          </div>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Deny Removal',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3b82f6'
+    });
+
+    if (result.isConfirmed) {
+      this.processing = true;
+      try {
+        // Set status back to active and clear removal fields
+        await this.householdService.updateHouseholdMemberStatus(request.$id!, 'active');
+        await Swal.fire('Denied', 'Removal request has been denied. Member remains in the household.', 'success');
+        
+        // Trigger data refresh for notifications and badges
+        this.dataRefreshService.triggerMultipleRefresh(['notifications', 'household_requests', 'households']);
+        
+        await this.loadRequests();
+        await this.loadStats();
+      } catch (error) {
+        console.error('Error denying removal:', error);
+        Swal.fire('Error', 'Failed to deny removal request', 'error');
       } finally {
         this.processing = false;
       }
@@ -399,6 +576,8 @@ export class HouseholdRequestsComponent implements OnInit {
     const classes: Record<string, string> = {
       'active': 'bg-gradient-to-r from-green-400 to-emerald-500 text-white',
       'pending_verification': 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white',
+      'pending_removal': 'bg-gradient-to-r from-red-400 to-rose-500 text-white',
+      'rejected': 'bg-gradient-to-r from-gray-400 to-gray-500 text-white',
       'claimed': 'bg-gradient-to-r from-blue-400 to-indigo-500 text-white'
     };
     return classes[status] || 'bg-gray-200 text-gray-600';
@@ -407,7 +586,9 @@ export class HouseholdRequestsComponent implements OnInit {
   formatStatus(status: string): string {
     const formats: Record<string, string> = {
       'active': 'Active',
-      'pending_verification': 'Pending Review',
+      'pending_verification': 'Pending Addition',
+      'pending_removal': 'Pending Removal',
+      'rejected': 'Rejected',
       'claimed': 'Claimed'
     };
     return formats[status] || status;

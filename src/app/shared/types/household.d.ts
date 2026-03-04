@@ -16,7 +16,7 @@ export interface Household {
 }
 
 export type MemberType = 'linked' | 'pending_registration';
-export type MemberStatus = 'claimed' | 'active' | 'pending_verification';
+export type MemberStatus = 'claimed' | 'active' | 'pending_verification' | 'pending_removal' | 'rejected';
 export type Relationship = 'Head' | 'Spouse' | 'Child' | 'Parent' | 'Sibling' | 'Relative' | 'Other';
 
 export interface HouseholdMember {
@@ -39,6 +39,15 @@ export interface HouseholdMember {
   canClaimAccount: boolean;
   createdAt: string;
   updatedAt?: string;
+  
+  // Removal request fields
+  removalReason?: string;
+  removalRequestedAt?: string;
+  
+  // Denial/Rejection tracking
+  removalDeniedAt?: string; // When admin denies a removal request
+  rejectedAt?: string; // When admin rejects an addition request
+  rejectionReason?: string; // Why the addition was rejected
 }
 
 export interface HouseholdWithMembers extends Household {

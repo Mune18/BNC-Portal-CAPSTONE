@@ -1,10 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
-import { RouterModule, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterModule, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../shared/services/auth.service'; // Add this import
 import { UserService } from '../shared/services/user.service'; // Import UserService
 import { ResidentInfo } from '../shared/types/resident'; // Import ResidentInfo model
 import { NotificationService, Notification } from '../shared/services/notification.service';
+import { HouseholdService } from '../shared/services/household.service';
+import { ComplaintService } from '../shared/services/complaint.service';
+import { DataRefreshService } from '../shared/services/data-refresh.service';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -43,11 +48,15 @@ import Swal from 'sweetalert2';
               </a>
             </li>
             <li>
-              <a [routerLink]="['/user/household']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/user/household']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="relative flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <span class="flex-1 ms-3 whitespace-nowrap">My Household</span>
+                <span *ngIf="pendingHouseholdCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full min-w-[1.25rem]">
+                  {{ pendingHouseholdCount > 99 ? '99+' : pendingHouseholdCount }}
+                </span>
               </a>
             </li>
             <!-- <li>
@@ -57,9 +66,13 @@ import Swal from 'sweetalert2';
               </a>
             </li> -->
             <li>
-              <a [routerLink]="['/user/complaints']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
+              <a [routerLink]="['/user/complaints']" routerLinkActive="bg-blue-100" (click)="onNavLinkClick()" class="relative flex items-center p-2 text-gray-900 rounded-lg hover:bg-blue-100">
                 <img src="/assets/report.png" alt="Complaints Icon" class="w-5 h-5">
                 <span class="flex-1 ms-3 whitespace-nowrap">Complaints & Reports</span>
+                <span *ngIf="activeComplaintsCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full min-w-[1.25rem]">
+                  {{ activeComplaintsCount > 99 ? '99+' : activeComplaintsCount }}
+                </span>
               </a>
             </li>
           </ul>
@@ -234,12 +247,18 @@ import Swal from 'sweetalert2';
             <a [routerLink]="['/user/household']" 
                routerLinkActive="text-blue-600" 
                #householdLink="routerLinkActive"
-               class="flex flex-col items-center py-1.5 sm:py-2 px-1 sm:px-2 transition-colors duration-200"
+               class="relative flex flex-col items-center py-1.5 sm:py-2 px-1 sm:px-2 transition-colors duration-200"
                [class.text-blue-600]="householdLink.isActive"
                [class.text-gray-600]="!householdLink.isActive">
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-              </svg>
+              <div class="relative">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span *ngIf="pendingHouseholdCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1 py-0.5 text-[8px] sm:text-[10px] font-bold leading-none text-white bg-red-600 rounded-full min-w-[0.875rem] sm:min-w-[1rem]">
+                  {{ pendingHouseholdCount > 9 ? '9+' : pendingHouseholdCount }}
+                </span>
+              </div>
               <span class="text-[10px] sm:text-xs">Household</span>
             </a>
 
@@ -247,12 +266,18 @@ import Swal from 'sweetalert2';
             <a [routerLink]="['/user/complaints']" 
                routerLinkActive="text-blue-600" 
                #complaintsLink="routerLinkActive"
-               class="flex flex-col items-center py-1.5 sm:py-2 px-1 sm:px-2 transition-colors duration-200"
+               class="relative flex flex-col items-center py-1.5 sm:py-2 px-1 sm:px-2 transition-colors duration-200"
                [class.text-blue-600]="complaintsLink.isActive"
                [class.text-gray-600]="!complaintsLink.isActive">
-              <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
+              <div class="relative">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6 mb-0.5 sm:mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span *ngIf="activeComplaintsCount > 0" 
+                      class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1 py-0.5 text-[8px] sm:text-[10px] font-bold leading-none text-white bg-red-600 rounded-full min-w-[0.875rem] sm:min-w-[1rem]">
+                  {{ activeComplaintsCount > 9 ? '9+' : activeComplaintsCount }}
+                </span>
+              </div>
               <span class="text-[10px] sm:text-xs">Report</span>
             </a>
 
@@ -386,11 +411,21 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
   unreadNotificationsCount = 0;
   notificationsLoading = false;
 
+  // Badge counts
+  pendingHouseholdCount = 0;
+  activeComplaintsCount = 0;
+  private badgeCountsCheckInterval: any;
+  private routerSubscription?: Subscription;
+  private dataRefreshSubscription?: Subscription;
+
   constructor(
     private router: Router, 
     private authService: AuthService, 
     private userService: UserService,
-    public notificationService: NotificationService
+    public notificationService: NotificationService,
+    private householdService: HouseholdService,
+    private complaintService: ComplaintService,
+    private dataRefreshService: DataRefreshService
   ) {
     this.checkIfMobile();
   }
@@ -411,6 +446,9 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
     // Load initial notifications
     this.loadUserNotifications();
 
+    // Load initial badge counts
+    this.loadBadgeCounts();
+
     // Check for new notifications every 10 seconds (smart refresh)
     this.notificationCheckInterval = setInterval(async () => {
       try {
@@ -426,6 +464,41 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
         console.error('Error checking for new notifications:', error);
       }
     }, 10000);
+
+    // Check for badge counts every 30 seconds
+    this.badgeCountsCheckInterval = setInterval(() => {
+      this.loadBadgeCounts();
+    }, 30000);
+
+    // Subscribe to router events to refresh counts on navigation
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.loadBadgeCounts();
+      });
+
+    // Subscribe to data refresh events
+    this.dataRefreshSubscription = new Subscription();
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('household_requests').subscribe(() => {
+        this.loadBadgeCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('households').subscribe(() => {
+        this.loadBadgeCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('notifications').subscribe(() => {
+        this.loadUserNotifications();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('complaints').subscribe(() => {
+        this.loadBadgeCounts();
+      })
+    );
     
     // Load user profile
     try {
@@ -444,6 +517,15 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
     }
     if (this.notificationCheckInterval) {
       clearInterval(this.notificationCheckInterval);
+    }
+    if (this.badgeCountsCheckInterval) {
+      clearInterval(this.badgeCountsCheckInterval);
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+    if (this.dataRefreshSubscription) {
+      this.dataRefreshSubscription.unsubscribe();
     }
   }
 
@@ -481,6 +563,39 @@ export class RootLayoutUserComponent implements OnInit, OnDestroy {
       console.error('Error loading user notifications:', error);
     } finally {
       this.notificationsLoading = false;
+    }
+  }
+
+  async loadBadgeCounts() {
+    try {
+      const account = await this.authService.getAccount();
+      if (account) {
+        const resident = await this.userService.getUserInformation(account.$id);
+        
+        if (resident?.$id) {
+          // Load pending household member requests (submitted by this user, awaiting admin approval)
+          const household = await this.householdService.getHouseholdForResident(resident.$id);
+          if (household) {
+            const householdWithMembers = await this.householdService.getHouseholdWithMembers(household.$id!);
+            if (householdWithMembers) {
+              // Count members with pending_verification or pending_removal status
+              this.pendingHouseholdCount = householdWithMembers.members.filter(
+                m => m.status === 'pending_verification' || m.status === 'pending_removal'
+              ).length;
+            }
+          } else {
+            this.pendingHouseholdCount = 0;
+          }
+
+          // Load active complaints (pending or in_review)
+          const complaints = await this.complaintService.getUserComplaints();
+          this.activeComplaintsCount = complaints.filter(
+            c => c.status === 'pending' || c.status === 'in_review'
+          ).length;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading badge counts:', error);
     }
   }
 

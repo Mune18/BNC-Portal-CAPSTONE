@@ -296,9 +296,10 @@ export class HouseholdService extends BaseAppwriteService {
   ): Promise<SearchResidentResult[]> {
     try {
       // Get current household members to exclude them
+      // Exclude rejected members - they can be re-added
       const currentMembers = await this.getHouseholdMembers(currentHouseholdId);
       const existingResidentIds = currentMembers
-        .filter(m => m.linkedResidentId)
+        .filter(m => m.linkedResidentId && m.status !== 'rejected')
         .map(m => m.linkedResidentId!);
 
       // Fetch all active/inactive residents (limited to 100 for performance)
@@ -479,13 +480,13 @@ export class HouseholdService extends BaseAppwriteService {
 
         return member as unknown as HouseholdMember;
       } else {
-        // Linked member - just create the household member record
+        // Linked member - create household member record with pending approval
         const memberData = {
           householdId: request.householdId,
           linkedResidentId: request.linkedResidentId,
           relationship: request.relationship,
           memberType: 'linked',
-          status: 'active',
+          status: 'pending_verification', // Changed to require admin approval
           canClaimAccount: false,
           createdAt: now,
           updatedAt: now
@@ -511,8 +512,8 @@ export class HouseholdService extends BaseAppwriteService {
    */
   async updateHouseholdMemberStatus(
     memberId: string,
-    status: 'active' | 'pending_verification',
-    rejectionReason?: string
+    status: 'active' | 'pending_verification' | 'pending_removal' | 'rejected',
+    reason?: string
   ): Promise<HouseholdMember> {
     try {
       // First, get the current member data
@@ -526,6 +527,27 @@ export class HouseholdService extends BaseAppwriteService {
         status,
         updatedAt: new Date().toISOString()
       };
+
+      // If requesting removal, save the reason and timestamp
+      if (status === 'pending_removal' && reason) {
+        updateData.removalReason = reason;
+        updateData.removalRequestedAt = new Date().toISOString();
+      }
+
+      // If rejecting an addition request, save rejection details
+      if (status === 'rejected') {
+        updateData.rejectedAt = new Date().toISOString();
+        if (reason) {
+          updateData.rejectionReason = reason;
+        }
+      }
+
+      // If setting back to active from pending_removal (denial), track it
+      if (status === 'active' && currentMember.status === 'pending_removal') {
+        updateData.removalReason = null;
+        updateData.removalRequestedAt = null;
+        updateData.removalDeniedAt = new Date().toISOString();
+      }
 
       // If approving, update the linked resident's approval status
       if (status === 'active' && currentMember.linkedResidentId) {
@@ -704,19 +726,31 @@ export class HouseholdService extends BaseAppwriteService {
 
   /**
    * Get pending household members (for admin approval)
+   * Includes both pending_verification (additions) and pending_removal (removals)
    */
   async getPendingHouseholdMembers(): Promise<HouseholdMemberWithResident[]> {
     try {
-      const response = await this.database.listDocuments(
-        environment.appwriteDatabaseId,
-        this.HOUSEHOLD_MEMBERS_COLLECTION,
-        [
-          Query.equal('status', 'pending_verification'),
-          Query.orderDesc('createdAt')
-        ]
-      );
+      // Fetch both pending_verification and pending_removal members
+      const [verificationResponse, removalResponse] = await Promise.all([
+        this.database.listDocuments(
+          environment.appwriteDatabaseId,
+          this.HOUSEHOLD_MEMBERS_COLLECTION,
+          [
+            Query.equal('status', 'pending_verification'),
+            Query.orderDesc('createdAt')
+          ]
+        ),
+        this.database.listDocuments(
+          environment.appwriteDatabaseId,
+          this.HOUSEHOLD_MEMBERS_COLLECTION,
+          [
+            Query.equal('status', 'pending_removal'),
+            Query.orderDesc('removalRequestedAt')
+          ]
+        )
+      ]);
 
-      const members = response.documents as unknown as HouseholdMember[];
+      const members = [...verificationResponse.documents, ...removalResponse.documents] as unknown as HouseholdMember[];
       
       // Enrich with household and resident information
       const enrichedMembers = await Promise.all(
@@ -758,6 +792,55 @@ export class HouseholdService extends BaseAppwriteService {
     } catch (error) {
       console.error('Error getting pending household members:', error);
       return [];
+    }
+  }
+
+  /**
+   * Clean up old rejected members (older than 7 days)
+   * This should be called periodically to remove rejected members that are no longer needed for notifications
+   */
+  async cleanupOldRejectedMembers(): Promise<number> {
+    try {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+
+      // Find all rejected members
+      const response = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        this.HOUSEHOLD_MEMBERS_COLLECTION,
+        [
+          Query.equal('status', 'rejected')
+        ]
+      );
+
+      let cleanedCount = 0;
+
+      // Delete rejected members older than 7 days
+      for (const member of response.documents) {
+        const rejectedAt = member['rejectedAt'];
+        if (rejectedAt && rejectedAt < sevenDaysAgoISO) {
+          try {
+            await this.database.deleteDocument(
+              environment.appwriteDatabaseId,
+              this.HOUSEHOLD_MEMBERS_COLLECTION,
+              member.$id
+            );
+            cleanedCount++;
+          } catch (error) {
+            console.error('Error deleting old rejected member:', member.$id, error);
+          }
+        }
+      }
+
+      if (cleanedCount > 0) {
+        console.log(`Cleaned up ${cleanedCount} old rejected household members`);
+      }
+
+      return cleanedCount;
+    } catch (error) {
+      console.error('Error cleaning up old rejected members:', error);
+      return 0;
     }
   }
 

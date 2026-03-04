@@ -310,6 +310,21 @@ export class RootLayoutAdminComponent implements OnInit, OnDestroy {
       })
     );
     this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('household_requests').subscribe(() => {
+        this.loadPendingCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('households').subscribe(() => {
+        this.loadPendingCounts();
+      })
+    );
+    this.dataRefreshSubscription.add(
+      this.dataRefreshService.onRefresh('notifications').subscribe(() => {
+        this.loadNotifications();
+      })
+    );
+    this.dataRefreshSubscription.add(
       this.dataRefreshService.onRefresh('complaints').subscribe(() => {
         this.loadPendingCounts();
       })

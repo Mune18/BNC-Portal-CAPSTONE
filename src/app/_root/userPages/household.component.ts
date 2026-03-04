@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HouseholdService } from '../../shared/services/household.service';
@@ -6,6 +6,7 @@ import { AddHouseholdMemberFormComponent } from './add-household-member-form.com
 import { AuthService } from '../../shared/services/auth.service';
 import { UserService } from '../../shared/services/user.service';
 import { LoadingComponent } from '../../shared/components/loading.component';
+import { DataRefreshService } from '../../shared/services/data-refresh.service';
 import { 
   HouseholdWithMembers, 
   HouseholdMemberWithResident, 
@@ -48,7 +49,7 @@ import Swal from 'sweetalert2';
               <div class="text-left sm:text-right">
                 <p class="text-[10px] sm:text-sm text-gray-500">Total Members</p>
                 <p class="text-xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  {{ household.totalMembers }}
+                  {{ activeMembers.length }}
                 </p>
               </div>
             </div>
@@ -70,7 +71,7 @@ import Swal from 'sweetalert2';
           </div>
 
           <!-- Add Member Button -->
-          <div class="flex justify-center sm:justify-end">
+          <div class="flex justify-center sm:justify-end" *ngIf="isHouseholdHead">
             <button 
               (click)="openAddMemberModal()"
               class="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-base rounded-md sm:rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-lg hover:shadow-xl font-semibold"
@@ -82,6 +83,18 @@ import Swal from 'sweetalert2';
             </button>
           </div>
 
+          <!-- Info message for non-head members -->
+          <div *ngIf="!isHouseholdHead" class="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4">
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-[10px] sm:text-sm text-blue-800">
+                <strong>Note:</strong> Only the household head can add or remove members. If you need to make changes to the household, please contact the household head.
+              </p>
+            </div>
+          </div>
+
           <!-- Household Members List -->
           <div class="bg-white rounded-lg sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div class="px-3 sm:px-5 md:px-6 py-2 sm:py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
@@ -89,7 +102,7 @@ import Swal from 'sweetalert2';
             </div>
 
             <div class="divide-y divide-gray-200">
-              <div *ngFor="let member of household.members" 
+              <div *ngFor="let member of activeMembers" 
                    class="p-2.5 sm:p-4 md:p-6 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200">
                 <div class="flex items-start justify-between flex-col sm:flex-row gap-2 sm:gap-0">
                   <div class="flex items-start gap-2 sm:gap-4 flex-1 w-full sm:w-auto">
@@ -144,22 +157,43 @@ import Swal from 'sweetalert2';
                   </div>
 
                   <!-- Actions -->
-                  <div class="flex items-center gap-1 sm:gap-2 self-start sm:self-center">
-                    <button 
-                      *ngIf="member.relationship !== 'Head' && member.status !== 'pending_verification'"
-                      (click)="removeMember(member)"
-                      class="p-1 sm:p-2 text-red-600 hover:bg-red-50 rounded-md sm:rounded-lg transition-colors"
-                      title="Remove member"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                  <div class="flex items-center gap-1 sm:gap-2 self-start sm:self-center relative">
+                    <!-- 3-Dot Menu Button -->
+                    <div *ngIf="isHouseholdHead && member.relationship !== 'Head' && member.status !== 'pending_verification' && member.status !== 'pending_removal'" class="relative">
+                      <button 
+                        (click)="toggleMemberMenu(member.$id!); $event.stopPropagation()"
+                        class="p-1 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-md sm:rounded-lg transition-colors"
+                        title="More options"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                        </svg>
+                      </button>
+
+                      <!-- Dropdown Menu -->
+                      <div *ngIf="openMemberMenuId === member.$id" 
+                           class="absolute right-0 mt-1 sm:mt-2 w-44 sm:w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50 py-1">
+                        <button 
+                          (click)="requestRemoveMember(member); $event.stopPropagation()"
+                          class="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          <span>Remove Member</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Pending Removal Badge -->
+                    <span *ngIf="member.status === 'pending_removal'" 
+                          class="px-1.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-full bg-orange-100 text-orange-800 whitespace-nowrap">
+                      Pending Removal
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div *ngIf="household.members.length === 0" class="p-6 sm:p-12 text-center">
+              <div *ngIf="activeMembers.length === 0" class="p-6 sm:p-12 text-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 sm:h-16 sm:w-16 text-gray-300 mx-auto mb-3 sm:mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -387,6 +421,7 @@ export class HouseholdComponent implements OnInit {
   currentUserId: string = '';
   currentResident: any = null;
   creatingHousehold = false;
+  isHouseholdHead: boolean = false; // Track if current user is the household head
 
   // Add member modal
   showAddMemberModal = false;
@@ -397,14 +432,24 @@ export class HouseholdComponent implements OnInit {
   selectedResident: SearchResidentResult | null = null;
   submitting = false;
   newMemberRelationship: Relationship | '' = '';
+  openMemberMenuId: string | null = null; // Track which member's menu is open
 
   private searchTimeout: any;
 
   constructor(
     private householdService: HouseholdService,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private dataRefreshService: DataRefreshService
   ) {}
+
+  // Getter to return only active/approved members (hide pending members from user view)
+  get activeMembers(): HouseholdMemberWithResident[] {
+    if (!this.household?.members) return [];
+    return this.household.members.filter(member => 
+      member.status === 'active' || member.status === 'claimed' || member.status === 'pending_removal'
+    );
+  }
 
   async ngOnInit() {
     await this.loadHousehold();
@@ -424,6 +469,8 @@ export class HouseholdComponent implements OnInit {
         
         if (household) {
           this.household = await this.householdService.getHouseholdWithMembers(household.$id!);
+          // Check if current user is the household head
+          this.isHouseholdHead = this.household?.headOfHouseholdId === this.currentUserId;
         }
       }
     } catch (error) {
@@ -522,7 +569,21 @@ export class HouseholdComponent implements OnInit {
           memberType: 'linked'
         });
 
-        await Swal.fire('Success', 'Household member added successfully!', 'success');
+        await Swal.fire({
+          icon: 'success',
+          title: 'Submitted for Review',
+          html: `
+            <p class="mb-3">The household member request has been submitted and is pending admin approval.</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-left">
+              <p class="font-semibold text-blue-900 mb-2">What happens next?</p>
+              <ul class="text-blue-800 space-y-1 list-disc list-inside">
+                <li>Admin will review the household member addition</li>
+                <li>You will be notified once approved</li>
+                <li>The member will then appear in your household</li>
+              </ul>
+            </div>
+          `
+        });
       } else if (this.addMemberStep === 2) {
         // Add pending registration member with comprehensive information
         if (!this.memberForm) {
@@ -580,6 +641,9 @@ export class HouseholdComponent implements OnInit {
 
       this.closeAddMemberModal();
       await this.loadHousehold();
+      
+      // Trigger data refresh for notifications and badges
+      this.dataRefreshService.triggerMultipleRefresh(['notifications', 'household_requests', 'households']);
     } catch (error: any) {
       console.error('Error adding household member:', error);
       Swal.fire({
@@ -593,25 +657,89 @@ export class HouseholdComponent implements OnInit {
     }
   }
 
-  async removeMember(member: HouseholdMemberWithResident) {
+  toggleMemberMenu(memberId: string) {
+    // Close menu if clicking the same member, otherwise open the new one
+    this.openMemberMenuId = this.openMemberMenuId === memberId ? null : memberId;
+  }
+
+  async requestRemoveMember(member: HouseholdMemberWithResident) {
+    // Close the menu
+    this.openMemberMenuId = null;
+
     const result = await Swal.fire({
-      title: 'Remove Household Member?',
-      text: `Are you sure you want to remove ${this.getMemberName(member)} from your household?`,
-      icon: 'warning',
+      title: 'Request Member Removal?',
+      html: `
+        <div class="text-left">
+          <p class="mb-3">You are requesting to remove:</p>
+          <p class="font-semibold text-lg mb-4">${this.getMemberName(member)}</p>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2 text-left">Reason for Removal *</label>
+            <textarea 
+              id="removalReason" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+              rows="4" 
+              placeholder="Please provide a reason for removing this member (e.g., moved to another location, no longer living in the household, etc.)..."
+              required></textarea>
+          </div>
+          
+          <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm text-blue-800">
+              <strong>Note:</strong> This removal request will be sent to the admin for approval. 
+              The member will remain in the household until the admin approves the removal.
+            </p>
+          </div>
+        </div>
+      `,
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Yes, Remove',
+      confirmButtonText: 'Yes, Request Removal',
       cancelButtonText: 'Cancel',
-      confirmButtonColor: '#ef4444'
+      confirmButtonColor: '#ef4444',
+      preConfirm: () => {
+        const reason = (document.getElementById('removalReason') as HTMLTextAreaElement)?.value;
+        if (!reason || reason.trim() === '') {
+          Swal.showValidationMessage('Please provide a reason for removal');
+          return false;
+        }
+        return reason.trim();
+      }
     });
 
-    if (result.isConfirmed) {
+    if (result.isConfirmed && result.value) {
       try {
-        await this.householdService.removeHouseholdMember(member.$id!);
-        await Swal.fire('Removed', 'Household member has been removed', 'success');
+        // Update member status to pending_removal with reason
+        await this.householdService.updateHouseholdMemberStatus(member.$id!, 'pending_removal', result.value);
+        
+        await Swal.fire({
+          icon: 'success',
+          title: 'Removal Request Submitted',
+          html: `
+            <p class="mb-3">Your request to remove ${this.getMemberName(member)} has been submitted.</p>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-left">
+              <p class="font-semibold text-blue-900 mb-2">What happens next?</p>
+              <ul class="text-blue-800 space-y-1 list-disc list-inside">
+                <li>Admin will review your removal request</li>
+                <li>You will be notified once it's approved</li>
+                <li>The member will be removed after approval</li>
+              </ul>
+            </div>
+          `,
+          confirmButtonColor: '#3b82f6'
+        });
+        
         await this.loadHousehold();
+        
+        // Trigger data refresh for notifications and badges
+        this.dataRefreshService.triggerMultipleRefresh(['notifications', 'household_requests', 'households']);
       } catch (error) {
-        console.error('Error removing member:', error);
-        Swal.fire('Error', 'Failed to remove household member', 'error');
+        console.error('Error requesting member removal:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Request Failed',
+          text: 'Failed to submit removal request. Please try again.',
+          confirmButtonColor: '#ef4444'
+        });
       }
     }
   }
@@ -656,6 +784,8 @@ export class HouseholdComponent implements OnInit {
     const classes: Record<string, string> = {
       'active': 'bg-gradient-to-r from-green-400 to-emerald-500 text-white',
       'pending_verification': 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white',
+      'pending_removal': 'bg-gradient-to-r from-orange-400 to-orange-500 text-white',
+      'rejected': 'bg-gradient-to-r from-red-400 to-rose-500 text-white',
       'claimed': 'bg-gradient-to-r from-blue-400 to-indigo-500 text-white'
     };
     return classes[status] || 'bg-gray-200 text-gray-600';
@@ -665,6 +795,8 @@ export class HouseholdComponent implements OnInit {
     const formats: Record<string, string> = {
       'active': 'Active',
       'pending_verification': 'Pending Review',
+      'pending_removal': 'Pending Removal',
+      'rejected': 'Rejected',
       'claimed': 'Claimed'
     };
     return formats[status] || status;
@@ -748,5 +880,14 @@ export class HouseholdComponent implements OnInit {
       age--;
     }
     return age;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Close member menu when clicking outside
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.openMemberMenuId = null;
+    }
   }
 }

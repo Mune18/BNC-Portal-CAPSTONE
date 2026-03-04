@@ -7,10 +7,11 @@ import { AdminService } from './admin.service';
 import { ComplaintService } from './complaint.service';
 import { ResidentUpdateService } from './resident-update.service';
 import { AnnouncementService } from './announcement.service';
+import { HouseholdService } from './household.service';
 
 export interface Notification {
   id: string;
-  type: 'new_registration' | 'complaint' | 'update_request' | 'announcement' | 'system';
+  type: 'new_registration' | 'complaint' | 'update_request' | 'announcement' | 'household_request' | 'system';
   title: string;
   message: string;
   timestamp: Date;
@@ -33,7 +34,8 @@ export class NotificationService extends BaseAppwriteService {
     private adminService: AdminService,
     private complaintService: ComplaintService,
     private residentUpdateService: ResidentUpdateService,
-    private announcementService: AnnouncementService
+    private announcementService: AnnouncementService,
+    private householdService: HouseholdService
   ) {
     super(router);
     this.loadReadNotifications();
@@ -48,19 +50,22 @@ export class NotificationService extends BaseAppwriteService {
         pendingRegistrations,
         pendingComplaints,
         pendingUpdateRequests,
-        recentAnnouncements
+        recentAnnouncements,
+        householdRequests
       ] = await Promise.all([
         this.getNewRegistrationNotifications(),
         this.getComplaintNotifications(),
         this.getUpdateRequestNotifications(),
-        this.getAnnouncementNotifications()
+        this.getAnnouncementNotifications(),
+        this.getHouseholdRequestNotifications()
       ]);
 
       notifications.push(
         ...pendingRegistrations,
         ...pendingComplaints,
         ...pendingUpdateRequests,
-        ...recentAnnouncements
+        ...recentAnnouncements,
+        ...householdRequests
       );
 
       // Sort by timestamp (newest first), then by priority
@@ -263,6 +268,195 @@ export class NotificationService extends BaseAppwriteService {
     }
   }
 
+  private async getHouseholdRequestNotifications(): Promise<Notification[]> {
+    try {
+      const pendingMembers = await this.householdService.getPendingHouseholdMembers();
+
+      return pendingMembers.map(member => {
+        const isAddition = member.status === 'pending_verification';
+        const isRemoval = member.status === 'pending_removal';
+        
+        const timestamp = isRemoval && member.removalRequestedAt 
+          ? new Date(member.removalRequestedAt) 
+          : new Date(member.createdAt);
+        
+        const hoursAgo = Math.floor((Date.now() - timestamp.getTime()) / (1000 * 60 * 60));
+        
+        // Determine priority based on how long it's been pending
+        let priority: 'low' | 'medium' | 'high' = 'medium';
+        if (hoursAgo > 48) priority = 'high'; // More than 2 days
+        else if (hoursAgo > 24) priority = 'medium'; // More than 1 day
+        else priority = 'low'; // Less than 1 day
+
+        const memberName = member.residentInfo 
+          ? `${member.residentInfo.firstName} ${member.residentInfo.lastName}`
+          : 'Unknown Member';
+
+        const title = isAddition 
+          ? 'New Household Member Request' 
+          : 'Household Member Removal Request';
+        
+        const message = isAddition
+          ? `Request to add ${memberName} (${member.relationship}) ${this.getTimeAgo(timestamp)}`
+          : `Request to remove ${memberName} (${member.relationship}) ${this.getTimeAgo(timestamp)}`;
+
+        return {
+          id: `household_${member.$id}`,
+          type: 'household_request' as const,
+          title,
+          message,
+          timestamp,
+          isRead: false,
+          actionUrl: `/admin/household-requests?highlight=${member.$id}`,
+          priority,
+          relatedId: member.$id
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching household request notifications:', error);
+      return [];
+    }
+  }
+
+  private async getUserHouseholdNotifications(userId: string): Promise<Notification[]> {
+    try {
+      // Get the user's resident ID
+      const resident = await this.database.listDocuments(
+        environment.appwriteDatabaseId,
+        environment.residentCollectionId,
+        [Query.equal('userId', userId)]
+      );
+
+      if (resident.documents.length === 0) {
+        return [];
+      }
+
+      const residentId = resident.documents[0].$id;
+
+      // Get household for this resident
+      const household = await this.householdService.getHouseholdForResident(residentId);
+      if (!household) {
+        return [];
+      }
+
+      // Get all household members
+      const householdWithMembers = await this.householdService.getHouseholdWithMembers(household.$id!);
+      if (!householdWithMembers) {
+        return [];
+      }
+
+      const notifications: Notification[] = [];
+
+      // Only show notifications to the household head
+      if (household.headOfHouseholdId === residentId) {
+        const now = Date.now();
+        const sevenDaysAgo = now - (7 * 24 * 60 * 60 * 1000);
+
+        householdWithMembers.members.forEach(member => {
+          const memberName = member.residentInfo 
+            ? `${member.residentInfo.firstName} ${member.residentInfo.lastName}`
+            : 'Unknown Member';
+
+          // Show pending requests
+          if (member.status === 'pending_verification' || member.status === 'pending_removal') {
+            const isAddition = member.status === 'pending_verification';
+            const timestamp = member.status === 'pending_removal' && member.removalRequestedAt
+              ? new Date(member.removalRequestedAt)
+              : new Date(member.createdAt);
+
+            const title = isAddition 
+              ? 'Household Addition Pending' 
+              : 'Household Removal Pending';
+            
+            const message = isAddition
+              ? `Request to add ${memberName} is awaiting admin approval`
+              : `Request to remove ${memberName} is awaiting admin approval`;
+
+            notifications.push({
+              id: `user_household_pending_${member.$id}`,
+              type: 'household_request' as const,
+              title,
+              message,
+              timestamp,
+              isRead: false,
+              actionUrl: `/user/household?highlight=${member.$id}`,
+              priority: 'medium' as const,
+              relatedId: member.$id
+            });
+          }
+
+          // Show recently approved additions (active status with recent updatedAt)
+          if (member.status === 'active' && member.updatedAt && member.relationship !== 'Head') {
+            const updatedAt = new Date(member.updatedAt).getTime();
+            const createdAt = new Date(member.createdAt).getTime();
+            
+            // If updatedAt is different from createdAt and within last 7 days, it was recently approved
+            if (updatedAt > createdAt && updatedAt > sevenDaysAgo) {
+              notifications.push({
+                id: `user_household_approved_${member.$id}`,
+                type: 'household_request' as const,
+                title: 'Household Member Approved',
+                message: `${memberName} has been approved and added to your household`,
+                timestamp: new Date(member.updatedAt),
+                isRead: false,
+                actionUrl: `/user/household?highlight=${member.$id}`,
+                priority: 'high' as const,
+                relatedId: member.$id
+              });
+            }
+          }
+
+          // Show rejected additions (within last 7 days)
+          if (member.status === 'rejected' && member.rejectedAt) {
+            const rejectedAt = new Date(member.rejectedAt).getTime();
+            
+            if (rejectedAt > sevenDaysAgo) {
+              const message = member.rejectionReason
+                ? `Request to add ${memberName} was rejected. Reason: ${member.rejectionReason}`
+                : `Request to add ${memberName} was rejected by admin`;
+
+              notifications.push({
+                id: `user_household_rejected_${member.$id}`,
+                type: 'household_request' as const,
+                title: 'Household Addition Rejected',
+                message,
+                timestamp: new Date(member.rejectedAt),
+                isRead: false,
+                actionUrl: `/user/household`,
+                priority: 'high' as const,
+                relatedId: member.$id
+              });
+            }
+          }
+
+          // Show denied removal requests (within last 7 days)
+          if (member.status === 'active' && member.removalDeniedAt) {
+            const deniedAt = new Date(member.removalDeniedAt).getTime();
+            
+            if (deniedAt > sevenDaysAgo) {
+              notifications.push({
+                id: `user_household_removal_denied_${member.$id}`,
+                type: 'household_request' as const,
+                title: 'Removal Request Denied',
+                message: `Your request to remove ${memberName} was denied. Member remains in household.`,
+                timestamp: new Date(member.removalDeniedAt),
+                isRead: false,
+                actionUrl: `/user/household?highlight=${member.$id}`,
+                priority: 'high' as const,
+                relatedId: member.$id
+              });
+            }
+          }
+        });
+      }
+
+      return notifications;
+    } catch (error) {
+      console.error('Error fetching user household notifications:', error);
+      return [];
+    }
+  }
+
   async getUnreadCount(): Promise<number> {
     const notifications = await this.getAllNotifications();
     return notifications.filter(n => !n.isRead).length;
@@ -331,6 +525,8 @@ export class NotificationService extends BaseAppwriteService {
         return 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z';
       case 'announcement':
         return 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z';
+      case 'household_request':
+        return 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6';
       default:
         return 'M15 17h5l-5 5v-5zM4 7h16M4 12h16M4 17h11';
     }
@@ -346,6 +542,8 @@ export class NotificationService extends BaseAppwriteService {
         return 'text-yellow-600 bg-yellow-100';
       case 'announcement':
         return 'text-green-600 bg-green-100';
+      case 'household_request':
+        return 'text-purple-600 bg-purple-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
@@ -359,17 +557,20 @@ export class NotificationService extends BaseAppwriteService {
       const [
         userComplaints,
         userUpdateRequests,
-        recentAnnouncements
+        recentAnnouncements,
+        userHouseholdNotifications
       ] = await Promise.all([
         this.getUserComplaintNotifications(userId),
         this.getUserUpdateRequestNotifications(userId),
-        this.getUserAnnouncementNotifications()
+        this.getUserAnnouncementNotifications(),
+        this.getUserHouseholdNotifications(userId)
       ]);
 
       notifications.push(
         ...userComplaints,
         ...userUpdateRequests,
-        ...recentAnnouncements
+        ...recentAnnouncements,
+        ...userHouseholdNotifications
       );
 
       // Sort by timestamp (newest first), then by priority
